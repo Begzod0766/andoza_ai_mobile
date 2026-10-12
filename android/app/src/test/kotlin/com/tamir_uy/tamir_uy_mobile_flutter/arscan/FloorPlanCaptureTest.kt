@@ -150,4 +150,62 @@ class FloorPlanCaptureTest {
         assertEquals(2, m["trackingLossCount"])
         assertEquals(95, m["durationSec"])
     }
+
+    // ── auto corners ───────────────────────────────────────────────────────
+    private fun seg(ax: Float, az: Float, bx: Float, bz: Float) = WallSegment(0, ax, az, bx, bz)
+
+    private fun cand(x: Float, z: Float, a: WallSegment, b: WallSegment = seg(x, z, x, z + 1f)) =
+        CornerCandidate(0L, x, z, stable = true, wallA = a, wallB = b)
+
+    @Test fun `first auto corner is accepted`() {
+        assertTrue(FloorPlanCapture().acceptsAuto(cand(1f, 1f, seg(0f, 1f, 4f, 1f))))
+    }
+
+    @Test fun `auto corner must share a wall with the last corner`() {
+        val c = FloorPlanCapture()
+        c.addCorner(Vec3(0f, 0f, 0f))
+        assertTrue(c.acceptsAuto(cand(4f, 0f, seg(0f, 0f, 4f, 0f), seg(4f, 0f, 4f, 3f))))
+        assertFalse(c.acceptsAuto(cand(4f, 3f, seg(4f, 0f, 4f, 3f), seg(4f, 3f, 0f, 3f))))
+    }
+
+    @Test fun `a candidate on an existing corner is not added again`() {
+        val c = FloorPlanCapture()
+        c.addCorner(Vec3(0f, 0f, 0f))
+        c.addCorner(Vec3(4f, 0f, 0f))
+        assertFalse(c.acceptsAuto(cand(4.05f, 0f, seg(0f, 0f, 4f, 0f), seg(4f, 0f, 4f, 3f))))
+    }
+
+    @Test fun `a candidate on the first corner closes once there are three corners`() {
+        val two = FloorPlanCapture()
+        two.addCorner(Vec3(0f, 0f, 0f))
+        two.addCorner(Vec3(4f, 0f, 0f))
+        assertFalse(two.acceptsAuto(cand(0.05f, 0f, seg(4f, 0f, 0f, 0f), seg(0f, 3f, 0f, 0f))))
+
+        val c = FloorPlanCapture()
+        square(c)
+        assertTrue(c.acceptsAuto(cand(0.05f, 0f, seg(0f, 3f, 0f, 0f), seg(0f, 0f, 4f, 0f))))
+    }
+
+    @Test fun `undoing an auto corner rejects that spot for auto only`() {
+        val c = FloorPlanCapture()
+        c.addCorner(Vec3(0f, 0f, 0f), auto = true)
+        assertTrue(c.undo())
+        assertFalse(c.acceptsAuto(cand(0.1f, 0f, seg(0f, 0f, 4f, 0f))))
+        assertEquals(AddResult.ADDED, c.addCorner(Vec3(0.1f, 0f, 0f), auto = false))
+    }
+
+    @Test fun `undoing a manual corner rejects nothing`() {
+        val c = FloorPlanCapture()
+        c.addCorner(Vec3(0f, 0f, 0f))
+        assertTrue(c.undo())
+        assertTrue(c.acceptsAuto(cand(0f, 0f, seg(0f, 0f, 4f, 0f))))
+    }
+
+    @Test fun `closed outline accepts nothing`() {
+        val c = FloorPlanCapture()
+        square(c)
+        c.addCorner(Vec3(0.1f, 0f, 0.1f))
+        assertTrue(c.isClosed)
+        assertFalse(c.acceptsAuto(cand(2f, 2f, seg(0f, 2f, 4f, 2f))))
+    }
 }

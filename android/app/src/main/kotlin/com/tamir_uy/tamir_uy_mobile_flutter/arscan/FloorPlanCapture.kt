@@ -21,6 +21,14 @@ class FloorPlanCapture(val snapDistanceM: Float = 0.20f) {
     // frame while the UI thread may read it (a tap on "Tasdiqlash").
     @Volatile private var points: List<Vec3> = emptyList()
 
+    // Parallel to [points]: whether that corner was taken on its own from a
+    // wall corner (not by the user). Only the GL thread reads it.
+    private var autoFlags: List<Boolean> = emptyList()
+
+    // Where the user undid an auto corner: never auto-added there again
+    // (they can still snap or hold there on purpose).
+    private var rejected: List<Vec3> = emptyList()
+
     /** Height of the floor plane — the first corner's Y; later corners are pinned to it. */
     @Volatile var floorY: Float? = null
         private set
@@ -42,11 +50,12 @@ class FloorPlanCapture(val snapDistanceM: Float = 0.20f) {
         !isClosed && points.size >= 3 &&
             hypot(p.x - points[0].x, p.z - points[0].z) <= snapDistanceM
 
-    fun addCorner(p: Vec3): AddResult {
+    fun addCorner(p: Vec3, auto: Boolean = false): AddResult {
         if (isClosed) return AddResult.REJECTED_CLOSED
         val y = floorY ?: p.y.also { floorY = it }
         val snap = wouldSnap(p)
         points = points + Vec3(p.x, y, p.z)
+        autoFlags = autoFlags + auto
         if (snap) {
             isClosed = true
             return AddResult.CLOSED
@@ -56,7 +65,9 @@ class FloorPlanCapture(val snapDistanceM: Float = 0.20f) {
 
     fun undo(): Boolean {
         if (points.isEmpty()) return false
+        if (autoFlags.lastOrNull() == true) rejected = rejected + points.last()
         points = points.dropLast(1)
+        autoFlags = autoFlags.dropLast(1)
         isClosed = false
         if (points.isEmpty()) floorY = null
         return true
@@ -70,6 +81,7 @@ class FloorPlanCapture(val snapDistanceM: Float = 0.20f) {
     fun reopen(): Boolean {
         if (!isClosed) return false
         points = points.dropLast(1)
+        autoFlags = autoFlags.dropLast(1)
         isClosed = false
         return true
     }
@@ -87,6 +99,7 @@ class FloorPlanCapture(val snapDistanceM: Float = 0.20f) {
         val firstLost = positions.indexOfFirst { it == null }
         val keep = if (firstLost < 0) positions.size else firstLost
         points = positions.take(keep).map { Vec3(it!!.x, y, it.z) }
+        autoFlags = autoFlags.take(keep)
         val lost = current.size - keep
         if (lost > 0) isClosed = false
         return lost
@@ -116,6 +129,29 @@ class FloorPlanCapture(val snapDistanceM: Float = 0.20f) {
         return t.takeIf { it in MIN_HEIGHT_M..MAX_HEIGHT_M }
     }
 
+    /**
+     * Whether a wall corner may be added without the user doing anything:
+     * the outline is open, it isn't a spot the user undid, it isn't an
+     * existing corner (the first one only once it would close the outline),
+     * and it continues the outline — the last corner lies on one of its walls.
+     */
+    fun acceptsAuto(c: CornerCandidate): Boolean {
+        if (isClosed) return false
+        if (rejected.any { hypot(it.x - c.x, it.z - c.z) <= REJECT_RADIUS_M }) return false
+        val current = points
+        current.forEachIndexed { i, p ->
+            if (hypot(p.x - c.x, p.z - c.z) <= snapDistanceM) return i == 0 && current.size >= 3
+        }
+        val last = current.lastOrNull() ?: return true
+        return lineDistance(last, c.wallA) <= ON_WALL_M || lineDistance(last, c.wallB) <= ON_WALL_M
+    }
+
+    private fun lineDistance(p: Vec3, w: WallSegment): Float {
+        val len = w.length
+        if (len < 1e-6f) return hypot(p.x - w.ax, p.z - w.az)
+        return abs((p.x - w.ax) * (w.bz - w.az) - (p.z - w.az) * (w.bx - w.ax)) / len
+    }
+
     fun toResult(height: Float, heightMeasured: Boolean, durationSec: Int): Map<String, Any> = mapOf(
         "corners" to points.map { listOf(it.x.toDouble(), it.z.toDouble()) },
         "height" to height.toDouble(),
@@ -127,6 +163,8 @@ class FloorPlanCapture(val snapDistanceM: Float = 0.20f) {
 
     companion object {
         const val MIN_HEIGHT_M = 1.8f
+        const val ON_WALL_M = 0.15f
+        const val REJECT_RADIUS_M = 0.20f
         const val MAX_HEIGHT_M = 4.5f
     }
 }
