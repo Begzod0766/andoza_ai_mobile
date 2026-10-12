@@ -33,6 +33,14 @@ data class OverlayState(
     val closed: Boolean = false,
     val heightAxis: Pair<Pair<Float, Float>, Pair<Float, Float>>? = null,
     val heightLabel: String? = null,
+    /** Walls ARCore found, as floor lines. */
+    val walls: List<Pair<Pair<Float, Float>, Pair<Float, Float>>> = emptyList(),
+    /** Where walls meet — corners that can go in on their own. */
+    val candidates: List<Pair<Float, Float>> = emptyList(),
+    /** 0–1: how long the target has been held still. */
+    val dwell: Float = 0f,
+    /** Target drawn here when snapped to a wall corner; null = screen centre. */
+    val reticleAt: Pair<Float, Float>? = null,
 )
 
 /** Transparent view over the camera: outline, corner dots, lengths and the aim reticle. */
@@ -42,6 +50,9 @@ class ArOverlayView(context: Context) : View(context) {
     private val dot = Paint(Paint.ANTI_ALIAS_FLAG).apply { color = Color.rgb(40, 80, 208) }
     private val ring = Paint(Paint.ANTI_ALIAS_FLAG).apply { color = Color.WHITE; style = Paint.Style.STROKE; strokeWidth = 2.5f * density }
     private val text = Paint(Paint.ANTI_ALIAS_FLAG).apply { color = Color.WHITE; textSize = 14f * density; textAlign = Paint.Align.CENTER; setShadowLayer(4f, 0f, 0f, Color.BLACK) }
+    private val wall = Paint(Paint.ANTI_ALIAS_FLAG).apply { color = Color.rgb(59, 130, 246); strokeWidth = 3f * density; strokeCap = Paint.Cap.ROUND }
+    private val candidate = Paint(Paint.ANTI_ALIAS_FLAG).apply { color = Color.WHITE; style = Paint.Style.STROKE; strokeWidth = 2.5f * density }
+    private val progress = Paint(Paint.ANTI_ALIAS_FLAG).apply { color = Color.rgb(59, 130, 246); style = Paint.Style.STROKE; strokeWidth = 4f * density; strokeCap = Paint.Cap.ROUND }
     private val axis = Paint(Paint.ANTI_ALIAS_FLAG).apply { color = Color.rgb(249, 115, 22); strokeWidth = 3f * density }
 
     var state = OverlayState()
@@ -49,6 +60,8 @@ class ArOverlayView(context: Context) : View(context) {
 
     override fun onDraw(canvas: Canvas) {
         val s = state
+        for ((a, b) in s.walls) canvas.drawLine(a.first, a.second, b.first, b.second, wall)
+        for (c in s.candidates) canvas.drawCircle(c.first, c.second, 9f * density, candidate)
         val pts = s.corners
         for (i in 0 until pts.size - 1) {
             val a = pts[i] ?: continue
@@ -65,14 +78,19 @@ class ArOverlayView(context: Context) : View(context) {
         s.heightLabel?.let { canvas.drawText(it, width / 2f, height / 2f - 40f * density, text) }
 
         // Aim reticle in the centre: white ring, blue when it would snap.
-        val cx = width / 2f; val cy = height / 2f
+        val cx = s.reticleAt?.first ?: (width / 2f)
+        val cy = s.reticleAt?.second ?: (height / 2f)
         ring.color = when {
-            s.snapping -> Color.rgb(40, 80, 208)
+            s.snapping || s.reticleAt != null -> Color.rgb(40, 80, 208)
             s.reticleOnFloor -> Color.WHITE
             else -> Color.argb(110, 255, 255, 255)
         }
         canvas.drawCircle(cx, cy, 18f * density, ring)
         canvas.drawCircle(cx, cy, 2.5f * density, ring)
+        if (s.dwell > 0f) {
+            val r = 18f * density
+            canvas.drawArc(cx - r, cy - r, cx + r, cy + r, -90f, 360f * s.dwell, false, progress)
+        }
     }
 
     companion object {

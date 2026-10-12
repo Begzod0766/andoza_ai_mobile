@@ -534,7 +534,7 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get arScanCornersHint =>
-      'Наведите прицел на угол пола и добавьте угол';
+      'Медленно покажите стены — углы добавятся сами. Или задержите прицел на углу';
 
   @override
   String get arScanAddCorner => 'Добавить угол';

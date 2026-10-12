@@ -660,7 +660,7 @@
   "newProjectArScanTitle": "Measure with camera",
   "newProjectArScanDesc": "Mark the floor corners with your phone camera to get the room plan",
   "arScanFindFloor": "Point the phone at the floor and move it slowly",
-  "arScanCornersHint": "Put the target on a floor corner and add it",
+  "arScanCornersHint": "Slowly show the walls — corners add themselves. Or hold the target on a corner",
   "arScanAddCorner": "Add corner",
   "arScanUndo": "Undo",
   "arScanFinish": "Done",

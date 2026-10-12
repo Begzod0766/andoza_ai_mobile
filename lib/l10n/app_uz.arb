@@ -709,7 +709,7 @@
   "@arScanFindFloor": {
     "description": "Android ARCore floor-plan scanner"
   },
-  "arScanCornersHint": "Nishonni pol burchagiga keltirib, burchak qo'shing",
+  "arScanCornersHint": "Devorlarni sekin ko'rsating — burchaklar o'zi qo'shiladi. Yoki nishonni burchakda ushlab turing",
   "@arScanCornersHint": {
     "description": "Android ARCore floor-plan scanner"
   },

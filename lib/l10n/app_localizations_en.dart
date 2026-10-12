@@ -541,7 +541,8 @@ class AppLocalizationsEn extends AppLocalizations {
       'Point the phone at the floor and move it slowly';
 
   @override
-  String get arScanCornersHint => 'Put the target on a floor corner and add it';
+  String get arScanCornersHint =>
+      'Slowly show the walls — corners add themselves. Or hold the target on a corner';
 
   @override
   String get arScanAddCorner => 'Add corner';

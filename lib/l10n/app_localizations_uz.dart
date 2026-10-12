@@ -532,7 +532,7 @@ class AppLocalizationsUz extends AppLocalizations {
 
   @override
   String get arScanCornersHint =>
-      'Nishonni pol burchagiga keltirib, burchak qo\'shing';
+      'Devorlarni sekin ko\'rsating — burchaklar o\'zi qo\'shiladi. Yoki nishonni burchakda ushlab turing';
 
   @override
   String get arScanAddCorner => 'Burchak qo\'shish';

@@ -9,10 +9,12 @@ import android.graphics.Color
 import android.graphics.drawable.GradientDrawable
 import android.opengl.GLES20
 import android.opengl.GLSurfaceView
+import android.os.Build
 import android.os.Bundle
 import android.os.SystemClock
 import android.util.Log
 import android.view.Gravity
+import android.view.HapticFeedbackConstants
 import android.view.View
 import android.widget.Button
 import android.widget.FrameLayout
@@ -23,6 +25,7 @@ import com.google.ar.core.ArCoreApk
 import com.google.ar.core.Config
 import com.google.ar.core.HitResult
 import com.google.ar.core.Plane
+import com.google.ar.core.Pose
 import com.google.ar.core.Session
 import com.google.ar.core.TrackingFailureReason
 import com.google.ar.core.TrackingState
@@ -56,6 +59,8 @@ class ArScanActivity : Activity(), GLSurfaceView.Renderer {
         private const val CAMERA_REQUEST = 4202
         private const val FLOOR_HINT_AFTER_MS = 20_000L
         private const val NOTICE_MS = 2_500L
+        // The target snaps onto a wall corner this close to it (metres).
+        private const val SNAP_M = 0.15f
         private val PRESET_HEIGHTS = floatArrayOf(2.5f, 2.7f, 2.8f, 3.0f, 3.2f)
         private const val TAG = "ArScan"
     }
@@ -76,7 +81,7 @@ class ArScanActivity : Activity(), GLSurfaceView.Renderer {
         "arScanTrackingLost" to "Yorug'lik kam yoki telefon tez harakatlandi",
         "arScanFloorHint" to "Yorug'roq joyda, gilam yoki naqshli polga qarating",
         "arScanSnapToFirst" to "Birinchi burchakka yaqinlashing — kontur yopiladi",
-        "arScanCornersHint" to "Nishonni pol burchagiga keltirib, burchak qo'shing",
+        "arScanCornersHint" to "Devorlarni sekin ko'rsating — burchaklar o'zi qo'shiladi. Yoki nishonni burchakda ushlab turing",
         "arScanCornersLost" to "Ba'zi burchaklar yo'qoldi — ularni qayta belgilang",
         "arScanNoFloorHere" to "Avval polni skaner qiling",
         "arScanKeepMeasuring" to "O'lchashni davom ettirish",
@@ -103,6 +108,13 @@ class ArScanActivity : Activity(), GLSurfaceView.Renderer {
     private val capture = FloorPlanCapture()
     private val anchors = mutableListOf<Anchor>()
     private var lastFloorHit: HitResult? = null
+    private var lastFloorY: Float? = null
+    private val walls = WallTracker()
+    private val dwell = DwellDetector()
+    private val planeIds = HashMap<Plane, Int>()
+    private var nextPlaneId = 1
+    // Set on the GL thread when a corner goes in; the UI thread buzzes once.
+    @Volatile private var cornerAdded = false
     @Volatile private var liveHeight: Float? = null
     @Volatile private var tracking = false
     private var wasTracking = false
@@ -283,16 +295,48 @@ class ArScanActivity : Activity(), GLSurfaceView.Renderer {
             noFloorUntil = SystemClock.elapsedRealtime() + NOTICE_MS
             return
         }
-        val anchor = hit.createAnchor()
+        place(hit.createAnchor(), auto = false)
+    }
+
+    /** GL thread: a corner where two walls meet, on the floor. */
+    private fun addCornerAt(x: Float, z: Float, auto: Boolean) {
+        if (!capture.canAddCorner(tracking = tracking)) return
+        val s = session ?: return
+        val y = capture.floorY ?: lastFloorY ?: return
+        place(s.createAnchor(Pose.makeTranslation(x, y, z)), auto)
+    }
+
+    /** GL thread. */
+    private fun place(anchor: Anchor, auto: Boolean) {
         val t = anchor.pose
         cornersLost = false
         noFloorUntil = 0L
-        when (capture.addCorner(Vec3(t.tx(), t.ty(), t.tz()))) {
+        when (capture.addCorner(Vec3(t.tx(), t.ty(), t.tz()), auto)) {
             AddResult.REJECTED_CLOSED -> anchor.detach()
-            AddResult.CLOSED -> { anchors.add(anchor); step = Step.HEIGHT }
-            AddResult.ADDED -> { anchors.add(anchor); step = Step.CORNERS }
+            AddResult.CLOSED -> { anchors.add(anchor); step = Step.HEIGHT; cornerAdded = true }
+            AddResult.ADDED -> { anchors.add(anchor); step = Step.CORNERS; cornerAdded = true }
         }
     }
+
+    /** GL thread: this frame's vertical planes as floor-level wall pieces. */
+    private fun wallObservations(s: Session): List<WallObs> =
+        s.getAllTrackables(Plane::class.java).mapNotNull { plane ->
+            if (plane.type != Plane.Type.VERTICAL || plane.trackingState != TrackingState.TRACKING ||
+                plane.subsumedBy != null
+            ) return@mapNotNull null
+            val pose = plane.centerPose
+            val poly = plane.polygon
+            val world = ArrayList<Vec3>(poly.limit() / 2)
+            var i = 0
+            while (i + 1 < poly.limit()) {
+                val w = pose.transformPoint(floatArrayOf(poly.get(i), 0f, poly.get(i + 1)))
+                world += Vec3(w[0], w[1], w[2])
+                i += 2
+            }
+            val n = pose.yAxis
+            val id = planeIds.getOrPut(plane) { nextPlaneId++ }
+            wallObsFrom(id, Vec3(pose.tx(), pose.ty(), pose.tz()), Vec3(n[0], n[1], n[2]), world)
+        }
 
     private fun confirmExit() {
         AlertDialog.Builder(this)
@@ -459,6 +503,37 @@ class ArScanActivity : Activity(), GLSurfaceView.Renderer {
             }
             if (step == Step.FIND_FLOOR && lastFloorHit != null) step = Step.CORNERS
             val reticle = lastFloorHit?.hitPose?.let { Vec3(it.tx(), it.ty(), it.tz()) }
+            if (reticle != null) lastFloorY = reticle.y
+
+            // Walls and their corners: a corner that holds still goes in on its
+            // own; otherwise the target snaps to a nearby one, and holding the
+            // target still adds a corner (snapped or on the bare floor).
+            var wallFrame: WallFrame? = null
+            var snapTo: CornerCandidate? = null
+            var dwellProgress = 0f
+            if (step == Step.CORNERS && tracking && !capture.isClosed) {
+                val now = SystemClock.elapsedRealtime()
+                val wf = walls.update(wallObservations(s), now)
+                wallFrame = wf
+                val auto = wf.candidates.firstOrNull { it.stable && capture.acceptsAuto(it) }
+                if (auto != null) {
+                    addCornerAt(auto.x, auto.z, auto = true)
+                    dwell.reset()
+                } else {
+                    snapTo = reticle?.let { r ->
+                        wf.candidates.minByOrNull { kotlin.math.hypot(it.x - r.x, it.z - r.z) }
+                            ?.takeIf { kotlin.math.hypot(it.x - r.x, it.z - r.z) <= SNAP_M }
+                    }
+                    val d = dwell.update(reticle, now)
+                    dwellProgress = d.progress
+                    if (d.fired) {
+                        val target = snapTo
+                        if (target != null) addCornerAt(target.x, target.z, auto = false) else addCorner()
+                    }
+                }
+            } else {
+                dwell.reset()
+            }
 
             // Ceiling height along the first corner's vertical axis.
             liveHeight = if (step == Step.HEIGHT && tracking) {
@@ -485,6 +560,14 @@ class ArScanActivity : Activity(), GLSurfaceView.Renderer {
                 if (a != null && b != null) Pair(a, b) else null
             } else null
             val snapping = reticle != null && capture.wouldSnap(reticle)
+            val wallY = capture.floorY ?: lastFloorY
+            val wallLines = if (wallFrame == null || wallY == null) emptyList() else wallFrame.walls.mapNotNull { w ->
+                val a = pr.project(Vec3(w.ax, wallY, w.az)); val b = pr.project(Vec3(w.bx, wallY, w.bz))
+                if (a == null || b == null) null else Pair(a, b)
+            }
+            val candidateDots = if (wallFrame == null || wallY == null) emptyList() else
+                wallFrame.candidates.mapNotNull { pr.project(Vec3(it.x, wallY, it.z)) }
+            val reticleAt = snapTo?.let { t -> wallY?.let { pr.project(Vec3(t.x, it, t.z)) } }
             val trackingHint = if (tracking) null else when (camera.trackingFailureReason) {
                 TrackingFailureReason.NONE -> null
                 else -> s("arScanTrackingLost")
@@ -493,6 +576,7 @@ class ArScanActivity : Activity(), GLSurfaceView.Renderer {
                 corners = projected, labels = labels, reticleOnFloor = reticle != null,
                 snapping = snapping, closed = capture.isClosed, heightAxis = axis,
                 heightLabel = liveHeight?.let { ArOverlayView.metres(it) },
+                walls = wallLines, candidates = candidateDots, dwell = dwellProgress, reticleAt = reticleAt,
             )
             val n = corners.size
             val height = liveHeight
@@ -501,8 +585,13 @@ class ArScanActivity : Activity(), GLSurfaceView.Renderer {
                 SystemClock.elapsedRealtime() < noFloorUntil -> s("arScanNoFloorHere")
                 else -> null
             }
+            val buzz = cornerAdded
+            cornerAdded = false
             runOnUiThread {
                 overlay.state = state
+                if (buzz) overlay.performHapticFeedback(
+                    if (Build.VERSION.SDK_INT >= 30) HapticFeedbackConstants.CONFIRM else HapticFeedbackConstants.VIRTUAL_KEY,
+                )
                 render(trackingHint, snapping, n, height, notice)
             }
         } catch (e: Exception) {

@@ -1063,7 +1063,7 @@ abstract class AppLocalizations {
   /// Android ARCore floor-plan scanner
   ///
   /// In uz, this message translates to:
-  /// **'Nishonni pol burchagiga keltirib, burchak qo\'shing'**
+  /// **'Devorlarni sekin ko\'rsating — burchaklar o\'zi qo\'shiladi. Yoki nishonni burchakda ushlab turing'**
   String get arScanCornersHint;
 
   /// Android ARCore floor-plan scanner
