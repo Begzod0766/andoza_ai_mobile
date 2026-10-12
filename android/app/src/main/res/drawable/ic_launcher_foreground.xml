@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Adaptive icon foreground: the ladder "A" from branding/logo/icon-maskable.svg,
+     kept inside the 66dp safe zone (the SVG's translate(256 256) scale(.6) translate(-256 -254)). -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:aapt="http://schemas.android.com/aapt"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="512"
+    android:viewportHeight="512">
+    <group
+        android:scaleX="0.6"
+        android:scaleY="0.6"
+        android:translateX="102.4"
+        android:translateY="103.6">
+        <path
+            android:fillAlpha="0.16"
+            android:fillColor="#FFFFFFFF"
+            android:pathData="M86,436 A170,13 0 1,0 426,436 A170,13 0 1,0 86,436 Z" />
+        <path
+            android:pathData="M84,436 H428"
+            android:strokeAlpha="0.55"
+            android:strokeColor="#FFFFFFFF"
+            android:strokeLineCap="round"
+            android:strokeWidth="12" />
+        <path
+            android:pathData="M216,96 L112,400"
+            android:strokeLineCap="round"
+            android:strokeWidth="42">
+            <aapt:attr name="android:strokeColor">
+                <gradient android:type="linear"
+                    android:startX="0" android:startY="96"
+                    android:endX="0" android:endY="400">
+                    <item android:offset="0" android:color="#FFFFFFFF" />
+                    <item android:offset="1" android:color="#FFC7D6FF" />
+                </gradient>
+            </aapt:attr>
+        </path>
+        <path
+            android:pathData="M296,96 L400,400"
+            android:strokeLineCap="round"
+            android:strokeWidth="42">
+            <aapt:attr name="android:strokeColor">
+                <gradient android:type="linear"
+                    android:startX="0" android:startY="96"
+                    android:endX="0" android:endY="400">
+                    <item android:offset="0" android:color="#FFFFFFFF" />
+                    <item android:offset="1" android:color="#FFC7D6FF" />
+                </gradient>
+            </aapt:attr>
+        </path>
+        <path
+            android:pathData="M184.9,187 L327.1,187"
+            android:strokeColor="#FF9DB8FF"
+            android:strokeLineCap="round"
+            android:strokeWidth="32" />
+        <path
+            android:pathData="M156.8,269 L355.2,269"
+            android:strokeColor="#FFFDBA74"
+            android:strokeLineCap="round"
+            android:strokeWidth="32" />
+        <path
+            android:pathData="M128.8,351 L383.2,351"
+            android:strokeColor="#FF9DB8FF"
+            android:strokeLineCap="round"
+            android:strokeWidth="32" />
+        <path android:pathData="M205,58 H307 A19,19 0 0,1 307,96 H205 A19,19 0 0,1 205,58 Z">
+            <aapt:attr name="android:fillColor">
+                <gradient android:type="linear"
+                    android:startX="0" android:startY="96"
+                    android:endX="0" android:endY="400">
+                    <item android:offset="0" android:color="#FFFFFFFF" />
+                    <item android:offset="1" android:color="#FFC7D6FF" />
+                </gradient>
+            </aapt:attr>
+        </path>
+    </group>
+</vector>
