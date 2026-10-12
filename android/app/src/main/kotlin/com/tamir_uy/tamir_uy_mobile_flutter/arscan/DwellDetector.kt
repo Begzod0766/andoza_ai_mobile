@@ -43,9 +43,9 @@ class DwellDetector(
         return Dwell(1f, fired = true)
     }
 
-    fun reset() {
+    /** Start the hold over (target lost, a corner went in elsewhere) — but still don't fire again where it last fired. */
+    fun clearProgress() {
         anchor = null
-        firedAt = null
     }
 
     private fun dist(a: Vec3, b: Vec3) = hypot(a.x - b.x, a.z - b.z)

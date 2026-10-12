@@ -55,4 +55,16 @@ class DwellDetectorTest {
         assertFalse(d.update(p(0f), 1500).fired)
         assertTrue(d.update(p(0f), 1600).fired)
     }
+
+    @Test fun `clearing progress keeps the fire-once rule`() {
+        val d = DwellDetector()
+        d.update(p(0f), 0)
+        assertTrue(d.update(p(0f), 1000).fired)
+        d.clearProgress()
+        var t = 1100L
+        while (t <= 4000L) {
+            assertFalse(d.update(p(0f), t).fired)
+            t += 100
+        }
+    }
 }

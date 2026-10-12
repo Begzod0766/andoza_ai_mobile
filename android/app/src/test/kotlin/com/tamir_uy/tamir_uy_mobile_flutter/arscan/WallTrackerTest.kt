@@ -112,4 +112,9 @@ class WallTrackerTest {
         assertEquals(2f, o.halfLength, 1e-4f)
         assertNull(wallObsFrom(7, Vec3(2f, 1f, 0f), Vec3(0f, 1f, 0f), poly))
     }
+
+    @Test fun `walls on one line with a doorway between stay apart`() {
+        val f = WallTracker().update(listOf(wall(1, 0f, 0f, 1f, 0f), wall(2, 2f, 0f, 4f, 0f)), 0)
+        assertEquals(2, f.walls.size)
+    }
 }

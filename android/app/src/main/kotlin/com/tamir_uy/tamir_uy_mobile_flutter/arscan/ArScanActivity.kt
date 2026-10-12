@@ -115,6 +115,8 @@ class ArScanActivity : Activity(), GLSurfaceView.Renderer {
     private var nextPlaneId = 1
     // Set on the GL thread when a corner goes in; the UI thread buzzes once.
     @Volatile private var cornerAdded = false
+    // The wall corner the target is snapped to this frame (the button uses it too).
+    private var snapTarget: CornerCandidate? = null
     @Volatile private var liveHeight: Float? = null
     @Volatile private var tracking = false
     private var wasTracking = false
@@ -258,7 +260,7 @@ class ArScanActivity : Activity(), GLSurfaceView.Renderer {
 
     private fun onMain() = onGl {
         when (step) {
-            Step.FIND_FLOOR, Step.CORNERS -> addCorner()
+            Step.FIND_FLOOR, Step.CORNERS -> snapTarget?.let { addCornerAt(it.x, it.z, auto = false) } ?: addCorner()
             Step.HEIGHT -> liveHeight?.let { finishWith(it, measured = true) }
         }
     }
@@ -518,22 +520,29 @@ class ArScanActivity : Activity(), GLSurfaceView.Renderer {
                 val auto = wf.candidates.firstOrNull { it.stable && capture.acceptsAuto(it) }
                 if (auto != null) {
                     addCornerAt(auto.x, auto.z, auto = true)
-                    dwell.reset()
+                    dwell.clearProgress()
                 } else {
+                    // Never snap onto a placed corner (a zero-length wall), except the first to close.
                     snapTo = reticle?.let { r ->
-                        wf.candidates.minByOrNull { kotlin.math.hypot(it.x - r.x, it.z - r.z) }
+                        wf.candidates.filter { capture.isNewSpot(it.x, it.z) }
+                            .minByOrNull { kotlin.math.hypot(it.x - r.x, it.z - r.z) }
                             ?.takeIf { kotlin.math.hypot(it.x - r.x, it.z - r.z) <= SNAP_M }
                     }
                     val d = dwell.update(reticle, now)
                     dwellProgress = d.progress
                     if (d.fired) {
                         val target = snapTo
-                        if (target != null) addCornerAt(target.x, target.z, auto = false) else addCorner()
+                        if (target != null) {
+                            addCornerAt(target.x, target.z, auto = false)
+                        } else if (reticle != null && capture.isNewSpot(reticle.x, reticle.z)) {
+                            addCorner()
+                        }
                     }
                 }
             } else {
-                dwell.reset()
+                dwell.clearProgress()
             }
+            snapTarget = snapTo
 
             // Ceiling height along the first corner's vertical axis.
             liveHeight = if (step == Step.HEIGHT && tracking) {

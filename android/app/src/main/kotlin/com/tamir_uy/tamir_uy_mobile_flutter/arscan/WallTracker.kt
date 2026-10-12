@@ -52,6 +52,8 @@ fun wallObsFrom(id: Int, center: Vec3, normal: Vec3, polygonWorld: List<Vec3>): 
 class WallTracker(
     private val mergeAngleDeg: Float = 5f,
     private val mergeDistM: Float = 0.08f,
+    // Pieces further apart along the line are separate walls (a doorway, a notch).
+    private val mergeGapM: Float = 0.6f,
     private val minCornerAngleDeg: Float = 30f,
     private val maxEndGapM: Float = 0.5f,
     private val stableMs: Long = 1000L,
@@ -86,16 +88,28 @@ class WallTracker(
 
     /** Pieces of one wall (same direction, same line) become one segment on the longest piece's line. */
     private fun merge(walls: List<WallObs>): List<WallSegment> {
-        val clusters = mutableListOf<MutableList<WallObs>>()
+        class Cluster(val members: MutableList<WallObs>, var lo: Float, var hi: Float)
+        val clusters = mutableListOf<Cluster>()
         for (w in walls.sortedByDescending { it.halfLength }) {
+            var at = 0f
             val home = clusters.firstOrNull { c ->
-                val l = c[0]
+                val l = c.members[0]
+                at = (w.cx - l.cx) * l.dx + (w.cz - l.cz) * l.dz
+                val gap = maxOf(c.lo - (at + w.halfLength), (at - w.halfLength) - c.hi, 0f)
                 angleDeg(l.dx, l.dz, w.dx, w.dz) <= mergeAngleDeg &&
-                    abs((w.cx - l.cx) * -l.dz + (w.cz - l.cz) * l.dx) <= mergeDistM
+                    abs((w.cx - l.cx) * -l.dz + (w.cz - l.cz) * l.dx) <= mergeDistM &&
+                    gap <= mergeGapM
             }
-            if (home != null) home += w else clusters += mutableListOf(w)
+            if (home != null) {
+                home.members += w
+                home.lo = minOf(home.lo, at - w.halfLength)
+                home.hi = maxOf(home.hi, at + w.halfLength)
+            } else {
+                clusters += Cluster(mutableListOf(w), -w.halfLength, w.halfLength)
+            }
         }
-        return clusters.map { c ->
+        return clusters.map { cluster ->
+            val c = cluster.members
             val l = c[0]
             var lo = Float.MAX_VALUE
             var hi = -Float.MAX_VALUE

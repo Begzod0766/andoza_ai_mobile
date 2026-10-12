@@ -208,4 +208,33 @@ class FloorPlanCaptureTest {
         assertTrue(c.isClosed)
         assertFalse(c.acceptsAuto(cand(2f, 2f, seg(0f, 2f, 4f, 2f))))
     }
+
+    @Test fun `going back from the height step does not close again on its own`() {
+        val c = FloorPlanCapture()
+        square(c)
+        c.addCorner(Vec3(0.05f, 0f, 0f), auto = true)
+        assertTrue(c.isClosed)
+        assertTrue(c.reopen())
+        assertFalse(c.acceptsAuto(cand(0.05f, 0f, seg(0f, 3f, 0f, 0f), seg(0f, 0f, 4f, 0f))))
+    }
+
+    @Test fun `the outline only closes from a corner on one of the closing walls`() {
+        val c = FloorPlanCapture()
+        c.addCorner(Vec3(0f, 0f, 0f))
+        c.addCorner(Vec3(4f, 0f, 0f))
+        c.addCorner(Vec3(4f, 0f, 3f))
+        // The first corner's walls are z=0 and x=0; the last corner (4,3) is on neither.
+        assertFalse(c.acceptsAuto(cand(0f, 0f, seg(0f, 0f, 4f, 0f), seg(0f, 3f, 0f, 0f))))
+    }
+
+    @Test fun `a placed corner is not a new spot, the first one is once it would close`() {
+        val c = FloorPlanCapture()
+        c.addCorner(Vec3(0f, 0f, 0f))
+        c.addCorner(Vec3(4f, 0f, 0f))
+        assertFalse(c.isNewSpot(4.05f, 0f))
+        assertFalse(c.isNewSpot(0.05f, 0f))
+        assertTrue(c.isNewSpot(4f, 3f))
+        c.addCorner(Vec3(4f, 0f, 3f))
+        assertTrue(c.isNewSpot(0.05f, 0f))
+    }
 }

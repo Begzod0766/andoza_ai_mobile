@@ -29,6 +29,10 @@ class FloorPlanCapture(val snapDistanceM: Float = 0.20f) {
     // (they can still snap or hold there on purpose).
     private var rejected: List<Vec3> = emptyList()
 
+    // After "back" from the height step: don't close the outline again on our
+    // own (it would bounce straight back) until the user adds a corner.
+    private var autoCloseBlocked = false
+
     /** Height of the floor plane — the first corner's Y; later corners are pinned to it. */
     @Volatile var floorY: Float? = null
         private set
@@ -52,6 +56,7 @@ class FloorPlanCapture(val snapDistanceM: Float = 0.20f) {
 
     fun addCorner(p: Vec3, auto: Boolean = false): AddResult {
         if (isClosed) return AddResult.REJECTED_CLOSED
+        autoCloseBlocked = false
         val y = floorY ?: p.y.also { floorY = it }
         val snap = wouldSnap(p)
         points = points + Vec3(p.x, y, p.z)
@@ -82,6 +87,7 @@ class FloorPlanCapture(val snapDistanceM: Float = 0.20f) {
         if (!isClosed) return false
         points = points.dropLast(1)
         autoFlags = autoFlags.dropLast(1)
+        autoCloseBlocked = true
         isClosed = false
         return true
     }
@@ -132,18 +138,31 @@ class FloorPlanCapture(val snapDistanceM: Float = 0.20f) {
     /**
      * Whether a wall corner may be added without the user doing anything:
      * the outline is open, it isn't a spot the user undid, it isn't an
-     * existing corner (the first one only once it would close the outline),
-     * and it continues the outline — the last corner lies on one of its walls.
+     * existing corner (the first one only once it would close the outline,
+     * and not right after "back" from the height step), and it continues the
+     * outline — the last corner lies on one of its walls.
      */
     fun acceptsAuto(c: CornerCandidate): Boolean {
         if (isClosed) return false
         if (rejected.any { hypot(it.x - c.x, it.z - c.z) <= REJECT_RADIUS_M }) return false
+        if (!isNewSpot(c.x, c.z)) return false
         val current = points
-        current.forEachIndexed { i, p ->
-            if (hypot(p.x - c.x, p.z - c.z) <= snapDistanceM) return i == 0 && current.size >= 3
-        }
+        val closing = current.isNotEmpty() && hypot(current[0].x - c.x, current[0].z - c.z) <= snapDistanceM
+        if (closing && autoCloseBlocked) return false
         val last = current.lastOrNull() ?: return true
         return lineDistance(last, c.wallA) <= ON_WALL_M || lineDistance(last, c.wallB) <= ON_WALL_M
+    }
+
+    /**
+     * False on top of a placed corner — snapping or holding there would add a
+     * zero-length wall — except the first corner once there are 3 (that closes).
+     */
+    fun isNewSpot(x: Float, z: Float): Boolean {
+        val current = points
+        current.forEachIndexed { i, p ->
+            if (hypot(p.x - x, p.z - z) <= snapDistanceM) return i == 0 && current.size >= 3 && !isClosed
+        }
+        return true
     }
 
     private fun lineDistance(p: Vec3, w: WallSegment): Float {
