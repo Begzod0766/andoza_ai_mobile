@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+
 import '../../config/design_tokens.dart';
 import '../../l10n/app_localizations.dart';
 import '../../models/api/api.dart' show DeltaResponse, RoomStateValue;
@@ -45,18 +46,26 @@ class _E1EstimationIntroScreenState
   }
 
   /// Downloads the server-generated smeta PDF for the persisted room and opens
-  /// the share sheet. Requires the room to be persisted (Phase 2 bridge).
-  Future<void> _downloadPdf(String roomId, String roomName) async {
+  /// the share sheet, pointing from the PDF button ([buttonContext]). Requires
+  /// the room to be persisted (Phase 2 bridge).
+  Future<void> _downloadPdf(
+    BuildContext buttonContext,
+    String roomId,
+    String roomName,
+  ) async {
+    final origin = _shareOrigin(buttonContext);
     setState(() => _downloadingPdf = true);
     final messenger = ScaffoldMessenger.of(context);
     final l10n = AppLocalizations.of(context)!;
     try {
-      final bytes =
-          await ref.read(estimateRepositoryProvider).downloadPdf(roomId);
+      final bytes = await ref
+          .read(estimateRepositoryProvider)
+          .downloadPdf(roomId);
       await sharePdfBytes(
         bytes,
         fileName: 'smeta_${roomName.replaceAll(' ', '_')}',
         shareText: 'AndozaAI smeta — $roomName',
+        origin: origin,
       );
     } catch (e) {
       messenger.showSnackBar(
@@ -65,6 +74,14 @@ class _E1EstimationIntroScreenState
     } finally {
       if (mounted) setState(() => _downloadingPdf = false);
     }
+  }
+
+  /// The widget's area in global coordinates, for the share sheet to point
+  /// from; iOS 26 refuses a zero-sized origin.
+  Rect _shareOrigin(BuildContext context) {
+    final box = context.findRenderObject() as RenderBox?;
+    if (box == null || !box.hasSize) return const Rect.fromLTWH(0, 0, 1, 1);
+    return box.localToGlobal(Offset.zero) & box.size;
   }
 
   /// The stage label to show in the savings banner when using the backend
@@ -118,7 +135,9 @@ class _E1EstimationIntroScreenState
     final serverLines = roomId == null
         ? null
         : ref.watch(estimatePreviewProvider(roomId)).valueOrNull?.lines;
-    final floor = serverRoom == null ? null : floorNote(serverRoom, serverLines);
+    final floor = serverRoom == null
+        ? null
+        : floorNote(serverRoom, serverLines);
 
     return Scaffold(
       backgroundColor: DesignTokens.backgroundLight,
@@ -260,23 +279,29 @@ class _E1EstimationIntroScreenState
                     Row(
                       children: [
                         Expanded(
-                          child: OutlinedButton.icon(
-                            onPressed: _downloadingPdf
-                                ? null
-                                : () => _downloadPdf(
+                          child: Builder(
+                            builder: (buttonContext) => OutlinedButton.icon(
+                              onPressed: _downloadingPdf
+                                  ? null
+                                  : () => _downloadPdf(
+                                      buttonContext,
                                       roomId,
                                       room?.name ?? 'Xona',
                                     ),
-                            icon: _downloadingPdf
-                                ? const SizedBox(
-                                    width: 16,
-                                    height: 16,
-                                    child: CircularProgressIndicator(
-                                        strokeWidth: 2),
-                                  )
-                                : const Icon(Icons.picture_as_pdf_outlined),
-                            label: Text(
-                              _downloadingPdf ? l10n.estimatePreparingPdf : 'PDF',
+                              icon: _downloadingPdf
+                                  ? const SizedBox(
+                                      width: 16,
+                                      height: 16,
+                                      child: CircularProgressIndicator(
+                                        strokeWidth: 2,
+                                      ),
+                                    )
+                                  : const Icon(Icons.picture_as_pdf_outlined),
+                              label: Text(
+                                _downloadingPdf
+                                    ? l10n.estimatePreparingPdf
+                                    : 'PDF',
+                              ),
                             ),
                           ),
                         ),
@@ -410,7 +435,9 @@ class _StageRow extends StatelessWidget {
               const Icon(Icons.chevron_right, color: DesignTokens.textMuted),
             const SizedBox(width: DesignTokens.spacingSm),
             Text(
-              stage.isExcluded ? l10n.estimateZeroSom : formatSom(stage.subtotal.round()),
+              stage.isExcluded
+                  ? l10n.estimateZeroSom
+                  : formatSom(stage.subtotal.round()),
               style: DesignTokens.subtitle2.copyWith(
                 color: stage.isExcluded
                     ? DesignTokens.textMuted
@@ -448,8 +475,10 @@ class _FloorNoteBanner extends StatelessWidget {
       ),
       child: Row(
         children: [
-          const Icon(Icons.warning_amber_rounded,
-              color: DesignTokens.accentOrange),
+          const Icon(
+            Icons.warning_amber_rounded,
+            color: DesignTokens.accentOrange,
+          ),
           const SizedBox(width: DesignTokens.spacingSm),
           Expanded(
             child: Text(
@@ -459,10 +488,7 @@ class _FloorNoteBanner extends StatelessWidget {
               style: DesignTokens.body2,
             ),
           ),
-          TextButton(
-            onPressed: onPick,
-            child: Text(l10n.estimateFloorPick),
-          ),
+          TextButton(onPressed: onPick, child: Text(l10n.estimateFloorPick)),
         ],
       ),
     );
