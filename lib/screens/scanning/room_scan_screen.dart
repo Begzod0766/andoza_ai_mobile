@@ -85,12 +85,7 @@ class _RoomScanScreenState extends ConsumerState<RoomScanScreen> {
       _error = null;
     });
     try {
-      final result = await svc.scanRooms(labels: {
-        'nextRoom': l10n.scanNextRoom,
-        'finish': l10n.scanFinish,
-        'cancel': l10n.actionCancel,
-        'roomN': l10n.scanRoomN(0).replaceFirst('0', '{n}'),
-      });
+      final result = await svc.scanRooms(labels: roomScanLabels(l10n));
       if (!mounted) return;
       if (result == null) {
         context.pop();
@@ -178,7 +173,7 @@ class _RoomScanScreenState extends ConsumerState<RoomScanScreen> {
       _error = null;
     });
     try {
-      final result = await svc.scan();
+      final result = await svc.scan(labels: roomScanLabels(AppLocalizations.of(context)!));
       if (!mounted) return;
       if (result == null) {
         _logger.i('roomscan cancelled by user');

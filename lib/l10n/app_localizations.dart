@@ -5121,6 +5121,54 @@ abstract class AppLocalizations {
   /// In uz, this message translates to:
   /// **'Faylni ochib bo\'lmadi'**
   String get mebelExportFailed;
+
+  /// LiDAR scanner: hint at the bottom when the scan starts.
+  ///
+  /// In uz, this message translates to:
+  /// **'Xonani sekin aylanib skanerlang'**
+  String get scanHintStart;
+
+  /// LiDAR scanner coaching: the phone is too far from the wall.
+  ///
+  /// In uz, this message translates to:
+  /// **'Telefonni devorga yaqinroq tuting'**
+  String get scanCoachMoveCloser;
+
+  /// LiDAR scanner coaching: the phone is too close to the wall.
+  ///
+  /// In uz, this message translates to:
+  /// **'Telefonni devordan birozroq uzoqlashtiring'**
+  String get scanCoachMoveAway;
+
+  /// LiDAR scanner coaching: the phone moves too fast.
+  ///
+  /// In uz, this message translates to:
+  /// **'Juda tez harakatlanyapsiz — sekinroq aylaning'**
+  String get scanCoachSlowDown;
+
+  /// LiDAR scanner coaching: not enough light.
+  ///
+  /// In uz, this message translates to:
+  /// **'Xona qorong\'i — yorug\'likni yoqing'**
+  String get scanCoachTurnOnLight;
+
+  /// LiDAR scanner coaching: the surface has too little texture to track.
+  ///
+  /// In uz, this message translates to:
+  /// **'Bu yuza silliq/bir xil — kamerani boshqa tomonga burang'**
+  String get scanCoachLowTexture;
+
+  /// LiDAR scanner coaching: everything is fine, keep going.
+  ///
+  /// In uz, this message translates to:
+  /// **'Zo\'r ketyapti — xonani shu tezlikda aylanib chiqing'**
+  String get scanCoachGood;
+
+  /// LiDAR scanner coaching: fallback for an instruction the app does not know.
+  ///
+  /// In uz, this message translates to:
+  /// **'Skanerlashda davom eting'**
+  String get scanCoachKeepGoing;
 }
 
 class _AppLocalizationsDelegate

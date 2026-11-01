@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:logger/logger.dart';
 import 'package:riverpod/riverpod.dart';
 
+import '../../l10n/app_localizations.dart';
 import '../../providers/auth_provider.dart';
 import '../../services/api_client.dart';
 import 'models/captured_room.dart';
@@ -71,6 +72,27 @@ class RoomScanException implements Exception {
   String toString() => 'RoomScanException($code): $message';
 }
 
+/// The native RoomPlan scanners' texts in the app's language: the buttons,
+/// the starting hint and the coaching lines for RoomPlan's instructions.
+/// Without them the scanner shows its built-in Uzbek. `roomN` holds `{n}`.
+/// RoomPlan's own animated prompts ("Point camera at…") come from iOS in the
+/// phone's language and are out of the app's reach.
+Map<String, String> roomScanLabels(AppLocalizations l10n) => {
+      'nextRoom': l10n.scanNextRoom,
+      'finish': l10n.scanFinish,
+      'cancel': l10n.actionCancel,
+      'done': l10n.actionDone,
+      'roomN': l10n.scanRoomN(0).replaceFirst('0', '{n}'),
+      'start': l10n.scanHintStart,
+      'moveCloser': l10n.scanCoachMoveCloser,
+      'moveAway': l10n.scanCoachMoveAway,
+      'slowDown': l10n.scanCoachSlowDown,
+      'turnOnLight': l10n.scanCoachTurnOnLight,
+      'lowTexture': l10n.scanCoachLowTexture,
+      'good': l10n.scanCoachGood,
+      'keepGoing': l10n.scanCoachKeepGoing,
+    };
+
 /// Bridges the native RoomPlan module (`MethodChannel("andoza/roomscan")`) and
 /// uploads the captured room to the backend. Pure-Dart-testable: the channel is
 /// mocked via `TestDefaultBinaryMessengerBinding` in tests, and on non-iOS the
@@ -107,9 +129,9 @@ class RoomScanService {
   }
 
   /// Present the native multi-room scanner (iOS 17+, see
-  /// [ScanSupport.multiRoom]). [labels] are its button texts: `nextRoom`,
-  /// `finish`, `cancel`, `roomN` (with `{n}`). Returns null when the user
-  /// cancels; throws [RoomScanException] on a native error.
+  /// [ScanSupport.multiRoom]). [labels] are its texts in the app's language
+  /// (see [roomScanLabels]). Returns null when the user cancels; throws
+  /// [RoomScanException] on a native error.
   Future<MultiScanResult?> scanRooms({required Map<String, String> labels}) async {
     try {
       final res = await channel.invokeMapMethod<String, dynamic>(
@@ -139,11 +161,13 @@ class RoomScanService {
     }
   }
 
-  /// Present the native RoomPlan scanner. Returns null when the user cancels;
+  /// Present the native RoomPlan scanner. [labels] are its texts in the app's
+  /// language (see [roomScanLabels]). Returns null when the user cancels;
   /// throws [RoomScanException] on a native error (`busy`, `scan_failed`, …).
-  Future<ScanResult?> scan() async {
+  Future<ScanResult?> scan({required Map<String, String> labels}) async {
     try {
-      final res = await channel.invokeMapMethod<String, dynamic>('scanRoom');
+      final res = await channel.invokeMapMethod<String, dynamic>(
+          'scanRoom', {'labels': labels});
       if (res == null) {
         _logger.i('roomscan scanRoom → cancelled');
         return null;

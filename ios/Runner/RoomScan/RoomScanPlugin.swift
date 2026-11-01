@@ -38,7 +38,7 @@ final class RoomScanPlugin: NSObject {
     case "isSupported":
       result(Self.isSupportedPayload())
     case "scanRoom":
-      scanRoom(result: result)
+      scanRoom(arguments: call.arguments, result: result)
     case "scanRooms":
       scanRooms(arguments: call.arguments, result: result)
     case "scanObject":
@@ -90,7 +90,7 @@ final class RoomScanPlugin: NSObject {
     }
 
     isPresenting = true
-    let controller = MultiRoomScanViewController(labels: MultiRoomScanLabels(arguments)) { [weak self] outcome in
+    let controller = MultiRoomScanViewController(labels: RoomScanLabels(arguments)) { [weak self] outcome in
       guard let self = self else { return }
       self.isPresenting = false
       self.activeController = nil
@@ -110,7 +110,7 @@ final class RoomScanPlugin: NSObject {
     host.present(controller, animated: true)
   }
 
-  private func scanRoom(result: @escaping FlutterResult) {
+  private func scanRoom(arguments: Any?, result: @escaping FlutterResult) {
     guard !isPresenting else {
       os_log("scanRoom rejected — a scan is already active", log: Self.log, type: .error)
       result(FlutterError(code: "busy", message: "Skaner allaqachon ochiq", details: nil))
@@ -135,7 +135,7 @@ final class RoomScanPlugin: NSObject {
     }
 
     isPresenting = true
-    let controller = RoomScanViewController { [weak self] outcome in
+    let controller = RoomScanViewController(labels: RoomScanLabels(arguments)) { [weak self] outcome in
       guard let self = self else { return }
       self.isPresenting = false
       self.activeController = nil

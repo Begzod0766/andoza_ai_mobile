@@ -2782,4 +2782,31 @@ class AppLocalizationsUz extends AppLocalizations {
 
   @override
   String get mebelExportFailed => 'Faylni ochib bo\'lmadi';
+
+  @override
+  String get scanHintStart => 'Xonani sekin aylanib skanerlang';
+
+  @override
+  String get scanCoachMoveCloser => 'Telefonni devorga yaqinroq tuting';
+
+  @override
+  String get scanCoachMoveAway => 'Telefonni devordan birozroq uzoqlashtiring';
+
+  @override
+  String get scanCoachSlowDown =>
+      'Juda tez harakatlanyapsiz — sekinroq aylaning';
+
+  @override
+  String get scanCoachTurnOnLight => 'Xona qorong\'i — yorug\'likni yoqing';
+
+  @override
+  String get scanCoachLowTexture =>
+      'Bu yuza silliq/bir xil — kamerani boshqa tomonga burang';
+
+  @override
+  String get scanCoachGood =>
+      'Zo\'r ketyapti — xonani shu tezlikda aylanib chiqing';
+
+  @override
+  String get scanCoachKeepGoing => 'Skanerlashda davom eting';
 }

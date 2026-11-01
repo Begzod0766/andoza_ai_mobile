@@ -2771,5 +2771,13 @@
   "furnitureLoadFailed": "Couldn't open the product",
   "profileMenuMebel": "Furniture manufacturing",
   "profileMenuMebelHint": "For workshops: cabinet parts, edge banding and price",
-  "mebelExportFailed": "Couldn't open the file"
+  "mebelExportFailed": "Couldn't open the file",
+  "scanHintStart": "Walk slowly around the room to scan it",
+  "scanCoachMoveCloser": "Hold the phone closer to the wall",
+  "scanCoachMoveAway": "Move the phone a little away from the wall",
+  "scanCoachSlowDown": "You're moving too fast — slow down",
+  "scanCoachTurnOnLight": "The room is dark — turn on the light",
+  "scanCoachLowTexture": "This surface is too plain — point the camera elsewhere",
+  "scanCoachGood": "Going well — keep walking around the room at this pace",
+  "scanCoachKeepGoing": "Keep scanning"
 }

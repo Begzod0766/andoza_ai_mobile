@@ -2771,5 +2771,13 @@
   "furnitureLoadFailed": "Не удалось открыть товар",
   "profileMenuMebel": "Производство мебели",
   "profileMenuMebelHint": "Для цехов: детали шкафа, кромка и цена",
-  "mebelExportFailed": "Не удалось открыть файл"
+  "mebelExportFailed": "Не удалось открыть файл",
+  "scanHintStart": "Медленно обойдите комнату, сканируя её",
+  "scanCoachMoveCloser": "Поднесите телефон ближе к стене",
+  "scanCoachMoveAway": "Отодвиньте телефон немного от стены",
+  "scanCoachSlowDown": "Вы двигаетесь слишком быстро — помедленнее",
+  "scanCoachTurnOnLight": "В комнате темно — включите свет",
+  "scanCoachLowTexture": "Поверхность слишком однородная — направьте камеру в другую сторону",
+  "scanCoachGood": "Отлично — продолжайте обходить комнату в том же темпе",
+  "scanCoachKeepGoing": "Продолжайте сканирование"
 }

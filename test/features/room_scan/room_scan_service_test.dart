@@ -71,13 +71,17 @@ void main() {
     test('returns a parsed ScanResult', () async {
       mock((call) async {
         expect(call.method, 'scanRoom');
+        // The scanner's texts travel with the call, in the app's language.
+        expect(call.arguments, {
+          'labels': {'cancel': 'Отмена'},
+        });
         return <String, dynamic>{
           'json': sampleJson,
           'usdzPath': '/tmp/scan.usdz',
           'version': 'roomplan-1',
         };
       });
-      final r = await service.scan();
+      final r = await service.scan(labels: const {'cancel': 'Отмена'});
       expect(r, isNotNull);
       expect(r!.usdzPath, '/tmp/scan.usdz');
       expect(r.version, 'roomplan-1');
@@ -86,14 +90,14 @@ void main() {
 
     test('cancel → null', () async {
       mock((call) async => null);
-      expect(await service.scan(), isNull);
+      expect(await service.scan(labels: const {}), isNull);
     });
 
     test('busy → RoomScanException(busy)', () async {
       mock((call) async =>
           throw PlatformException(code: 'busy', message: 'already scanning'));
       await expectLater(
-        service.scan(),
+        service.scan(labels: const {}),
         throwsA(isA<RoomScanException>().having((e) => e.code, 'code', 'busy')),
       );
     });
@@ -101,7 +105,7 @@ void main() {
     test('scan_failed → RoomScanException(scan_failed)', () async {
       mock((call) async => throw PlatformException(code: 'scan_failed'));
       await expectLater(
-        service.scan(),
+        service.scan(labels: const {}),
         throwsA(isA<RoomScanException>()
             .having((e) => e.code, 'code', 'scan_failed')),
       );

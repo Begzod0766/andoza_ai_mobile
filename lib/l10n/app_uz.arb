@@ -3004,5 +3004,37 @@
   "mebelExportFailed": "Faylni ochib bo'lmadi",
   "@mebelExportFailed": {
     "description": "Furniture workshop: the PDF or CSV export could not be opened or shared."
+  },
+  "scanHintStart": "Xonani sekin aylanib skanerlang",
+  "@scanHintStart": {
+    "description": "LiDAR scanner: hint at the bottom when the scan starts."
+  },
+  "scanCoachMoveCloser": "Telefonni devorga yaqinroq tuting",
+  "@scanCoachMoveCloser": {
+    "description": "LiDAR scanner coaching: the phone is too far from the wall."
+  },
+  "scanCoachMoveAway": "Telefonni devordan birozroq uzoqlashtiring",
+  "@scanCoachMoveAway": {
+    "description": "LiDAR scanner coaching: the phone is too close to the wall."
+  },
+  "scanCoachSlowDown": "Juda tez harakatlanyapsiz — sekinroq aylaning",
+  "@scanCoachSlowDown": {
+    "description": "LiDAR scanner coaching: the phone moves too fast."
+  },
+  "scanCoachTurnOnLight": "Xona qorong'i — yorug'likni yoqing",
+  "@scanCoachTurnOnLight": {
+    "description": "LiDAR scanner coaching: not enough light."
+  },
+  "scanCoachLowTexture": "Bu yuza silliq/bir xil — kamerani boshqa tomonga burang",
+  "@scanCoachLowTexture": {
+    "description": "LiDAR scanner coaching: the surface has too little texture to track."
+  },
+  "scanCoachGood": "Zo'r ketyapti — xonani shu tezlikda aylanib chiqing",
+  "@scanCoachGood": {
+    "description": "LiDAR scanner coaching: everything is fine, keep going."
+  },
+  "scanCoachKeepGoing": "Skanerlashda davom eting",
+  "@scanCoachKeepGoing": {
+    "description": "LiDAR scanner coaching: fallback for an instruction the app does not know."
   }
 }

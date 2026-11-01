@@ -2785,4 +2785,30 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get mebelExportFailed => 'Не удалось открыть файл';
+
+  @override
+  String get scanHintStart => 'Медленно обойдите комнату, сканируя её';
+
+  @override
+  String get scanCoachMoveCloser => 'Поднесите телефон ближе к стене';
+
+  @override
+  String get scanCoachMoveAway => 'Отодвиньте телефон немного от стены';
+
+  @override
+  String get scanCoachSlowDown => 'Вы двигаетесь слишком быстро — помедленнее';
+
+  @override
+  String get scanCoachTurnOnLight => 'В комнате темно — включите свет';
+
+  @override
+  String get scanCoachLowTexture =>
+      'Поверхность слишком однородная — направьте камеру в другую сторону';
+
+  @override
+  String get scanCoachGood =>
+      'Отлично — продолжайте обходить комнату в том же темпе';
+
+  @override
+  String get scanCoachKeepGoing => 'Продолжайте сканирование';
 }

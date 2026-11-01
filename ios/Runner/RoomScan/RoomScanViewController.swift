@@ -19,6 +19,7 @@ final class RoomScanViewController: UIViewController {
   private static let log = OSLog(subsystem: "uz.andoza.roomscan", category: "viewcontroller")
 
   private let completion: (RoomScanOutcome) -> Void
+  private let labels: RoomScanLabels
   private var roomCaptureView: RoomCaptureView!
   private let captureConfig = RoomCaptureSession.Configuration()
   private var didFinish = false
@@ -26,7 +27,8 @@ final class RoomScanViewController: UIViewController {
 
   private let hintLabel = UILabel()
 
-  init(completion: @escaping (RoomScanOutcome) -> Void) {
+  init(labels: RoomScanLabels, completion: @escaping (RoomScanOutcome) -> Void) {
+    self.labels = labels
     self.completion = completion
     super.init(nibName: nil, bundle: nil)
   }
@@ -61,21 +63,21 @@ final class RoomScanViewController: UIViewController {
   }
 
   private func setUpChrome() {
-    // Top bar: "Bekor qilish" (left) / "Tayyor" (right).
+    // Top bar: cancel (left) / done (right).
     let topBar = UIView()
     topBar.translatesAutoresizingMaskIntoConstraints = false
     topBar.backgroundColor = UIColor.black.withAlphaComponent(0.35)
     view.addSubview(topBar)
 
     let cancelButton = UIButton(type: .system)
-    cancelButton.setTitle("Bekor qilish", for: .normal)
+    cancelButton.setTitle(labels.cancel, for: .normal)
     cancelButton.setTitleColor(.white, for: .normal)
     cancelButton.titleLabel?.font = .systemFont(ofSize: 17, weight: .medium)
     cancelButton.addTarget(self, action: #selector(cancelTapped), for: .touchUpInside)
     cancelButton.translatesAutoresizingMaskIntoConstraints = false
 
     let doneButton = UIButton(type: .system)
-    doneButton.setTitle("Tayyor", for: .normal)
+    doneButton.setTitle(labels.done, for: .normal)
     doneButton.setTitleColor(.white, for: .normal)
     doneButton.titleLabel?.font = .systemFont(ofSize: 17, weight: .bold)
     doneButton.addTarget(self, action: #selector(doneTapped), for: .touchUpInside)
@@ -90,7 +92,7 @@ final class RoomScanViewController: UIViewController {
     hintLabel.font = .systemFont(ofSize: 16, weight: .semibold)
     hintLabel.textAlignment = .center
     hintLabel.numberOfLines = 2
-    hintLabel.text = "Xonani sekin aylanib skanerlang"
+    hintLabel.text = labels.start
     hintLabel.backgroundColor = UIColor.black.withAlphaComponent(0.35)
     hintLabel.layer.cornerRadius = 12
     hintLabel.layer.masksToBounds = true
@@ -169,20 +171,6 @@ final class RoomScanViewController: UIViewController {
     NotificationCenter.default.removeObserver(self)
     os_log("deinit", log: Self.log, type: .info)
   }
-
-  // MARK: - Uzbek instruction strings
-
-  static func uzbekInstruction(_ instruction: RoomCaptureSession.Instruction) -> String {
-    switch instruction {
-    case .moveCloseToWall: return "Telefonni devorga yaqinroq tuting"
-    case .moveAwayFromWall: return "Telefonni devordan birozroq uzoqlashtiring"
-    case .slowDown: return "Juda tez harakatlanyapsiz — sekinroq aylaning"
-    case .turnOnLight: return "Xona qorong'i — yorug'likni yoqing"
-    case .lowTexture: return "Bu yuza silliq/bir xil — kamerani boshqa tomonga burang"
-    case .normal: return "Zo'r ketyapti — xonani shu tezlikda aylanib chiqing"
-    @unknown default: return "Skanerlashda davom eting"
-    }
-  }
 }
 
 // MARK: - RoomCaptureViewDelegate
@@ -229,7 +217,7 @@ extension RoomScanViewController: RoomCaptureViewDelegate {
 @available(iOS 16.0, *)
 extension RoomScanViewController: RoomCaptureSessionDelegate {
   func captureSession(_ session: RoomCaptureSession, didProvide instruction: RoomCaptureSession.Instruction) {
-    let text = Self.uzbekInstruction(instruction)
+    let text = labels.instruction(instruction)
     os_log("instruction: %{public}@", log: Self.log, type: .info, String(describing: instruction))
     DispatchQueue.main.async { [weak self] in
       self?.hintLabel.text = text

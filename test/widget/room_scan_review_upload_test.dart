@@ -43,7 +43,7 @@ class _FailingScanService implements RoomScanService {
   Future<ScanSupport> checkSupport() async => const ScanSupport(true, null);
 
   @override
-  Future<ScanResult?> scan() async => null;
+  Future<ScanResult?> scan({required Map<String, String> labels}) async => null;
 
   @override
   Future<String?> scanObject() async => null;

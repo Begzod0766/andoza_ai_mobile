@@ -6,21 +6,60 @@ import os.log
 import RoomPlan
 #endif
 
-/// Labels for the multi-room scanner's buttons, passed in from Dart so they
-/// follow the app's language. `roomN` holds `{n}` for the room number.
-struct MultiRoomScanLabels {
+/// The RoomPlan scanners' texts (buttons, the starting hint and the coaching
+/// lines), passed in from Dart as `labels` so they follow the app's language.
+/// The Uzbek defaults cover an older Dart side that sends none. `roomN` holds
+/// `{n}` for the room number.
+struct RoomScanLabels {
   var nextRoom = "Keyingi xona"
   var finish = "Tugatish"
   var cancel = "Bekor qilish"
+  var done = "Tayyor"
   var roomN = "{n}-xona"
+  var start = "Xonani sekin aylanib skanerlang"
+  var moveCloser = "Telefonni devorga yaqinroq tuting"
+  var moveAway = "Telefonni devordan birozroq uzoqlashtiring"
+  var slowDown = "Juda tez harakatlanyapsiz — sekinroq aylaning"
+  var turnOnLight = "Xona qorong'i — yorug'likni yoqing"
+  var lowTexture = "Bu yuza silliq/bir xil — kamerani boshqa tomonga burang"
+  var good = "Zo'r ketyapti — xonani shu tezlikda aylanib chiqing"
+  var keepGoing = "Skanerlashda davom eting"
 
   init(_ args: Any?) {
     guard let map = (args as? [String: Any])?["labels"] as? [String: Any] else { return }
-    if let v = map["nextRoom"] as? String { nextRoom = v }
-    if let v = map["finish"] as? String { finish = v }
-    if let v = map["cancel"] as? String { cancel = v }
-    if let v = map["roomN"] as? String { roomN = v }
+    func take(_ key: String, _ value: inout String) {
+      if let v = map[key] as? String, !v.isEmpty { value = v }
+    }
+    take("nextRoom", &nextRoom)
+    take("finish", &finish)
+    take("cancel", &cancel)
+    take("done", &done)
+    take("roomN", &roomN)
+    take("start", &start)
+    take("moveCloser", &moveCloser)
+    take("moveAway", &moveAway)
+    take("slowDown", &slowDown)
+    take("turnOnLight", &turnOnLight)
+    take("lowTexture", &lowTexture)
+    take("good", &good)
+    take("keepGoing", &keepGoing)
   }
+
+  #if canImport(RoomPlan)
+  /// The coaching line for RoomPlan's current instruction.
+  @available(iOS 16.0, *)
+  func instruction(_ instruction: RoomCaptureSession.Instruction) -> String {
+    switch instruction {
+    case .moveCloseToWall: return moveCloser
+    case .moveAwayFromWall: return moveAway
+    case .slowDown: return slowDown
+    case .turnOnLight: return turnOnLight
+    case .lowTexture: return lowTexture
+    case .normal: return good
+    @unknown default: return keepGoing
+    }
+  }
+  #endif
 }
 
 /// Several rooms of a flat in one session. One ARSession stays alive across
@@ -36,7 +75,7 @@ final class MultiRoomScanViewController: UIViewController {
   private static let log = OSLog(subsystem: "uz.andoza.roomscan", category: "multiroom")
 
   private let completion: (RoomScanOutcome) -> Void
-  private let labels: MultiRoomScanLabels
+  private let labels: RoomScanLabels
   private let arSession = ARSession()
   private var roomCaptureView: RoomCaptureView!
   private let captureConfig = RoomCaptureSession.Configuration()
@@ -56,7 +95,7 @@ final class MultiRoomScanViewController: UIViewController {
   private let nextButton = UIButton(type: .system)
   private let finishButton = UIButton(type: .system)
 
-  init(labels: MultiRoomScanLabels, completion: @escaping (RoomScanOutcome) -> Void) {
+  init(labels: RoomScanLabels, completion: @escaping (RoomScanOutcome) -> Void) {
     self.labels = labels
     self.completion = completion
     super.init(nibName: nil, bundle: nil)
@@ -131,7 +170,7 @@ final class MultiRoomScanViewController: UIViewController {
     hintLabel.font = .systemFont(ofSize: 16, weight: .semibold)
     hintLabel.textAlignment = .center
     hintLabel.numberOfLines = 2
-    hintLabel.text = "Xonani sekin aylanib skanerlang"
+    hintLabel.text = labels.start
     hintLabel.backgroundColor = UIColor.black.withAlphaComponent(0.35)
     hintLabel.layer.cornerRadius = 12
     hintLabel.layer.masksToBounds = true
@@ -314,7 +353,7 @@ extension MultiRoomScanViewController: RoomCaptureViewDelegate {
 @available(iOS 17.0, *)
 extension MultiRoomScanViewController: RoomCaptureSessionDelegate {
   func captureSession(_ session: RoomCaptureSession, didProvide instruction: RoomCaptureSession.Instruction) {
-    let text = RoomScanViewController.uzbekInstruction(instruction)
+    let text = labels.instruction(instruction)
     DispatchQueue.main.async { [weak self] in
       self?.hintLabel.text = text
     }

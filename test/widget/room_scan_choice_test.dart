@@ -16,7 +16,7 @@ class _FakeScan implements RoomScanService {
   @override
   Future<ScanSupport> checkSupport() async => support;
   @override
-  Future<ScanResult?> scan() async {
+  Future<ScanResult?> scan({required Map<String, String> labels}) async {
     scans++;
     return null; // cancelled
   }
@@ -89,11 +89,10 @@ void main() {
     await tester.tap(find.text('Bir nechta xona (kvartira)'));
     await tester.pump(const Duration(milliseconds: 500));
     expect(fake.scans, 0);
-    expect(fake.flatLabels, {
-      'nextRoom': 'Keyingi xona',
-      'finish': 'Tugatish',
-      'cancel': 'Bekor qilish',
-      'roomN': '{n}-xona',
-    });
+    expect(fake.flatLabels, containsPair('nextRoom', 'Keyingi xona'));
+    expect(fake.flatLabels, containsPair('finish', 'Tugatish'));
+    expect(fake.flatLabels, containsPair('cancel', 'Bekor qilish'));
+    expect(fake.flatLabels, containsPair('roomN', '{n}-xona'));
+    expect(fake.flatLabels, containsPair('good', "Zo'r ketyapti — xonani shu tezlikda aylanib chiqing"));
   });
 }

@@ -2785,4 +2785,30 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get mebelExportFailed => 'Couldn\'t open the file';
+
+  @override
+  String get scanHintStart => 'Walk slowly around the room to scan it';
+
+  @override
+  String get scanCoachMoveCloser => 'Hold the phone closer to the wall';
+
+  @override
+  String get scanCoachMoveAway => 'Move the phone a little away from the wall';
+
+  @override
+  String get scanCoachSlowDown => 'You\'re moving too fast — slow down';
+
+  @override
+  String get scanCoachTurnOnLight => 'The room is dark — turn on the light';
+
+  @override
+  String get scanCoachLowTexture =>
+      'This surface is too plain — point the camera elsewhere';
+
+  @override
+  String get scanCoachGood =>
+      'Going well — keep walking around the room at this pace';
+
+  @override
+  String get scanCoachKeepGoing => 'Keep scanning';
 }
