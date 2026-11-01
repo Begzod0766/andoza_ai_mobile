@@ -38,7 +38,9 @@ final class RoomScanPlugin: NSObject {
     case "isSupported":
       result(Self.isSupportedPayload())
     case "scanRoom":
-      scanRoom(result: result)
+      scanRoom(arguments: call.arguments, result: result)
+    case "scanRooms":
+      scanRooms(arguments: call.arguments, result: result)
     case "scanObject":
       scanObject(result: result)
     default:
@@ -46,12 +48,17 @@ final class RoomScanPlugin: NSObject {
     }
   }
 
-  /// `{supported: Bool, reason: "no_lidar" | "ios_too_old" | null}`
+  /// `{supported: Bool, reason: "no_lidar" | "ios_too_old" | null, multiRoom: Bool}`
+  /// — `multiRoom`: several rooms in one session, merged by StructureBuilder
+  /// (iOS 17+).
   private static func isSupportedPayload() -> [String: Any] {
     if #available(iOS 16, *) {
       if RoomCaptureSession.isSupported {
-        os_log("isSupported = true", log: log, type: .info)
-        return ["supported": true, "reason": NSNull()]
+        var multiRoom = false
+        if #available(iOS 17, *) { multiRoom = true }
+        os_log("isSupported = true, multiRoom = %{public}@", log: log, type: .info,
+               multiRoom ? "true" : "false")
+        return ["supported": true, "reason": NSNull(), "multiRoom": multiRoom]
       } else {
         os_log("isSupported = false (no LiDAR)", log: log, type: .info)
         return ["supported": false, "reason": "no_lidar"]
@@ -62,7 +69,48 @@ final class RoomScanPlugin: NSObject {
     }
   }
 
-  private func scanRoom(result: @escaping FlutterResult) {
+  /// Several rooms in one session (iOS 17+): `{rooms: [{json, usdzPath}],
+  /// version: "roomplan-1", partial: Bool}`, `nil` on cancel.
+  private func scanRooms(arguments: Any?, result: @escaping FlutterResult) {
+    guard !isPresenting else {
+      result(FlutterError(code: "busy", message: "Skaner allaqachon ochiq", details: nil))
+      return
+    }
+    guard #available(iOS 17, *) else {
+      result(FlutterError(code: "ios_too_old", message: "Bir nechta xona iOS 17 yoki undan yangi versiyani talab qiladi", details: nil))
+      return
+    }
+    guard RoomCaptureSession.isSupported else {
+      result(FlutterError(code: "scan_failed", message: "Qurilma RoomPlan'ni qo'llab-quvvatlamaydi", details: nil))
+      return
+    }
+    guard let host = Self.topViewController() else {
+      result(FlutterError(code: "scan_failed", message: "Ekranni topib bo'lmadi", details: nil))
+      return
+    }
+
+    isPresenting = true
+    let controller = MultiRoomScanViewController(labels: RoomScanLabels(arguments)) { [weak self] outcome in
+      guard let self = self else { return }
+      self.isPresenting = false
+      self.activeController = nil
+      switch outcome {
+      case .success(let payload):
+        os_log("scanRooms success", log: Self.log, type: .info)
+        result(payload)
+      case .cancelled:
+        result(nil)
+      case .failed(let message):
+        os_log("scanRooms failed: %{public}@", log: Self.log, type: .error, message)
+        result(FlutterError(code: "scan_failed", message: message, details: nil))
+      }
+    }
+    activeController = controller
+    controller.modalPresentationStyle = .fullScreen
+    host.present(controller, animated: true)
+  }
+
+  private func scanRoom(arguments: Any?, result: @escaping FlutterResult) {
     guard !isPresenting else {
       os_log("scanRoom rejected — a scan is already active", log: Self.log, type: .error)
       result(FlutterError(code: "busy", message: "Skaner allaqachon ochiq", details: nil))
@@ -87,7 +135,7 @@ final class RoomScanPlugin: NSObject {
     }
 
     isPresenting = true
-    let controller = RoomScanViewController { [weak self] outcome in
+    let controller = RoomScanViewController(labels: RoomScanLabels(arguments)) { [weak self] outcome in
       guard let self = self else { return }
       self.isPresenting = false
       self.activeController = nil

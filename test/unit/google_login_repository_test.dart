@@ -82,4 +82,33 @@ void main() {
     );
     expect(repo.token, isNull);
   });
+
+  test('posts the Apple identity token and name to /auth/apple', () async {
+    adapter.body = {
+      'access_token': 'acc',
+      'refresh_token': 'ref',
+      'token_type': 'bearer',
+      'user': {'id': 'u2'},
+    };
+
+    final res = await repo.loginWithApple('apple-token', name: 'Ali Valiyev');
+
+    expect(adapter.last!.path, endsWith('/auth/apple'));
+    expect(adapter.last!.data,
+        {'identity_token': 'apple-token', 'name': 'Ali Valiyev'});
+    expect(res.user.id, 'u2');
+    expect(await storage.getToken(), 'acc');
+  });
+
+  test('no name key when Apple did not share one', () async {
+    adapter.body = {
+      'access_token': 'acc',
+      'token_type': 'bearer',
+      'user': {'id': 'u2'},
+    };
+
+    await repo.loginWithApple('apple-token');
+
+    expect(adapter.last!.data, {'identity_token': 'apple-token'});
+  });
 }

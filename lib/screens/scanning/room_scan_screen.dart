@@ -6,9 +6,11 @@ import 'package:logger/logger.dart';
 
 import '../../config/design_tokens.dart';
 import '../../l10n/app_localizations.dart';
+import '../../services/analytics_service.dart';
 import '../../features/room_scan/pending_scan_store.dart';
 import '../../features/room_scan/room_scan_converter.dart';
 import '../../features/room_scan/room_scan_service.dart';
+import 'flat_scan_review_page.dart';
 import 'room_scan_review_page.dart';
 
 /// Drives the RoomPlan (LiDAR) capture: probe support → present the native
@@ -58,7 +60,111 @@ class _RoomScanScreenState extends ConsumerState<RoomScanScreen> {
       }
       return;
     }
+    // Several rooms in one go only where RoomPlan can merge them (iOS 17+);
+    // everywhere else the single-room scan, with no choice to make.
+    if (support.multiRoom) {
+      final choice = await _showChoiceSheet();
+      if (!mounted) return;
+      switch (choice) {
+        case 'one':
+          await _scan(svc);
+        case 'flat':
+          await _scanFlat(svc);
+        default:
+          context.pop();
+      }
+      return;
+    }
     await _scan(svc);
+  }
+
+  Future<void> _scanFlat(RoomScanService svc) async {
+    final l10n = AppLocalizations.of(context)!;
+    setState(() {
+      _busy = true;
+      _error = null;
+    });
+    try {
+      final result = await svc.scanRooms(labels: roomScanLabels(l10n));
+      if (!mounted) return;
+      if (result == null) {
+        context.pop();
+        return;
+      }
+      ref.read(analyticsProvider).scanFinished('lidar');
+      final drafts = <RoomScanDraft>[];
+      final scans = <ScanResult>[];
+      for (final scan in result.rooms) {
+        final draft = RoomScanConverter.toRoomDraft(scan.room);
+        if (!draft.plan.isValid) continue;
+        drafts.add(draft);
+        scans.add(scan);
+      }
+      if (drafts.isEmpty) {
+        setState(() => _error = l10n.scanNotDetected);
+        return;
+      }
+      try {
+        await PendingScanStore.saveFlat(MultiScanResult(rooms: scans, partial: result.partial));
+      } catch (e) {
+        _logger.w('roomscan pending-flat save failed (non-fatal): $e');
+      }
+      if (!mounted) return;
+      context.pushReplacement(
+        '/scanning/roomplan/review-flat',
+        extra: FlatScanReviewArgs(
+          drafts: drafts,
+          scans: scans,
+          partial: result.partial,
+          dropped: result.rooms.length - drafts.length,
+        ),
+      );
+    } on RoomScanException catch (e) {
+      _logger.e('roomscan flat failed', error: e);
+      if (mounted) setState(() => _error = _messageFor(context, e));
+    } finally {
+      if (mounted) setState(() => _busy = false);
+    }
+  }
+
+  Future<String?> _showChoiceSheet() {
+    final l10n = AppLocalizations.of(context)!;
+    return showModalBottomSheet<String>(
+      context: context,
+      backgroundColor: DesignTokens.white,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(DesignTokens.radiusSheet)),
+      ),
+      builder: (sheetCtx) => SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(
+            DesignTokens.screenPaddingHorizontal,
+            DesignTokens.spacingLg,
+            DesignTokens.screenPaddingHorizontal,
+            DesignTokens.spacingLg,
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Text(l10n.scanChoiceTitle, style: DesignTokens.heading3),
+              const SizedBox(height: DesignTokens.spacingMd),
+              ListTile(
+                leading: const Icon(Icons.crop_square),
+                title: Text(l10n.scanChoiceOneRoom),
+                onTap: () => Navigator.of(sheetCtx).pop('one'),
+              ),
+              ListTile(
+                leading: const Icon(Icons.dashboard_outlined),
+                title: Text(l10n.scanChoiceFlat),
+                subtitle: Text(l10n.scanChoiceFlatHint),
+                onTap: () => Navigator.of(sheetCtx).pop('flat'),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
   }
 
   Future<void> _scan(RoomScanService svc) async {
@@ -67,13 +173,14 @@ class _RoomScanScreenState extends ConsumerState<RoomScanScreen> {
       _error = null;
     });
     try {
-      final result = await svc.scan();
+      final result = await svc.scan(labels: roomScanLabels(AppLocalizations.of(context)!));
       if (!mounted) return;
       if (result == null) {
         _logger.i('roomscan cancelled by user');
         context.pop();
         return;
       }
+      ref.read(analyticsProvider).scanFinished('lidar');
       final draft = RoomScanConverter.toRoomDraft(result.room);
       if (!draft.plan.isValid) {
         setState(() => _error = draft.plan.invalidReason ??

@@ -8,6 +8,7 @@ import '../../models/business_profile.dart';
 import '../../providers/business_provider.dart';
 import 'business_labels.dart';
 import '../../widgets/common/app_image.dart';
+import 'style_chips.dart';
 
 /// "Mahsulotlarim": the shop's own 3D models in every moderation status, with
 /// the few things an owner may change on a phone — name, price, hiding an
@@ -172,6 +173,7 @@ class _ProductTile extends ConsumerWidget {
     final repo = ref.read(businessRepositoryProvider);
     final name = TextEditingController(text: product.name);
     final price = TextEditingController(text: product.priceUzs?.toString() ?? '');
+    var styles = product.styles;
     final action = await showModalBottomSheet<String>(
       context: context,
       isScrollControlled: true,
@@ -180,7 +182,10 @@ class _ProductTile extends ConsumerWidget {
         padding: EdgeInsets.fromLTRB(
             DesignTokens.screenPaddingHorizontal, 0, DesignTokens.screenPaddingHorizontal,
             MediaQuery.of(ctx).viewInsets.bottom + DesignTokens.spacingLg),
-        child: Column(
+        // Scrolls: with the style chips the sheet can outgrow a small screen
+        // once the keyboard is up.
+        child: SingleChildScrollView(
+          child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
@@ -194,6 +199,13 @@ class _ProductTile extends ConsumerWidget {
               decoration: InputDecoration(labelText: l10n.shopProductPrice),
             ),
             const SizedBox(height: DesignTokens.spacingMd),
+            StatefulBuilder(
+              builder: (ctx, setSheet) => StyleChips(
+                value: styles,
+                onChanged: (v) => setSheet(() => styles = v),
+              ),
+            ),
+            const SizedBox(height: DesignTokens.spacingMd),
             FilledButton(
                 onPressed: () => Navigator.of(ctx).pop('save'), child: Text(l10n.shopProductSave)),
             TextButton(
@@ -202,6 +214,7 @@ class _ProductTile extends ConsumerWidget {
               child: Text(l10n.shopProductDelete),
             ),
           ],
+          ),
         ),
       ),
     );
@@ -216,6 +229,8 @@ class _ProductTile extends ConsumerWidget {
           product.id,
           name: newName.isEmpty || newName == product.name ? null : newName,
           priceUzs: newPrice == product.priceUzs ? null : newPrice,
+          // Sent only when changed: [] clears them, an absent field leaves them.
+          styles: _sameStyles(styles, product.styles) ? null : styles,
         ),
       );
     } else {
@@ -250,3 +265,6 @@ String _uzs(int v) {
   }
   return "$b so'm";
 }
+
+bool _sameStyles(List<String> a, List<String> b) =>
+    a.length == b.length && a.every(b.contains);

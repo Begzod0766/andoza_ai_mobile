@@ -1,21 +1,36 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../config/design_tokens.dart';
 import '../../l10n/app_localizations.dart';
 import '../../models/design_selection_model.dart' show stageLabel;
 import '../../models/estimate_model.dart';
+import '../../services/analytics_service.dart';
 import '../../utils/currency.dart';
 
 /// E2: Bosqich smetasi batafsil — per-stage breakdown: material lines
 /// (real qty × unit price), "Materiallar jami," labour lines, sticky
 /// blue "Bosqich jami," CTA to Do'kon.
-class E2MaterialCostsScreen extends StatelessWidget {
+class E2MaterialCostsScreen extends ConsumerStatefulWidget {
   const E2MaterialCostsScreen({required this.stage, super.key});
 
   final EstimateStage stage;
 
   @override
+  ConsumerState<E2MaterialCostsScreen> createState() =>
+      _E2MaterialCostsScreenState();
+}
+
+class _E2MaterialCostsScreenState extends ConsumerState<E2MaterialCostsScreen> {
+  @override
+  void initState() {
+    super.initState();
+    ref.read(analyticsProvider).estimateViewed();
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final stage = widget.stage;
     final l10n = AppLocalizations.of(context)!;
     final materialItems = stage.lineItems
         .where((i) => i.id.endsWith('_mat'))

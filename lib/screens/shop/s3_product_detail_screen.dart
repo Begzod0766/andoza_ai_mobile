@@ -2,12 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../config/design_tokens.dart';
+import '../../features/moderation/report_repository.dart';
+import '../../features/moderation/report_sheet.dart';
 import '../../l10n/app_localizations.dart';
 import '../../models/shop_model.dart';
 import '../../providers/cart_provider.dart';
 import '../../providers/shop_provider.dart';
 import '../../utils/currency.dart';
 import '../../widgets/common/app_image.dart';
+import 'furniture_detail_screen.dart' show StoreLinkRow;
 
 /// S3: Mahsulot kartasi — product detail with a blue recommendation card
 /// showing the real computed project quantity (never a hardcoded guess)
@@ -37,6 +40,24 @@ class _S3ProductDetailScreenState extends ConsumerState<S3ProductDetailScreen> {
         backgroundColor: DesignTokens.backgroundLight,
         elevation: 0,
         title: Text(product.name, style: DesignTokens.subtitle1),
+        actions: [
+          // App Store guideline 1.2: sellers publish products, so others can
+          // report them.
+          PopupMenuButton<ReportTarget>(
+            icon: const Icon(Icons.more_vert),
+            onSelected: (target) => showReportSheet(
+              context,
+              target: target,
+              targetId: product.id,
+            ),
+            itemBuilder: (_) => [
+              PopupMenuItem(
+                value: ReportTarget.product,
+                child: Text(l10n.reportAction),
+              ),
+            ],
+          ),
+        ],
       ),
       body: Column(
         children: [
@@ -226,6 +247,13 @@ class _S3ProductDetailScreenState extends ConsumerState<S3ProductDetailScreen> {
                   ),
                   ),
                 ),
+                if (product.storeId != null) ...[
+                  const SizedBox(height: DesignTokens.spacingSm),
+                  StoreLinkRow(
+                    storeId: product.storeId!,
+                    storeName: product.brand.isEmpty ? null : product.brand,
+                  ),
+                ],
               ],
             ),
           ),

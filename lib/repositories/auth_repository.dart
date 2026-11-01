@@ -9,6 +9,11 @@ abstract interface class AuthRepository {
   /// client id) for an andoza session via `POST /auth/google`. Same response
   /// and persistence as [login].
   Future<AuthResponse> loginWithGoogle(String idToken);
+
+  /// Exchanges an Apple identity token for an andoza session via
+  /// `POST /auth/apple`. [name] is sent only when Apple shared it (first
+  /// authorization); the server keeps it for a new account only.
+  Future<AuthResponse> loginWithApple(String identityToken, {String? name});
   Future<void> requestOtp(String phone);
   Future<AuthResponse> verifyOtp(String phone, String code);
   Future<AuthResponse> register(String username, String password, String? name);
@@ -38,10 +43,15 @@ abstract interface class AuthRepository {
 }
 
 class AuthRepositoryImpl implements AuthRepository {
-  AuthRepositoryImpl(this._apiClient, this._storage);
+  AuthRepositoryImpl(this._apiClient, this._storage, {this.language});
 
   final ApiClient _apiClient;
   final SecureStorageService _storage;
+
+  /// The app language, sent when an account may be created (register, Google,
+  /// Apple) so a new account starts in it. The server ignores it for an
+  /// existing account.
+  final String Function()? language;
   String? _cachedToken;
   User? _cachedUser;
 
@@ -67,7 +77,23 @@ class AuthRepositoryImpl implements AuthRepository {
     try {
       final response = await _apiClient.post<Map<String, dynamic>>(
         '/auth/google',
-        data: {'id_token': idToken},
+        data: {'id_token': idToken, 'language': ?language?.call()},
+        fromJson: (json) => json as Map<String, dynamic>,
+      );
+      final authResponse = AuthResponse.fromJson(response);
+      await _persistSession(authResponse);
+      return authResponse;
+    } on ApiException catch (e) {
+      throw AuthException(e.message, statusCode: e.statusCode);
+    }
+  }
+
+  @override
+  Future<AuthResponse> loginWithApple(String identityToken, {String? name}) async {
+    try {
+      final response = await _apiClient.post<Map<String, dynamic>>(
+        '/auth/apple',
+        data: {'identity_token': identityToken, 'name': ?name, 'language': ?language?.call()},
         fromJson: (json) => json as Map<String, dynamic>,
       );
       final authResponse = AuthResponse.fromJson(response);
@@ -127,6 +153,8 @@ class AuthRepositoryImpl implements AuthRepository {
     try {
       final data = <String, dynamic>{'username': username, 'password': password};
       if (name != null && name.isNotEmpty) data['name'] = name;
+      final appLanguage = language?.call();
+      if (appLanguage != null) data['language'] = appLanguage;
       final response = await _apiClient.post<Map<String, dynamic>>(
         '/auth/register',
         data: data,

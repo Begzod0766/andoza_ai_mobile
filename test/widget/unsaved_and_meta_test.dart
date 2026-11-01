@@ -65,6 +65,14 @@ void main() {
     expect(studioPageUrl('https://x.uz', '/studio/r1?focus=1'), 'https://x.uz/studio/r1?focus=1&app=1');
   });
 
+  test("the studio page opens in the app's language", () {
+    expect(studioPageUrl('https://x.uz', '/studio/r1', language: 'ru'), 'https://x.uz/studio/r1?app=1&lang=ru');
+    expect(
+      studioPageUrl('https://x.uz', '/studio/r1?place=f1', language: 'en'),
+      'https://x.uz/studio/r1?place=f1&app=1&lang=en',
+    );
+  });
+
   test('project meta skips an empty address instead of printing "· ·"', () {
     final d = DateTime(2026, 9, 30);
     expect(projectMetaDetails('', d), '30.9.2026');

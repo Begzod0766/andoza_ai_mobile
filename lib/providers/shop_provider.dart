@@ -120,10 +120,8 @@ ElectricalNeed computeElectricalNeed(Ref ref) {
 
 /// Maps a backend `Material.category` free-form string onto the UI's
 /// [ShopCategory] enum. The two vocabularies diverge (server `plitka` vs UI
-/// `kafel`, server `elektr_mat` vs UI `elektr`), and the server has categories
-/// with no UI counterpart (`eshik` doors, `deraza` windows) — those, plus any
-/// future/unknown string, fall back to [ShopCategory.sement] so mapping never
-/// throws.
+/// `kafel`, server `elektr_mat` vs UI `elektr`). Any future/unknown string
+/// falls back to [ShopCategory.sement] so mapping never throws.
 ShopCategory _mapCategory(String serverCategory) => switch (serverCategory) {
   'boyoq' => ShopCategory.boyoq,
   'oboy' => ShopCategory.oboy,
@@ -135,8 +133,8 @@ ShopCategory _mapCategory(String serverCategory) => switch (serverCategory) {
   'sement' => ShopCategory.sement,
   'santexnika' => ShopCategory.santexnika,
   'elektr_mat' => ShopCategory.elektr,
-  'eshik' => ShopCategory.sement, // no door category → generic fallback
-  'deraza' => ShopCategory.sement, // no window category → generic fallback
+  'eshik' => ShopCategory.eshik,
+  'deraza' => ShopCategory.deraza,
   _ => ShopCategory.sement,
 };
 
@@ -177,6 +175,8 @@ double? _projectQuantityFor(
     case ShopCategory.parket:
     case ShopCategory.sement:
     case ShopCategory.santexnika:
+    case ShopCategory.eshik:
+    case ShopCategory.deraza:
       return null;
   }
 }
@@ -246,6 +246,23 @@ final shopCatalogProvider = Provider<List<Product>>((ref) {
         orElse: () => const <Product>[],
       );
 });
+
+/// Catalog products whose name matches [query] (trimmed, at most 100
+/// characters), searched by the server (`q`) over the whole catalog rather
+/// than over what [shopCatalogProvider] loaded.
+final shopSearchProvider =
+    Provider.autoDispose.family<AsyncValue<List<Product>>, String>((ref, query) {
+  final stores = ref.watch(storesProvider).valueOrNull ?? const <Store>[];
+  return ref
+      .watch(materialSearchProvider(query))
+      .whenData((materials) => _mapToProducts(materials, stores, ref));
+});
+
+/// [text] as a catalog search: trimmed, cut to the server's 100 characters.
+String shopSearchQuery(String text) {
+  final q = text.trim();
+  return q.length > 100 ? q.substring(0, 100) : q;
+}
 
 /// The error that made [shopCatalogProvider] empty, if any. [shopCatalogProvider]
 /// itself collapses loading AND error into an empty list, so a screen watching

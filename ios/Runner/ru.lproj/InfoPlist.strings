@@ -1,0 +1,4 @@
+/* Shown when the app first asks for the camera. */
+"NSCameraUsageDescription" = "Камера нужна, чтобы сканировать комнату с LiDAR и фотографировать обои.";
+/* Shown when the app first asks for the photo library. */
+"NSPhotoLibraryUsageDescription" = "Доступ к фото нужен, чтобы добавить обои или фото комнаты из галереи.";

@@ -6,10 +6,32 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../config/design_tokens.dart';
 import '../../l10n/app_localizations.dart';
 import '../../models/api/api.dart';
+import '../../models/business_profile.dart';
 import '../../providers/ai_provider.dart';
 import '../../providers/apartment_provider.dart';
 import '../../providers/estimate_api_provider.dart';
 import '../../utils/error_mapper.dart';
+import '../business/style_chips.dart';
+
+/// The request sent for [prompt] with a chosen furniture [style] (an id from
+/// [furnitureStyles]) put in front: "Hi-Tech uslubida. …". The style is named
+/// as the backend names it (`ai_designer.STYLE_LABELS`), whatever the app
+/// language, so the server can recognise it in the request (handoff §8, #36).
+String styledPrompt(String prompt, String? style) {
+  final name = style == null ? null : _stylePromptNames[style];
+  return name == null ? prompt : '$name uslubida. $prompt';
+}
+
+const _stylePromptNames = {
+  'neoklassika': 'Neoklassika',
+  'klassik': 'Klassik',
+  'zamonaviy': 'Zamonaviy',
+  'hitech': 'Hi-Tech',
+  'minimalist': 'Minimalist',
+  'skandinav': 'Skandinav',
+  'loft': 'Loft',
+  'milliy': 'Milliy',
+};
 
 /// "AI dizayner" sheet: the user types a natural-language request, the backend
 /// agent streams its reasoning + tool calls (SSE), and on completion proposes a
@@ -45,6 +67,7 @@ class _AiBuilderSheetState extends ConsumerState<AiBuilderSheet> {
   StreamSubscription<AiBuildEvent>? _sub;
   bool _running = false;
   bool _applying = false;
+  String? _style;
   AiDone? _result;
   String? _error;
 
@@ -65,7 +88,10 @@ class _AiBuilderSheetState extends ConsumerState<AiBuilderSheet> {
       _log.clear();
     });
 
-    _sub = ref.read(aiRepositoryProvider).build(widget.roomId, prompt).listen(
+    _sub = ref
+        .read(aiRepositoryProvider)
+        .build(widget.roomId, styledPrompt(prompt, _style))
+        .listen(
       (event) {
         if (!mounted) return;
         setState(() {
@@ -167,6 +193,30 @@ class _AiBuilderSheetState extends ConsumerState<AiBuilderSheet> {
                     hintText: l10n.studioAiHint,
                     border: const OutlineInputBorder(),
                   ),
+                ),
+                const SizedBox(height: DesignTokens.spacingSm),
+                Text(l10n.studioAiStyleLabel, style: DesignTokens.caption),
+                const SizedBox(height: DesignTokens.spacingXs),
+                Wrap(
+                  spacing: DesignTokens.spacingXs,
+                  runSpacing: DesignTokens.spacingXs,
+                  children: [
+                    for (final id in furnitureStyles)
+                      ChoiceChip(
+                        label: Text(furnitureStyleLabel(l10n, id)),
+                        selected: _style == id,
+                        labelStyle: DesignTokens.body2.copyWith(
+                          color: _style == id
+                              ? DesignTokens.white
+                              : DesignTokens.textDark,
+                        ),
+                        checkmarkColor: DesignTokens.white,
+                        // Tapping the chosen style again clears it.
+                        onSelected: _running
+                            ? null
+                            : (on) => setState(() => _style = on ? id : null),
+                      ),
+                  ],
                 ),
                 const SizedBox(height: DesignTokens.spacingSm),
                 SizedBox(

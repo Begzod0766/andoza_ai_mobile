@@ -5,7 +5,7 @@
   the CI workflow (ios.yml) with `sed` from repository secrets, so no real Apple
   Team ID or provisioning-profile name is ever committed to git.
 
-  iOS bundle id for this app is com.tamiruy.tamirUyMobileFlutter (differs from the
+  iOS bundle id for this app is uz.andozaai.app (differs from the
   Android applicationId — do not "align" them).
 -->
 <plist version="1.0">

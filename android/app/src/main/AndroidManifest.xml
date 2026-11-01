@@ -1,12 +1,25 @@
-<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
     <!-- Required for API calls to the backend. Flutter only adds INTERNET to the
          debug/profile manifests, so release builds have no network access without
          this line (login fails with "Connection failed"). -->
     <uses-permission android:name="android.permission.INTERNET" />
     <!-- ARCore floor-plan scanning (arscan.ArScanActivity). -->
     <uses-permission android:name="android.permission.CAMERA" />
+    <!-- Push notifications (Android 13+ asks the user at runtime). -->
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
     <!-- AR is optional so the app still installs on non-AR devices/emulators. -->
     <uses-feature android:name="android.hardware.camera.ar" android:required="false" />
+    <!-- The AR scanner is portrait-only (screenOrientation="portrait"), which
+         Play reads as "needs a portrait screen" and drops landscape-only TVs and
+         cars. The rest of the app does not need it. -->
+    <uses-feature android:name="android.hardware.screen.portrait" android:required="false" />
+    <!-- No ads: firebase_analytics adds the advertising-ID permissions, and Play
+         then blocks releases while the Advertising ID declaration says "No".
+         Analytics works without them. -->
+    <uses-permission android:name="com.google.android.gms.permission.AD_ID" tools:node="remove" />
+    <uses-permission android:name="android.permission.ACCESS_ADSERVICES_AD_ID" tools:node="remove" />
+    <uses-permission android:name="android.permission.ACCESS_ADSERVICES_ATTRIBUTION" tools:node="remove" />
     <application
         android:label="Andoza AI"
         android:name="${applicationName}"
@@ -32,6 +45,14 @@
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>
+            </intent-filter>
+            <!-- "Share → Andoza AI": a Pinterest pin shared from the Pinterest app
+                 (text like "Check out this Pin! https://pin.it/…"); see
+                 ShareChannel and lib/services/share_intent.dart. -->
+            <intent-filter>
+                <action android:name="android.intent.action.SEND"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+                <data android:mimeType="text/plain"/>
             </intent-filter>
             <!-- Deep links: andozaai://... routes straight to a go_router path
                  (e.g. andozaai:///studio/{roomId} opens the 3D Studio). -->
@@ -61,6 +82,25 @@
         <meta-data
             android:name="io.flutter.embedding.android.EnableImpeller"
             android:value="false" />
+        <!-- Firebase collection starts OFF so debug builds send nothing before
+             Dart runs; initFirebase turns it on at runtime in release builds. -->
+        <meta-data
+            android:name="firebase_analytics_collection_enabled"
+            android:value="false" />
+        <meta-data
+            android:name="firebase_crashlytics_collection_enabled"
+            android:value="false" />
+        <!-- Analytics never reads the advertising ID (see the removed AD_ID above). -->
+        <meta-data
+            android:name="google_analytics_adid_collection_enabled"
+            android:value="false" />
+        <!-- Pushes shown by the OS (app in background) use our channel and icon. -->
+        <meta-data
+            android:name="com.google.firebase.messaging.default_notification_channel_id"
+            android:value="andoza_updates" />
+        <meta-data
+            android:name="com.google.firebase.messaging.default_notification_icon"
+            android:resource="@drawable/ic_notification" />
         <!-- ARCore is optional: the app runs (reporting "unsupported") without it. -->
         <meta-data
             android:name="com.google.ar.core"

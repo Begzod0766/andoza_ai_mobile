@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:logger/logger.dart';
 import 'package:riverpod/riverpod.dart';
 
+import '../../l10n/app_localizations.dart';
 import '../../providers/auth_provider.dart';
 import '../../services/api_client.dart';
 import 'models/captured_room.dart';
@@ -19,7 +20,12 @@ class ScanSupport {
   /// [supported].
   final String? reason;
 
-  const ScanSupport(this.supported, this.reason);
+  /// Whether several rooms can be scanned in one session and merged
+  /// (RoomPlan's StructureBuilder: LiDAR and iOS 17+). False when the native
+  /// side does not say, so older builds keep the single-room scan.
+  final bool multiRoom;
+
+  const ScanSupport(this.supported, this.reason, {this.multiRoom = false});
 }
 
 /// A completed RoomPlan capture handed back from the native side.
@@ -45,6 +51,17 @@ class ScanResult {
   });
 }
 
+/// Several rooms captured in one session (`scanRooms`), in one world frame.
+class MultiScanResult {
+  final List<ScanResult> rooms;
+
+  /// The session ended early (the app went to the background); [rooms] are
+  /// the ones finished before that.
+  final bool partial;
+
+  const MultiScanResult({required this.rooms, required this.partial});
+}
+
 /// Raised when a scan fails on the native side (busy, scan_failed, parse_failed…).
 class RoomScanException implements Exception {
   final String code;
@@ -54,6 +71,27 @@ class RoomScanException implements Exception {
   @override
   String toString() => 'RoomScanException($code): $message';
 }
+
+/// The native RoomPlan scanners' texts in the app's language: the buttons,
+/// the starting hint and the coaching lines for RoomPlan's instructions.
+/// Without them the scanner shows its built-in Uzbek. `roomN` holds `{n}`.
+/// RoomPlan's own animated prompts ("Point camera at…") come from iOS in the
+/// phone's language and are out of the app's reach.
+Map<String, String> roomScanLabels(AppLocalizations l10n) => {
+      'nextRoom': l10n.scanNextRoom,
+      'finish': l10n.scanFinish,
+      'cancel': l10n.actionCancel,
+      'done': l10n.actionDone,
+      'roomN': l10n.scanRoomN(0).replaceFirst('0', '{n}'),
+      'start': l10n.scanHintStart,
+      'moveCloser': l10n.scanCoachMoveCloser,
+      'moveAway': l10n.scanCoachMoveAway,
+      'slowDown': l10n.scanCoachSlowDown,
+      'turnOnLight': l10n.scanCoachTurnOnLight,
+      'lowTexture': l10n.scanCoachLowTexture,
+      'good': l10n.scanCoachGood,
+      'keepGoing': l10n.scanCoachKeepGoing,
+    };
 
 /// Bridges the native RoomPlan module (`MethodChannel("andoza/roomscan")`) and
 /// uploads the captured room to the backend. Pure-Dart-testable: the channel is
@@ -76,7 +114,11 @@ class RoomScanService {
       final supported = res?['supported'] == true;
       final reason = res?['reason'] as String?;
       _logger.i('roomscan isSupported → supported=$supported reason=$reason');
-      return ScanSupport(supported, supported ? null : (reason ?? 'unsupported'));
+      return ScanSupport(
+        supported,
+        supported ? null : (reason ?? 'unsupported'),
+        multiRoom: supported && res?['multiRoom'] == true,
+      );
     } on MissingPluginException {
       // No native handler (Android, or iOS build without the module).
       return const ScanSupport(false, 'not_implemented');
@@ -86,11 +128,46 @@ class RoomScanService {
     }
   }
 
-  /// Present the native RoomPlan scanner. Returns null when the user cancels;
-  /// throws [RoomScanException] on a native error (`busy`, `scan_failed`, …).
-  Future<ScanResult?> scan() async {
+  /// Present the native multi-room scanner (iOS 17+, see
+  /// [ScanSupport.multiRoom]). [labels] are its texts in the app's language
+  /// (see [roomScanLabels]). Returns null when the user cancels; throws
+  /// [RoomScanException] on a native error.
+  Future<MultiScanResult?> scanRooms({required Map<String, String> labels}) async {
     try {
-      final res = await channel.invokeMapMethod<String, dynamic>('scanRoom');
+      final res = await channel.invokeMapMethod<String, dynamic>(
+          'scanRooms', {'labels': labels});
+      if (res == null) return null;
+      final version = res['version'] as String? ?? 'roomplan-1';
+      final rooms = <ScanResult>[];
+      for (final item in (res['rooms'] as List? ?? const [])) {
+        final map = (item as Map).cast<String, dynamic>();
+        final rawJson = map['json'] as String? ?? '';
+        final decoded = jsonDecode(rawJson);
+        if (decoded is! Map<String, dynamic>) {
+          throw const RoomScanException('parse_failed', 'Skan natijasi noto\'g\'ri');
+        }
+        rooms.add(ScanResult(
+          room: parseCapturedRoom(decoded),
+          rawJson: rawJson,
+          usdzPath: map['usdzPath'] as String? ?? '',
+          version: version,
+        ));
+      }
+      _logger.i('roomscan scanRooms → rooms=${rooms.length} partial=${res['partial']}');
+      return MultiScanResult(rooms: rooms, partial: res['partial'] == true);
+    } on PlatformException catch (e) {
+      _logger.e('roomscan scanRooms failed', error: e);
+      throw RoomScanException(e.code, e.message ?? 'Skanerlashda xatolik');
+    }
+  }
+
+  /// Present the native RoomPlan scanner. [labels] are its texts in the app's
+  /// language (see [roomScanLabels]). Returns null when the user cancels;
+  /// throws [RoomScanException] on a native error (`busy`, `scan_failed`, …).
+  Future<ScanResult?> scan({required Map<String, String> labels}) async {
+    try {
+      final res = await channel.invokeMapMethod<String, dynamic>(
+          'scanRoom', {'labels': labels});
       if (res == null) {
         _logger.i('roomscan scanRoom → cancelled');
         return null;
@@ -181,7 +258,10 @@ class RoomScanService {
   /// room. The room itself is created first via the normal handoff, exactly like
   /// the manual flow; this only uploads the extras. Returns the room JSON the
   /// backend echoes back (Phase 4).
-  Future<Map<String, dynamic>> upload(String roomId, ScanResult scan) async {
+  /// [scanGroup] marks the rooms of one multi-room session, so the backend's
+  /// duplicate-scan cleanup keeps them all.
+  Future<Map<String, dynamic>> upload(String roomId, ScanResult scan,
+      {String? scanGroup}) async {
     final bytes = await File(scan.usdzPath).readAsBytes();
     _logger.i('roomscan upload → room=$roomId usdz=${bytes.length}B');
     return _api.uploadFile<Map<String, dynamic>>(
@@ -190,7 +270,10 @@ class RoomScanService {
       filename: 'scan.usdz',
       fieldName: 'usdz',
       contentType: 'model/vnd.usdz+zip',
-      fields: {'room_json': scan.rawJson},
+      fields: {
+        'room_json': scan.rawJson,
+        'scan_group': ?scanGroup,
+      },
       fromJson: (d) => (d as Map).cast<String, dynamic>(),
     );
   }

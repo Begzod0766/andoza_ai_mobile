@@ -55,24 +55,30 @@ Map<String, dynamic> _$PaginatedMaterialsToJson(_PaginatedMaterials instance) =>
 _Furniture _$FurnitureFromJson(Map<String, dynamic> json) => _Furniture(
   id: json['id'] as String,
   storeId: json['store_id'] as String?,
+  storeName: json['store_name'] as String?,
   category: json['category'] as String,
   nameUz: json['name_uz'] as String,
   priceUzs: (json['price_uzs'] as num?)?.toInt(),
-  glbKey: json['glb_key'] as String?,
+  glbUrl: json['glb_url'] as String?,
+  thumbnailUrl: json['thumbnail_url'] as String?,
   footprintW: (json['footprint_w'] as num?)?.toDouble(),
   footprintD: (json['footprint_d'] as num?)?.toDouble(),
+  heightCm: (json['height_cm'] as num?)?.toDouble(),
 );
 
 Map<String, dynamic> _$FurnitureToJson(_Furniture instance) =>
     <String, dynamic>{
       'id': instance.id,
       'store_id': instance.storeId,
+      'store_name': instance.storeName,
       'category': instance.category,
       'name_uz': instance.nameUz,
       'price_uzs': instance.priceUzs,
-      'glb_key': instance.glbKey,
+      'glb_url': instance.glbUrl,
+      'thumbnail_url': instance.thumbnailUrl,
       'footprint_w': instance.footprintW,
       'footprint_d': instance.footprintD,
+      'height_cm': instance.heightCm,
     };
 
 _PaginatedFurniture _$PaginatedFurnitureFromJson(Map<String, dynamic> json) =>

@@ -1,16 +1,19 @@
-import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:webview_flutter/webview_flutter.dart';
+import 'package:webview_flutter_android/webview_flutter_android.dart';
 
 import '../../config/app_config.dart';
 import '../../config/design_tokens.dart';
 import '../../l10n/app_localizations.dart';
-import '../../models/user_model.dart';
 import '../../providers/auth_provider.dart';
+import '../../providers/locale_provider.dart';
 import '../../widgets/common/error_view.dart';
+import 'studio_session.dart';
+import 'webview_file_chooser.dart';
 
 /// Embeds a web page from the React/Three.js frontend (the 3D Studio or the
 /// room-capture wizard) in a WebView, authenticated as the current mobile user.
@@ -29,7 +32,6 @@ import '../../widgets/common/error_view.dart';
 class StudioWebViewScreen extends ConsumerStatefulWidget {
   const StudioWebViewScreen({
     required this.path,
-    this.title,
     super.key,
   });
 
@@ -39,26 +41,87 @@ class StudioWebViewScreen extends ConsumerStatefulWidget {
   /// [focus] opens the room on its own, without the flat's other rooms around
   /// it (the web studio's `?focus=1`).
   // ignore: prefer_const_constructors_in_immutables
-  StudioWebViewScreen.studio({required String roomId, bool focus = false, Key? key})
-      : this(path: focus ? '/studio/$roomId?focus=1' : '/studio/$roomId', key: key);
+  /// [aiPin] opens the studio's AI designer with that Pinterest pin already
+  /// taken (the web studio's `?ai_pin=`), after "Share → Andoza AI".
+  /// [place] is a shop's furniture id the studio puts into the room as it
+  /// opens (the web studio's `?place=`), from "Xonamga qo'yish".
+  StudioWebViewScreen.studio({
+    required String roomId,
+    bool focus = false,
+    String? aiPin,
+    String? place,
+    Key? key,
+  }) : this(
+         path: studioRoomPath(roomId, focus: focus, aiPin: aiPin, place: place),
+         key: key,
+       );
 
   /// The frontend route to open (e.g. `/wizard`, `/studio/{roomId}`).
   final String path;
-
-  /// The app-bar label. Defaults to [AppLocalizations.studioWebViewTitle]
-  /// when omitted.
-  final String? title;
 
   @override
   ConsumerState<StudioWebViewScreen> createState() =>
       _StudioWebViewScreenState();
 }
 
+/// The studio path for a room: `?focus=1` opens it alone, `?ai_pin=` opens
+/// the AI designer with a Pinterest pin, `?place=` puts a shop's furniture in.
+String studioRoomPath(
+  String roomId, {
+  bool focus = false,
+  String? aiPin,
+  String? place,
+}) {
+  final query = {
+    if (focus) 'focus': '1',
+    'ai_pin': ?aiPin,
+    'place': ?place,
+  };
+  return Uri(
+    path: '/studio/$roomId',
+    queryParameters: query.isEmpty ? null : query,
+  ).toString();
+}
+
 /// The web page to open for [path]. `app=1` tells the page it is inside the
-/// app, so it hides its own back button — this screen's AppBar already has one.
-String studioPageUrl(String base, String path) {
+/// app, so it hides its own back button — this screen draws one over the page.
+/// `lang=` opens it in the app's language rather than the account's or the
+/// phone's; the page then saves that language on the account.
+String studioPageUrl(String base, String path, {String? language}) {
   final sep = path.contains('?') ? '&' : '?';
-  return '$base$path${sep}app=1';
+  final lang = language == null
+      ? ''
+      : '&lang=${Uri.encodeQueryComponent(language)}';
+  return '$base$path${sep}app=1$lang';
+}
+
+/// The colour at the bottom of the web studio's 3D view.
+const _studioFloorColor = Color(0xFF0F1B2A);
+
+/// The first opaque background colour from the element at the page's bottom
+/// middle up to the root, as CSS gives it ("rgb(237, 227, 250)").
+const _bottomColorJs = '''
+(function () {
+  var el = document.elementFromPoint(window.innerWidth / 2, window.innerHeight - 2);
+  for (; el; el = el.parentElement) {
+    var c = getComputedStyle(el).backgroundColor;
+    if (c && c !== 'transparent' && !/rgba\\(.*,\\s*0\\)\$/.test(c)) return c;
+  }
+  return '';
+})()
+''';
+
+/// The colour in a CSS `rgb(r, g, b)` / `rgba(r, g, b, a)` string (quotes
+/// around it allowed, as a WebView may return them), or null.
+Color? parseCssRgb(String css) {
+  final m = RegExp(r'rgba?\((\d+),\s*(\d+),\s*(\d+)').firstMatch(css);
+  if (m == null) return null;
+  return Color.fromARGB(
+    255,
+    int.parse(m.group(1)!),
+    int.parse(m.group(2)!),
+    int.parse(m.group(3)!),
+  );
 }
 
 class _StudioWebViewScreenState extends ConsumerState<StudioWebViewScreen> {
@@ -76,8 +139,20 @@ class _StudioWebViewScreenState extends ConsumerState<StudioWebViewScreen> {
   bool _exiting = false;
   bool _loading = true;
   String? _error;
+  // Whether the page shown is the 3D studio itself (`/studio/...`), not the
+  // smeta (`/smeta/...`), whose title sits where the back button would.
+  bool _onStudioPage = true;
+  // The colour of the strip under the page, matched to the page's bottom.
+  Color _bottomColor = _studioFloorColor;
+  // Counts [_pageChanged] calls, so a slow one (it waits for the page to draw)
+  // cannot overwrite what a later one found.
+  int _pageSeq = 0;
 
-  String get _targetUrl => studioPageUrl(AppConfig.studioBaseUrl, widget.path);
+  String get _targetUrl => studioPageUrl(
+    AppConfig.studioBaseUrl,
+    widget.path,
+    language: ref.read(localeProvider).languageCode,
+  );
 
   @override
   void initState() {
@@ -115,7 +190,7 @@ class _StudioWebViewScreenState extends ConsumerState<StudioWebViewScreen> {
             // https://evil.com/studio/x, which the old path-only check would
             // have happily kept in-WebView with the tokens attached). Anything
             // off the studio origin is blocked outright.
-            if (request.isMainFrame && !_isAllowedStudioUrl(request.url)) {
+            if (request.isMainFrame && !isAllowedStudioUrl(request.url)) {
               debugPrint(
                 'StudioWebView: blocked off-origin navigation to '
                 '${request.url}',
@@ -137,7 +212,11 @@ class _StudioWebViewScreenState extends ConsumerState<StudioWebViewScreen> {
           onUrlChange: (change) {
             if (_studioReady && _hasLeftStudio(change.url)) {
               _returnToApp();
+              return;
             }
+            // Before the studio is up, the URL only bounces through the
+            // bootstrap pages ('/', /login); the studio's own load reports it.
+            if (_studioReady) _pageChanged(change.url);
           },
           onPageFinished: (url) async {
             // On the first load of the origin, seed the auth flag then navigate
@@ -145,7 +224,7 @@ class _StudioWebViewScreenState extends ConsumerState<StudioWebViewScreen> {
             if (!_seeded) {
               _seeded = true;
               // The field is assigned before any page load fires this callback.
-              await _controller!.runJavaScript(_authSeedJs(auth.user));
+              await _controller!.runJavaScript(studioAuthSeedJs(auth.user));
               await _controller!.loadRequest(Uri.parse(_targetUrl));
               return;
             }
@@ -158,6 +237,7 @@ class _StudioWebViewScreenState extends ConsumerState<StudioWebViewScreen> {
               _studioReady = true;
             }
             if (mounted && _loading) setState(() => _loading = false);
+            if (_studioReady) _pageChanged(url);
           },
           onWebResourceError: (err) {
             // Ignore sub-resource errors; only surface a hard main-frame fail.
@@ -173,74 +253,89 @@ class _StudioWebViewScreenState extends ConsumerState<StudioWebViewScreen> {
           },
         ),
       );
+    // Android's WebView ignores <input type="file"> unless the app answers it,
+    // so every Studio image upload did nothing there. iOS has its own picker.
+    final platform = controller.platform;
+    if (platform is AndroidWebViewController) {
+      platform.setOnShowFileSelector(
+        (params) => answerFileSelector(
+          acceptTypes: params.acceptTypes,
+          multiple: params.mode == FileSelectorMode.openMultiple,
+          capture: params.isCaptureEnabled,
+          chooseSource: _chooseImageSource,
+          pick: pickWithImagePicker,
+        ),
+      );
+    }
     setState(() => _controller = controller);
     _bootstrap(auth, controller);
+  }
+
+  /// Follows the page shown: the back button only over the 3D studio, and
+  /// the strip under the page in that page's bottom colour.
+  Future<void> _pageChanged(String? url) async {
+    final path = Uri.tryParse(url ?? '')?.path;
+    if (path == null || path.isEmpty) return;
+    final seq = ++_pageSeq;
+    final onStudio = path.startsWith('/studio');
+    var color = _studioFloorColor;
+    if (!onStudio) {
+      // A client-side route change lands before the new page has drawn.
+      await Future<void>.delayed(const Duration(milliseconds: 300));
+      color = await _pageBottomColor() ?? DesignTokens.white;
+    }
+    if (!mounted || seq != _pageSeq) return;
+    setState(() {
+      _onStudioPage = onStudio;
+      _bottomColor = color;
+    });
+  }
+
+  /// The background colour at the bottom middle of the page, or null.
+  Future<Color?> _pageBottomColor() async {
+    final controller = _controller;
+    if (controller == null) return null;
+    try {
+      final result = await controller.runJavaScriptReturningResult(
+        _bottomColorJs,
+      );
+      return parseCssRgb(result.toString());
+    } catch (_) {
+      return null;
+    }
+  }
+
+  /// Camera or gallery, for an image upload in the Studio (Android).
+  Future<ImageSource?> _chooseImageSource() {
+    if (!mounted) return Future.value();
+    final l10n = AppLocalizations.of(context)!;
+    return showModalBottomSheet<ImageSource>(
+      context: context,
+      builder: (ctx) => SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ListTile(
+              leading: const Icon(Icons.photo_camera_outlined),
+              title: Text(l10n.addProductCamera),
+              onTap: () => Navigator.pop(ctx, ImageSource.camera),
+            ),
+            ListTile(
+              leading: const Icon(Icons.photo_library_outlined),
+              title: Text(l10n.addProductGallery),
+              onTap: () => Navigator.pop(ctx, ImageSource.gallery),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 
   Future<void> _bootstrap(
     AuthAuthenticated auth,
     WebViewController controller,
   ) async {
-    final studioUri = Uri.parse(AppConfig.studioBaseUrl);
-    final host = studioUri.host;
-
-    // Never send auth tokens as cleartext cookies over an insecure origin: a
-    // plaintext http:// studio pointed at a non-loopback host would leak both
-    // the access and refresh tokens on the wire. https is always safe; plain
-    // http is tolerated only for local dev hosts (emulator loopback / LAN),
-    // where there's no meaningful MITM surface. Otherwise we skip cookie
-    // seeding entirely and just load the page unauthenticated.
-    if (studioUri.scheme != 'https' && !_isDevHost(host)) {
-      debugPrint(
-        'StudioWebView: refusing to seed auth cookies to insecure origin '
-        '${AppConfig.studioBaseUrl} (non-https, non-dev host); loading '
-        'without auth to avoid sending tokens in cleartext.',
-      );
-      await controller.loadRequest(studioUri);
-      return;
-    }
-
-    final cookies = WebViewCookieManager();
-
-    // Set the access-token cookie for the shared host so the frontend's
-    // credentialed API calls are authenticated (cookies ignore port, so one
-    // cookie covers both the frontend and the API when they share a host — the
-    // default). If STUDIO_BASE_URL is pointed at a different host than the API,
-    // this cookie won't reach the API and its calls will 401.
-    await cookies.setCookie(
-      WebViewCookie(name: 'token', value: auth.token, domain: host, path: '/'),
-    );
-
-    // Also seed the refresh-token cookie so the studio's api.ts can silently
-    // refresh once the short-lived access token expires — without this the
-    // WebView session dies at the access-token TTL. The web refresh path
-    // (`_tryRefresh` in frontend/src/lib/api.ts) is a bare
-    // `POST {API}/auth/refresh` with `credentials: "include"` and NO body: it
-    // relies entirely on the backend reading the `refresh_token` cookie (see
-    // backend auth.py `refresh_tokens`, a `refresh_token: Cookie()` param). The
-    // backend scopes that cookie to `path=/api/v1/auth/refresh`, so we mirror it
-    // exactly — same name, same path — and the WebView will send it on the
-    // refresh call. The value is the refresh token the mobile app already holds
-    // in secure storage; the backend rotates both cookies on each refresh, so
-    // the studio session then outlives the access-token TTL on its own.
-    final refreshToken =
-        await ref.read(secureStorageProvider).getRefreshToken();
-    if (refreshToken != null && refreshToken.isNotEmpty) {
-      // Derive the refresh path from the configured API base path so it stays
-      // in sync with the backend's cookie scope (`/api/v1` by default).
-      final apiPath = Uri.parse(AppConfig.apiUrl).path;
-      final basePath =
-          apiPath.endsWith('/') ? apiPath.substring(0, apiPath.length - 1) : apiPath;
-      await cookies.setCookie(
-        WebViewCookie(
-          name: 'refresh_token',
-          value: refreshToken,
-          domain: host,
-          path: '$basePath/auth/refresh',
-        ),
-      );
-    }
-
+    await seedStudioCookies(auth, ref.read(secureStorageProvider));
     // First load: the origin root establishes the origin so localStorage is
     // writable. It may bounce to /login (not yet seeded) — that's expected.
     await controller.loadRequest(Uri.parse(AppConfig.studioBaseUrl));
@@ -252,40 +347,6 @@ class _StudioWebViewScreenState extends ConsumerState<StudioWebViewScreen> {
   /// tabs (`/studio`, `/studio/{id}`, `/studio/{id}/{tab}`) return false so
   /// in-studio navigation stays in the WebView. A null/empty URL returns
   /// false so a spurious url change never triggers an exit.
-  /// Whether [url] is a navigation this WebView is allowed to follow: it must
-  /// share the studio's host, and use https (or plain http only when the studio
-  /// origin is itself a local dev host). This is the host-level containment the
-  /// old path-only [_hasLeftStudio] check was missing — it stops an
-  /// open-redirect / injected `window.location` to a foreign origin from
-  /// staying inside this JS-enabled, auth-seeded WebView.
-  bool _isAllowedStudioUrl(String url) {
-    final uri = Uri.tryParse(url);
-    if (uri == null || !uri.hasScheme || uri.host.isEmpty) return false;
-    final studio = Uri.parse(AppConfig.studioBaseUrl);
-    if (uri.host != studio.host) return false;
-    if (uri.scheme == 'https') return true;
-    // Plain http is only acceptable to a local dev host.
-    return uri.scheme == 'http' && _isDevHost(studio.host);
-  }
-
-  /// Whether [host] is a local development host (loopback or private LAN) for
-  /// which plaintext http is acceptable. Mirrors the cleartext allow-list in
-  /// android/app/src/main/res/xml/network_security_config.xml.
-  bool _isDevHost(String host) {
-    const explicit = {
-      '10.0.2.2', // Android emulator host loopback
-      'localhost',
-      '127.0.0.1',
-      '192.168.1.29', // CLAUDE.md dev backend
-      '192.168.1.5', // CLAUDE.md dev host
-    };
-    if (explicit.contains(host)) return true;
-    // Common private LAN ranges used for on-device development.
-    return host.startsWith('192.168.') ||
-        host.startsWith('10.') ||
-        host.startsWith('172.16.');
-  }
-
   bool _hasLeftStudio(String? url) {
     if (url == null) return false;
     final path = Uri.tryParse(url)?.path ?? '';
@@ -335,27 +396,7 @@ class _StudioWebViewScreenState extends ConsumerState<StudioWebViewScreen> {
         .catchError((_) {});
   }
 
-  /// JS that writes the Zustand `uy-tamir-auth` persisted state so the web
-  /// app's route guard sees an authenticated session.
-  String _authSeedJs(User user) {
-    final payload = jsonEncode({
-      'state': {
-        'user': {
-          'id': user.id,
-          'phone': user.phone,
-          'username': user.username,
-          'name': user.name,
-          'created_at': DateTime.now().toUtc().toIso8601String(),
-        },
-        'isAuthenticated': true,
-      },
-      'version': 0,
-    });
-    // jsonEncode again to safely embed as a JS string literal.
-    return "localStorage.setItem('uy-tamir-auth', ${jsonEncode(payload)});";
-  }
-
-  /// Intercepts the AppBar back button and the system back gesture — both go
+  /// Intercepts the back button over the page and the system back gesture — both go
   /// through the Navigator's pop, which this blocks (`canPop: false`) so the
   /// thumbnail capture can fire before the WebView is torn down. Without
   /// this, only an in-studio (web) navigation away triggers a capture (via
@@ -379,33 +420,73 @@ class _StudioWebViewScreenState extends ConsumerState<StudioWebViewScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context)!;
     return PopScope(
       canPop: false,
       onPopInvokedWithResult: (didPop, result) {
         if (!didPop) _onBackPressed();
       },
+      // No app bar: the page gets the whole screen under the status bar
+      // (the web studio has its own toolbar). Its left end is free, so the way
+      // out sits there.
       child: Scaffold(
-        appBar: AppBar(
-          // Always offer a way out: the web page hides its own back button
-          // inside the app, and a Studio opened with `go` (e.g. from the room
-          // wizard) has nothing to pop, so the default arrow wouldn't show.
-          leading: BackButton(onPressed: _onBackPressed),
-          title: Text(widget.title ?? l10n.studioWebViewTitle),
-          backgroundColor: DesignTokens.white,
-        ),
-        body: Stack(
+        backgroundColor: DesignTokens.white,
+        body: Column(
           children: [
-            if (_error == null && _controller != null)
-              WebViewWidget(controller: _controller!),
-            if (_loading && _error == null)
-              const Center(child: CircularProgressIndicator()),
-            if (_error != null)
-              ErrorView(
-                message: _error!,
-                onRetry: _retry,
-                icon: Icons.view_in_ar_outlined,
+            Expanded(
+              child: SafeArea(
+                bottom: false,
+                child: Stack(
+                  children: [
+                    if (_error == null && _controller != null)
+                      WebViewWidget(controller: _controller!),
+                    if (_loading && _error == null)
+                      const Center(child: CircularProgressIndicator()),
+                    if (_error != null)
+                      ErrorView(
+                        message: _error!,
+                        onRetry: _retry,
+                        icon: Icons.view_in_ar_outlined,
+                      ),
+                    // Always offer a way out: the web page hides its own
+                    // back button inside the app, and a Studio opened with
+                    // `go` (e.g. from the room wizard) has nothing to pop.
+                    // 40 pt, so it clears the toolbar's 3D/Smeta switch.
+                    // Not over the smeta page, whose title is there; its
+                    // 3D/Smeta switch leads back, and system back works.
+                    if (_onStudioPage || _error != null)
+                      Positioned(
+                        top: DesignTokens.spacingSm,
+                        left: DesignTokens.spacingXs,
+                        child: Material(
+                          color: DesignTokens.white,
+                          shape: const CircleBorder(),
+                          elevation: 2,
+                          child: SizedBox.square(
+                            dimension: 40,
+                            child: BackButton(
+                              onPressed: _onBackPressed,
+                              style: IconButton.styleFrom(
+                                padding: EdgeInsets.zero,
+                                iconSize: 20,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                  ],
+                ),
               ),
+            ),
+            // The page stops above the home indicator (iOS) and the system
+            // navigation bar (Android, drawn over the app edge to edge): the
+            // studio's buttons sit at its bottom edge, and there a swipe went
+            // home or the 3-button bar covered them. The strip is the 3D
+            // view's floor colour (or the other page's bottom colour), so it
+            // reads as part of the page.
+            Container(
+              height: MediaQuery.paddingOf(context).bottom,
+              color: _bottomColor,
+            ),
           ],
         ),
       ),

@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:flutter/foundation.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -26,8 +27,12 @@ class PendingScanStore {
   static const _kSavedAt = 'pending_scan_saved_at_ms';
   static const _kUsdzFileName = 'pending_scan.usdz';
 
+  /// Where the scan files are kept; replaced in tests.
+  @visibleForTesting
+  static Future<Directory> Function() documentsDir = getApplicationDocumentsDirectory;
+
   static Future<File> _usdzFile() async {
-    final dir = await getApplicationDocumentsDirectory();
+    final dir = await documentsDir();
     return File('${dir.path}/$_kUsdzFileName');
   }
 
@@ -91,6 +96,83 @@ class PendingScanStore {
       // Best-effort cleanup — a leftover temp file costs disk space, not
       // correctness (the SharedPreferences keys above are the source of
       // truth for `hasPending`).
+    }
+  }
+
+  // ── A multi-room scan (several rooms of a flat in one session) ──────────
+
+  static const _kFlatJson = 'pending_flat_json';
+  static const _kFlatPrefix = 'pending_flat_';
+
+  static Future<File> _flatUsdz(int i) async =>
+      File('${(await documentsDir()).path}/$_kFlatPrefix$i.usdz');
+
+  /// Keeps a multi-room scan until its review is finished, like [save] does
+  /// for one room: the `.usdz` files go to Documents, the room JSONs to prefs.
+  static Future<void> saveFlat(MultiScanResult flat) async {
+    await clearFlat(); // no files left over from a bigger earlier set
+    for (var i = 0; i < flat.rooms.length; i++) {
+      await File(flat.rooms[i].usdzPath).copy((await _flatUsdz(i)).path);
+    }
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(
+        _kFlatJson, jsonEncode([for (final r in flat.rooms) r.rawJson]));
+  }
+
+  static Future<bool> hasPendingFlat() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString(_kFlatJson) != null;
+  }
+
+  /// The kept multi-room scan, or null. Rooms that no longer convert to a
+  /// valid plan (or lost their file) are left out; with none left, the entry
+  /// is cleared.
+  static Future<({List<RoomScanDraft> drafts, List<ScanResult> scans})?>
+      loadFlat() async {
+    final prefs = await SharedPreferences.getInstance();
+    final raw = prefs.getString(_kFlatJson);
+    if (raw == null) return null;
+    final drafts = <RoomScanDraft>[];
+    final scans = <ScanResult>[];
+    try {
+      final list = (jsonDecode(raw) as List).cast<String>();
+      for (var i = 0; i < list.length; i++) {
+        try {
+          final file = await _flatUsdz(i);
+          if (!await file.exists()) continue;
+          final decoded = jsonDecode(list[i]);
+          if (decoded is! Map<String, dynamic>) continue;
+          final room = parseCapturedRoom(decoded);
+          final draft = RoomScanConverter.toRoomDraft(room);
+          if (!draft.plan.isValid) continue;
+          drafts.add(draft);
+          scans.add(ScanResult(
+              room: room, rawJson: list[i], usdzPath: file.path, version: 'roomplan-1'));
+        } catch (_) {
+          // One unreadable room does not lose the others.
+        }
+      }
+    } catch (_) {
+      // The entry itself is unreadable.
+    }
+    if (drafts.isEmpty) {
+      await clearFlat();
+      return null;
+    }
+    return (drafts: drafts, scans: scans);
+  }
+
+  static Future<void> clearFlat() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.remove(_kFlatJson);
+    try {
+      final dir = await documentsDir();
+      for (final f in dir.listSync().whereType<File>()) {
+        final name = f.uri.pathSegments.last;
+        if (name.startsWith(_kFlatPrefix) && name.endsWith('.usdz')) await f.delete();
+      }
+    } catch (_) {
+      // Best-effort, as in [clear].
     }
   }
 }

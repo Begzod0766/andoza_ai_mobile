@@ -21,7 +21,7 @@ flutter analyze
 flutter test
 ```
 
-Run against production: `--dart-define=API_URL=https://andoza.jumaniyozov.uz/api/v1`
+Run against production: `--dart-define=API_URL=https://andozaai.uz/api/v1`
 plus `API_BASE_URL` and `STUDIO_BASE_URL` (see `docs/BUILD_AND_RELEASE.md`).
 The defaults (`10.0.2.2`) only reach a backend on the host from the Android emulator.
 

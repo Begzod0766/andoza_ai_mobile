@@ -11,6 +11,9 @@ class User {
   final String? avatar;
   final DateTime? createdAt;
 
+  /// The account's interface language (uz/ru/en), from `/auth/me`.
+  final String? language;
+
   const User({
     required this.id,
     this.email,
@@ -21,6 +24,7 @@ class User {
     this.lastName,
     this.avatar,
     this.createdAt,
+    this.language,
   });
 
   factory User.fromJson(Map<String, dynamic> json) {
@@ -39,6 +43,7 @@ class User {
       createdAt: json['created_at'] != null
           ? DateTime.parse(json['created_at'] as String)
           : null,
+      language: json['language'] as String?,
     );
   }
 }

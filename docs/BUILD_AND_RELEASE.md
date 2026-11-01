@@ -6,9 +6,9 @@ va [RELEASE_SIGNING.md](RELEASE_SIGNING.md) (Android kalit).
 
 ## Talablar
 
-- Flutter **3.44.8** stable (CI shu versiyani ishlatadi), Dart `^3.12.1`.
+- Flutter **3.47.5** stable (CI shu versiyani ishlatadi), Dart `^3.13.0`.
 - Android: Java 17, Android SDK (minSdk 24).
-- iOS: macOS va Xcode, minimal iOS **15.0**. LiDAR skaner iOS 16+ va LiDAR'li iPhone/iPad'da ishlaydi.
+- iOS: macOS va Xcode, minimal iOS **15.0**. Ilova faqat iPhone uchun (iPad yo'q). LiDAR skaner iOS 16+ va LiDAR'li iPhone'da ishlaydi.
 
 ```bash
 flutter pub get
@@ -34,9 +34,9 @@ Haqiqiy qurilma yoki production uchun:
 
 ```bash
 flutter run \
-  --dart-define=API_URL=https://andoza.jumaniyozov.uz/api/v1 \
-  --dart-define=API_BASE_URL=https://andoza.jumaniyozov.uz \
-  --dart-define=STUDIO_BASE_URL=https://andoza.jumaniyozov.uz
+  --dart-define=API_URL=https://andozaai.uz/api/v1 \
+  --dart-define=API_BASE_URL=https://andozaai.uz \
+  --dart-define=STUDIO_BASE_URL=https://andozaai.uz
 ```
 
 Android HTTP (shifrlanmagan) ulanishni faqat `10.0.2.2`, `localhost`, `127.0.0.1`
@@ -48,7 +48,7 @@ yo'q. Shuning uchun haqiqiy qurilmada server manzili **HTTPS** bo'lishi kerak.
 
 | | Android | iOS |
 |---|---|---|
-| Ilova ID | `andozaai.com` (`applicationId`) | `com.tamiruy.tamirUyMobileFlutter` (bundle id) |
+| Ilova ID | `andozaai.com` (`applicationId`) | `uz.andozaai.app` (bundle id) |
 | Kod paketi | `com.tamir_uy.tamir_uy_mobile_flutter` (namespace) | — |
 | Nomi | Andoza AI | Andoza AI |
 | Minimal versiya | Android 7.0 (SDK 24) | iOS 15.0 |
@@ -56,6 +56,13 @@ yo'q. Shuning uchun haqiqiy qurilmada server manzili **HTTPS** bo'lishi kerak.
 
 Android'da `andozaai://` deep link'lari yoqilgan. Impeller o'chirilgan:
 emulyatorlarda u ilovani yiqitardi.
+
+**iOS Share Extension** (`ios/ShareExtension`, "Share → Andoza AI"):
+- Ilova ichidagi ikkinchi target. Bundle id: `uz.andozaai.app.ShareExtension`, team va avtomatik imzolash Runner bilan bir xil.
+- Versiyani `Generated.xcconfig` dan oladi, shuning uchun u har doim ilova versiyasiga teng bo'ladi.
+- App Group kerak emas: ulashilgan matn ilovaga `andozaai-share://pin?text=…` URL'i orqali beriladi.
+- Xcode'dan archive qilinganda (Automatic signing) extension'ning App ID va profili avtomatik yaratiladi.
+- CI'da qo'lda imzolash (`ios.yml`) uchun extension'ga ham alohida App Store provisioning profile va `ExportOptions.plist`'da ikkinchi qator kerak bo'ladi.
 
 ## Versiya
 

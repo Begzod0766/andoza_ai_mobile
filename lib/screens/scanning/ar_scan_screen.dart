@@ -8,6 +8,7 @@ import '../../features/ar_scan/ar_scan_service.dart';
 import '../../features/ar_scan/arcore_plan.dart';
 import '../../features/room_scan/room_scan_converter.dart';
 import '../../l10n/app_localizations.dart';
+import '../../services/analytics_service.dart';
 import 'room_scan_review_page.dart';
 
 /// Copy for a [ArPlanRejected.reason].
@@ -102,6 +103,7 @@ class _ArScanScreenState extends ConsumerState<ArScanScreen> with WidgetsBinding
         context.pop();
         return;
       }
+      ref.read(analyticsProvider).scanFinished('arcore');
       switch (buildArcorePlan(raw)) {
         case ArPlanOk(:final plan):
           context.pushReplacement(

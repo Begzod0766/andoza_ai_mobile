@@ -16,6 +16,8 @@ enum ShopCategory {
   sement,
   santexnika,
   elektr,
+  eshik,
+  deraza,
 }
 
 extension ShopCategoryInfo on ShopCategory {
@@ -29,6 +31,8 @@ extension ShopCategoryInfo on ShopCategory {
     ShopCategory.sement => l10n.shopCategorySement,
     ShopCategory.santexnika => l10n.shopCategorySantexnika,
     ShopCategory.elektr => l10n.shopCategoryElektr,
+    ShopCategory.eshik => l10n.shopCategoryEshik,
+    ShopCategory.deraza => l10n.shopCategoryDeraza,
   };
 }
 

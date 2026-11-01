@@ -9,10 +9,14 @@ import '../../config/design_tokens.dart';
 import '../../l10n/app_localizations.dart';
 import '../../providers/auth_provider.dart';
 import '../../providers/business_provider.dart';
+import '../../providers/locale_provider.dart';
 import '../../repositories/auth_repository.dart';
+import '../../services/analytics_service.dart';
 import '../../services/api_client.dart';
+import '../../services/apple_sign_in_service.dart';
 import '../../services/google_sign_in_service.dart';
 import '../../utils/error_mapper.dart';
+import '../settings/language_picker_sheet.dart';
 
 /// Login screen — a Flutter port of the web `/login` page: phone-OTP by default,
 /// with a 6-digit code step, plus username/password login and registration.
@@ -137,7 +141,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     });
     try {
       final res = await _repo.verifyOtp(_sentPhone, code);
+      final analytics = ref.read(analyticsProvider);
       ref.read(authStateProvider.notifier).setSession(res);
+      analytics.login('password');
     } catch (_) {
       setState(() {
         _error = l10n.loginErrorInvalidCode;
@@ -192,6 +198,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         );
     if (!mounted) return;
     final state = ref.read(authStateProvider);
+    if (state is AuthAuthenticated) ref.read(analyticsProvider).login('password');
     setState(() {
       _loading = false;
       if (state is AuthError) _error = _loginErrorMessage(l10n, state);
@@ -227,24 +234,50 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       final idToken = await ref.read(googleSignInServiceProvider).getIdToken();
       if (idToken == null) return;
       final res = await _repo.loginWithGoogle(idToken);
+      final analytics = ref.read(analyticsProvider);
       ref.read(authStateProvider.notifier).setSession(res);
+      analytics.login('google');
     } catch (e) {
-      if (mounted) setState(() => _error = _googleErrorMessage(l10n, e));
+      if (mounted) {
+        setState(() => _error = _socialErrorMessage(e, l10n.loginGoogleFailed));
+      }
     } finally {
       if (mounted) setState(() => _loading = false);
     }
   }
 
-  /// A rejected token (401) or a plugin failure reads as "Google sign-in
-  /// failed"; network/5xx/503-not-configured go through [mapErrorToMessage]
-  /// like the password login does.
-  String _googleErrorMessage(AppLocalizations l10n, Object error) {
+  Future<void> _appleLogin() async {
+    final l10n = AppLocalizations.of(context)!;
+    setState(() {
+      _loading = true;
+      _error = null;
+    });
+    try {
+      final cred = await ref.read(appleSignInServiceProvider).getCredential();
+      if (cred == null) return;
+      final res = await _repo.loginWithApple(cred.identityToken, name: cred.name);
+      final analytics = ref.read(analyticsProvider);
+      ref.read(authStateProvider.notifier).setSession(res);
+      analytics.login('apple');
+    } catch (e) {
+      if (mounted) {
+        setState(() => _error = _socialErrorMessage(e, l10n.loginAppleFailed));
+      }
+    } finally {
+      if (mounted) setState(() => _loading = false);
+    }
+  }
+
+  /// A rejected token (401) or a plugin failure reads as [failed] ("Google /
+  /// Apple sign-in failed"); network/5xx/503-not-configured go through
+  /// [mapErrorToMessage] like the password login does.
+  String _socialErrorMessage(Object error, String failed) {
     if (error is AuthException && error.statusCode != 401) {
       return mapErrorToMessage(
         ApiException(message: error.message, statusCode: error.statusCode),
       );
     }
-    return l10n.loginGoogleFailed;
+    return failed;
   }
 
   Future<void> _register() async {
@@ -252,6 +285,12 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     final u = _username.text.trim();
     if (u.length < 3) {
       setState(() => _error = l10n.loginErrorUsernameShort);
+      return;
+    }
+    // The API takes 3–50 characters (after trimming) and refuses more with a
+    // 422, which would otherwise surface as a vague "registration failed".
+    if (u.length > 50) {
+      setState(() => _error = l10n.loginErrorUsernameLong);
       return;
     }
     if (_password.text.length < 6) {
@@ -272,7 +311,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       // application itself is the next screen (the app shell opens it), where
       // it can be filled in — or left for later without losing the account.
       ref.read(pendingBusinessSetupProvider.notifier).state = _businessKind;
+      final analytics = ref.read(analyticsProvider);
       ref.read(authStateProvider.notifier).setSession(res);
+      analytics.login('password');
     } catch (e) {
       // 409 Conflict = username already taken — classify by the real status
       // code (carried on AuthException), not a fragile message substring.
@@ -300,22 +341,32 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
           // Top-anchored, not centred: the card's height differs per step
           // (phone / code / username / register), and a centred column moved the
           // logo up and down every time the step changed.
-          child: Align(
-            alignment: Alignment.topCenter,
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.fromLTRB(
-                DesignTokens.spacing24, 72, DesignTokens.spacing24, DesignTokens.spacing32),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  const _BrandHeader(),
-                  const SizedBox(height: DesignTokens.spacing32),
-                  _card(),
-                  const SizedBox(height: DesignTokens.spacing24),
-                  const _VersionLabel(),
-                ],
+          child: Stack(
+            children: [
+              Align(
+                alignment: Alignment.topCenter,
+                child: SingleChildScrollView(
+                  padding: const EdgeInsets.fromLTRB(
+                    DesignTokens.spacing24, 72, DesignTokens.spacing24, DesignTokens.spacing32),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const _BrandHeader(),
+                      const SizedBox(height: DesignTokens.spacing32),
+                      _card(),
+                      const SizedBox(height: DesignTokens.spacing24),
+                      const _VersionLabel(),
+                    ],
+                  ),
+                ),
               ),
-            ),
+              // The profile's language row is out of reach before sign-in.
+              const Positioned(
+                top: DesignTokens.spacing8,
+                right: DesignTokens.spacing8,
+                child: _LanguageButton(),
+              ),
+            ],
           ),
         ),
       ),
@@ -480,7 +531,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         _errorText(),
         const SizedBox(height: DesignTokens.spacing24),
         _primaryButton(l10n.loginSignIn, _loading ? null : _login),
-        ..._googleSection(l10n),
+        ..._socialSection(l10n),
         const SizedBox(height: DesignTokens.spacing16),
         Center(
           child: Wrap(
@@ -522,7 +573,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         _errorText(),
         const SizedBox(height: DesignTokens.spacing24),
         _primaryButton(l10n.loginRegister, _loading ? null : _register),
-        ..._googleSection(l10n),
+        ..._socialSection(l10n),
         const SizedBox(height: DesignTokens.spacing16),
         Center(
           child: Wrap(
@@ -541,21 +592,53 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   }
 
   // ── small widgets ───────────────────────────────────────────────────────
-  /// "yoki" divider + "Google bilan kirish". Hidden where Google sign-in isn't
-  /// configured (iOS until GOOGLE_IOS_CLIENT_ID is set — see
-  /// [GoogleSignInService.isAvailable]).
-  List<Widget> _googleSection(AppLocalizations l10n) {
-    if (!GoogleSignInService.isAvailable) return const [];
+  /// "yoki" divider + "Apple bilan kirish" (iOS, see
+  /// [AppleSignInService.isAvailable]) + "Google bilan kirish" (hidden where
+  /// Google sign-in isn't configured — see [GoogleSignInService.isAvailable]).
+  List<Widget> _socialSection(AppLocalizations l10n) {
+    final apple = AppleSignInService.isAvailable;
+    final google = GoogleSignInService.isAvailable;
+    if (!apple && !google) return const [];
     return [
       const SizedBox(height: DesignTokens.spacing16),
       const _OrDivider(),
       const SizedBox(height: DesignTokens.spacing16),
-      _outlinedButton(
-        l10n.loginWithGoogle,
-        _loading ? null : _googleLogin,
-        leading: const _GoogleMark(),
-      ),
+      if (apple) _appleButton(l10n.loginWithApple, _loading ? null : _appleLogin),
+      if (apple && google) const SizedBox(height: DesignTokens.spacing12),
+      if (google)
+        _outlinedButton(
+          l10n.loginWithGoogle,
+          _loading ? null : _googleLogin,
+          leading: const _GoogleMark(),
+        ),
     ];
+  }
+
+  /// Apple's own look (black, white logo and text), as its guidelines ask —
+  /// and at least as prominent as the Google button below it.
+  Widget _appleButton(String label, VoidCallback? onPressed) {
+    return SizedBox(
+      width: double.infinity,
+      child: FilledButton(
+        onPressed: onPressed,
+        style: FilledButton.styleFrom(
+          backgroundColor: Colors.black,
+          foregroundColor: DesignTokens.white,
+          padding: const EdgeInsets.symmetric(vertical: 13),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(DesignTokens.radiusMedium)),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Icon(Icons.apple, size: 22),
+            const SizedBox(width: DesignTokens.spacing8),
+            Flexible(
+              child: Text(label, style: DesignTokens.bodyMedium.copyWith(color: DesignTokens.white, fontWeight: FontWeight.w600)),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 
   Widget _roleOption(BusinessKind? kind, IconData icon, String title, String desc) {
@@ -742,6 +825,26 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 /// Static brand header above the auth card: a mark, the product name and a
 /// one-line tagline. Extracted as a `const` widget so the per-keystroke /
 /// per-cooldown rebuilds of the stateful screen never rebuild it.
+/// The current language; opens the language picker.
+class _LanguageButton extends ConsumerWidget {
+  const _LanguageButton();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final locale = ref.watch(localeProvider);
+    return Tooltip(
+      message: AppLocalizations.of(context)!.profileMenuLanguage,
+      child: TextButton(
+        onPressed: () => showLanguagePickerSheet(context, ref),
+        child: Text(
+          '${languageFlagEmoji(locale)} ${languageDisplayName(locale)}',
+          style: DesignTokens.subtitle2,
+        ),
+      ),
+    );
+  }
+}
+
 class _BrandHeader extends StatelessWidget {
   const _BrandHeader();
 

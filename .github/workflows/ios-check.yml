@@ -19,15 +19,20 @@ concurrency:
 
 jobs:
   build-ios-nosign:
-    runs-on: macos-14
+    # firebase-ios-sdk 12 needs Swift tools 6.1 (Xcode 16.3+); macos-14 ships
+    # Xcode 15, which cannot resolve its Swift package.
+    runs-on: macos-15
     steps:
+      - name: Xcode version
+        run: xcodebuild -version
+
       - name: Checkout
         uses: actions/checkout@v4
 
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.44.8'
+          flutter-version: '3.47.5'
           channel: stable
           cache: true
 
@@ -39,7 +44,12 @@ jobs:
           pod --version
 
       - name: Flutter pub get
-        run: flutter pub get
+        # Flutter 3.47 copies each plugin into build/{ios,macos}/SourcePackages with
+        # rsync; the runner's rsync 2.6.9 cannot create that missing parent on a
+        # fresh checkout ("mkdir ... failed: No such file or directory").
+        run: |
+          mkdir -p build/ios/SourcePackages build/macos/SourcePackages
+          flutter pub get
 
       - name: Code generation (freezed / json_serializable / riverpod)
         run: dart run build_runner build --delete-conflicting-outputs

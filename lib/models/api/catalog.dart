@@ -42,19 +42,23 @@ abstract class PaginatedMaterials with _$PaginatedMaterials {
 
 /// A furniture/3D-model catalog row (`GET /api/v1/furniture`).
 ///
-/// Mirrors `app/schemas/catalog.py::FurnitureOut`. [glbKey] points at the GLB
-/// model in object storage; [footprintW]/[footprintD] are in centimetres.
+/// Mirrors `app/schemas/catalog.py::FurnitureOut`. [glbUrl] is the 3D model
+/// (null for a photo-only listing, which the Studio cannot place);
+/// [footprintW]/[footprintD]/[heightCm] are in centimetres.
 @freezed
 abstract class Furniture with _$Furniture {
   const factory Furniture({
     required String id,
     @JsonKey(name: 'store_id') String? storeId,
+    @JsonKey(name: 'store_name') String? storeName,
     required String category,
     @JsonKey(name: 'name_uz') required String nameUz,
     @JsonKey(name: 'price_uzs') int? priceUzs,
-    @JsonKey(name: 'glb_key') String? glbKey,
+    @JsonKey(name: 'glb_url') String? glbUrl,
+    @JsonKey(name: 'thumbnail_url') String? thumbnailUrl,
     @JsonKey(name: 'footprint_w') double? footprintW,
     @JsonKey(name: 'footprint_d') double? footprintD,
+    @JsonKey(name: 'height_cm') double? heightCm,
   }) = _Furniture;
 
   factory Furniture.fromJson(Map<String, dynamic> json) =>

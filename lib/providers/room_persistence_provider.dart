@@ -2,6 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../models/api/api.dart';
 import '../models/design_selection_model.dart';
+import '../services/analytics_service.dart';
 import '../utils/room_geometry_mapper.dart';
 import 'apartment_provider.dart';
 import 'design_provider.dart';
@@ -107,6 +108,13 @@ class RoomPersistenceNotifier
       state = AsyncValue.data(
         PersistedRoom(clientRoomId: clientRoom.id, room: room),
       );
+      // Every flow that saves a room (wizard, drawing, LiDAR/ARCore scan
+      // handoff, photo, …) lands here exactly once per room, so this is the
+      // single place room_created is logged — only after the save succeeded.
+      final source = _ref.read(activeRoomPlanProvider)?.source;
+      if (source != null) {
+        _ref.read(analyticsProvider).roomCreated(source);
+      }
     } catch (e, st) {
       state = AsyncValue.error(e, st);
     }

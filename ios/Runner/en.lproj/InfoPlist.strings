@@ -1,0 +1,4 @@
+/* Shown when the app first asks for the camera. */
+"NSCameraUsageDescription" = "The camera is used to scan your room with LiDAR and to photograph wallpaper.";
+/* Shown when the app first asks for the photo library. */
+"NSPhotoLibraryUsageDescription" = "Photo library access lets you add a wallpaper or room photo from your gallery.";

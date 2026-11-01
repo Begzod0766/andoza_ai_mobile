@@ -73,6 +73,7 @@ class _FakeOrders implements OrdersRepository {
   final bool fail;
   int calls = 0;
   List<OrderLineCreate> lastLines = const [];
+  String? lastPhone;
 
   @override
   Future<ServerOrder> createOrder({
@@ -84,6 +85,7 @@ class _FakeOrders implements OrdersRepository {
   }) async {
     calls++;
     lastLines = lines;
+    lastPhone = phone;
     if (fail) {
       throw ApiException(
         message: 'Bad request: x',
@@ -222,6 +224,7 @@ void main() {
     final container = ProviderScope.containerOf(
       tester.element(find.byType(S6CheckoutScreen)),
     );
+    await _enterPhone(tester);
     await tester.tap(find.text("To'lash"));
     await tester.pumpAndSettle();
 
@@ -262,10 +265,41 @@ void main() {
         cartProvider.overrideWith((ref) => _cart(_uuid, dealerPrice: 90)),
       ], const S6CheckoutScreen()),
     );
+    await _enterPhone(tester);
     await tester.tap(find.text("To'lash"));
     await tester.pumpAndSettle();
 
     expect(orders.lastLines, hasLength(1));
     expect(orders.lastLines.single.unitPriceUzs, 90);
+    expect(orders.lastPhone, '+998901234567');
   });
+
+  testWidgets('checkout: a phone that is not Uzbek is refused before sending', (
+    tester,
+  ) async {
+    final orders = _FakeOrders();
+    await tester.pumpWidget(
+      _app([
+        ordersRepositoryProvider.overrideWithValue(orders),
+        cartProvider.overrideWith((ref) => _cart(_uuid)),
+      ], const S6CheckoutScreen()),
+    );
+    await _enterPhone(tester, '12');
+    await tester.tap(find.text("To'lash"));
+    await tester.pumpAndSettle();
+
+    expect(orders.calls, 0);
+    expect(find.textContaining("Telefon raqami noto'g'ri"), findsOneWidget);
+  });
+}
+
+/// The shop calls this number about delivery; checkout needs it.
+Future<void> _enterPhone(
+  WidgetTester tester, [
+  String phone = '+998 90 123 45 67',
+]) async {
+  await tester.enterText(
+    find.widgetWithText(TextField, 'Telefon raqami'),
+    phone,
+  );
 }

@@ -1,7 +1,10 @@
 import 'dart:math';
+
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+
 import '../../config/design_tokens.dart';
 import '../../l10n/app_localizations.dart';
 import '../../models/room_plan.dart';
@@ -78,7 +81,9 @@ class _PhotoScanningScreenState extends ConsumerState<PhotoScanningScreen>
         // The 360° capture extracts no dimensions, so seed a default rectangle
         // plan (the app's historical default box) as the in-app source of
         // truth; the wall-measurements screen next refines it.
-        ref.read(activeRoomPlanProvider.notifier).setPlan(
+        ref
+            .read(activeRoomPlanProvider.notifier)
+            .setPlan(
               RoomPlan.rectangle(
                 width: 3.2,
                 length: 4.5,
@@ -90,127 +95,136 @@ class _PhotoScanningScreenState extends ConsumerState<PhotoScanningScreen>
       }
     });
 
-    return Scaffold(
-      backgroundColor: DesignTokens.darkBg,
-      body: SafeArea(
-        child: Column(
-          children: [
-            Padding(
-              padding: const EdgeInsets.all(DesignTokens.spacingMd),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  GestureDetector(
-                    onTap: () => Navigator.of(context).pop(),
-                    child: Container(
-                      width: 40,
-                      height: 40,
+    // A dark screen with no AppBar: without this the status bar keeps the
+    // app's dark icons and the time and battery vanish into the background.
+    return AnnotatedRegion<SystemUiOverlayStyle>(
+      value: SystemUiOverlayStyle.light,
+      child: Scaffold(
+        backgroundColor: DesignTokens.darkBg,
+        body: SafeArea(
+          child: Column(
+            children: [
+              Padding(
+                padding: const EdgeInsets.all(DesignTokens.spacingMd),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    GestureDetector(
+                      onTap: () => Navigator.of(context).pop(),
+                      child: Container(
+                        width: 40,
+                        height: 40,
+                        decoration: BoxDecoration(
+                          color: Colors.white.withValues(alpha: 0.16),
+                          shape: BoxShape.circle,
+                        ),
+                        child: const Icon(
+                          Icons.close,
+                          color: DesignTokens.white,
+                        ),
+                      ),
+                    ),
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: DesignTokens.spacingMd,
+                        vertical: DesignTokens.spacingSm,
+                      ),
                       decoration: BoxDecoration(
                         color: Colors.white.withValues(alpha: 0.16),
-                        shape: BoxShape.circle,
+                        borderRadius: BorderRadius.circular(
+                          DesignTokens.radiusFull,
+                        ),
                       ),
-                      child: const Icon(Icons.close, color: DesignTokens.white),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const Icon(
+                            Icons.explore_outlined,
+                            color: DesignTokens.white,
+                            size: DesignTokens.iconSm,
+                          ),
+                          const SizedBox(width: DesignTokens.spacingSm),
+                          Text(
+                            l10n.photoPointsCount(
+                              scanState.capturedPoints,
+                              _totalPoints,
+                            ),
+                            style: DesignTokens.body2.copyWith(
+                              color: DesignTokens.white,
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
+                    const SizedBox(width: 40),
+                  ],
+                ),
+              ),
+              Expanded(
+                child: Center(
+                  child: AnimatedBuilder(
+                    animation: _pulseController,
+                    builder: (context, child) {
+                      return CustomPaint(
+                        size: const Size(280, 200),
+                        painter: _CaptureRingPainter(
+                          capturedPoints: scanState.capturedPoints,
+                          pulse: _pulseController.value,
+                        ),
+                      );
+                    },
                   ),
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: DesignTokens.spacingMd,
-                      vertical: DesignTokens.spacingSm,
-                    ),
+                ),
+              ),
+              Text(
+                l10n.photoTurnHint,
+                style: DesignTokens.body1.copyWith(color: DesignTokens.white),
+              ),
+              const SizedBox(height: DesignTokens.spacingXl),
+              Padding(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: DesignTokens.spacingXl,
+                  vertical: DesignTokens.spacingLg,
+                ),
+                child: GestureDetector(
+                  onTap: scanState.isComplete
+                      ? null
+                      : () =>
+                            ref.read(photoScanProvider.notifier).capturePoint(),
+                  child: Container(
+                    width: double.infinity,
+                    height: 56,
                     decoration: BoxDecoration(
-                      color: Colors.white.withValues(alpha: 0.16),
+                      color: DesignTokens.white,
                       borderRadius: BorderRadius.circular(
                         DesignTokens.radiusFull,
                       ),
                     ),
                     child: Row(
-                      mainAxisSize: MainAxisSize.min,
+                      mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        const Icon(
-                          Icons.explore_outlined,
-                          color: DesignTokens.white,
-                          size: DesignTokens.iconSm,
+                        Container(
+                          width: 22,
+                          height: 22,
+                          decoration: const BoxDecoration(
+                            color: DesignTokens.accentOrange,
+                            shape: BoxShape.circle,
+                          ),
                         ),
                         const SizedBox(width: DesignTokens.spacingSm),
                         Text(
-                          l10n.photoPointsCount(
-                            scanState.capturedPoints,
-                            _totalPoints,
-                          ),
-                          style: DesignTokens.body2.copyWith(
-                            color: DesignTokens.white,
+                          l10n.photoCapture,
+                          style: DesignTokens.subtitle2.copyWith(
+                            color: DesignTokens.textDark,
                           ),
                         ),
                       ],
                     ),
                   ),
-                  const SizedBox(width: 40),
-                ],
-              ),
-            ),
-            Expanded(
-              child: Center(
-                child: AnimatedBuilder(
-                  animation: _pulseController,
-                  builder: (context, child) {
-                    return CustomPaint(
-                      size: const Size(280, 200),
-                      painter: _CaptureRingPainter(
-                        capturedPoints: scanState.capturedPoints,
-                        pulse: _pulseController.value,
-                      ),
-                    );
-                  },
                 ),
               ),
-            ),
-            Text(
-              l10n.photoTurnHint,
-              style: DesignTokens.body1.copyWith(color: DesignTokens.white),
-            ),
-            const SizedBox(height: DesignTokens.spacingXl),
-            Padding(
-              padding: const EdgeInsets.symmetric(
-                horizontal: DesignTokens.spacingXl,
-                vertical: DesignTokens.spacingLg,
-              ),
-              child: GestureDetector(
-                onTap: scanState.isComplete
-                    ? null
-                    : () => ref.read(photoScanProvider.notifier).capturePoint(),
-                child: Container(
-                  width: double.infinity,
-                  height: 56,
-                  decoration: BoxDecoration(
-                    color: DesignTokens.white,
-                    borderRadius: BorderRadius.circular(
-                      DesignTokens.radiusFull,
-                    ),
-                  ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Container(
-                        width: 22,
-                        height: 22,
-                        decoration: const BoxDecoration(
-                          color: DesignTokens.accentOrange,
-                          shape: BoxShape.circle,
-                        ),
-                      ),
-                      const SizedBox(width: DesignTokens.spacingSm),
-                      Text(
-                        l10n.photoCapture,
-                        style: DesignTokens.subtitle2.copyWith(
-                          color: DesignTokens.textDark,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

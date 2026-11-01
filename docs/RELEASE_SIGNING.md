@@ -56,9 +56,9 @@ keyPassword=<same as store password>
 ```bash
 # ANDROID_HOME and flutter on PATH as on your machine
 flutter build appbundle --release \
-  --dart-define=API_URL=https://andoza.jumaniyozov.uz/api/v1 \
-  --dart-define=API_BASE_URL=https://andoza.jumaniyozov.uz \
-  --dart-define=STUDIO_BASE_URL=https://andoza.jumaniyozov.uz
+  --dart-define=API_URL=https://andozaai.uz/api/v1 \
+  --dart-define=API_BASE_URL=https://andozaai.uz \
+  --dart-define=STUDIO_BASE_URL=https://andozaai.uz
 ```
 
 Output: `build/app/outputs/bundle/release/app-release.aab`.

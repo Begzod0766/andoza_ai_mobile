@@ -448,6 +448,12 @@ abstract class AppLocalizations {
   /// **'Login kamida 3 ta belgidan iborat bo\'lishi kerak.'**
   String get loginErrorUsernameShort;
 
+  /// Register error: username is longer than the 50 characters the server accepts.
+  ///
+  /// In uz, this message translates to:
+  /// **'Login 50 ta belgidan oshmasin.'**
+  String get loginErrorUsernameLong;
+
   /// Register error: password must be at least 6 characters.
   ///
   /// In uz, this message translates to:
@@ -1384,6 +1390,18 @@ abstract class AppLocalizations {
   /// **'Izoh (ixtiyoriy)'**
   String get mastersCommentHint;
 
+  /// Shared form error (checkout, call-an-usta, shop/usta forms): the phone is not an Uzbek number; same text as the web app.
+  ///
+  /// In uz, this message translates to:
+  /// **'Telefon raqami noto\'g\'ri. Masalan: +998 90 123 45 67'**
+  String get phoneErrorInvalid;
+
+  /// U5 send-to-usta screen: label of the phone field the usta calls back on.
+  ///
+  /// In uz, this message translates to:
+  /// **'Telefon raqamingiz'**
+  String get mastersPhoneLabel;
+
   /// U5 send-smeta sheet: note explaining the master will review and propose a price.
   ///
   /// In uz, this message translates to:
@@ -2032,6 +2050,18 @@ abstract class AppLocalizations {
   /// **'Bosqich'**
   String get estimateStageFallback;
 
+  /// E1 smeta: warning banner when the Studio has a floor type but no floor product, so the floor is missing from the estimate.
+  ///
+  /// In uz, this message translates to:
+  /// **'Pol turi tanlangan, lekin mahsulot tanlanmagan — pol smetaga kirmadi.'**
+  String get estimateFloorUnpriced;
+
+  /// E1 smeta: button on the floor warning that opens the Studio to pick a floor product.
+  ///
+  /// In uz, this message translates to:
+  /// **'Polni tanlash'**
+  String get estimateFloorPick;
+
   /// Estimate adjust: E1 tooltip and E3 app bar title ('Adjust estimate').
   ///
   /// In uz, this message translates to:
@@ -2169,6 +2199,12 @@ abstract class AppLocalizations {
   /// In uz, this message translates to:
   /// **'Masalan: \"Devorlarni iliq bej rangga bo\'ya va divan qo\'sh\"'**
   String get studioAiHint;
+
+  /// AI builder sheet: heading over the optional furniture style chips; the chosen style is put in front of the request.
+  ///
+  /// In uz, this message translates to:
+  /// **'Uslub (ixtiyoriy)'**
+  String get studioAiStyleLabel;
 
   /// AI builder sheet: generate button label while the AI is working.
   ///
@@ -2680,6 +2716,12 @@ abstract class AppLocalizations {
   /// **'Aniq qiymat (m)'**
   String get wizardExactValue;
 
+  /// Room wizard, ceiling step: the typed height is not a number in the accepted range; Next stays disabled.
+  ///
+  /// In uz, this message translates to:
+  /// **'Shift balandligi {min} m dan {max} m gacha bo\'lishi kerak'**
+  String wizardCeilingOutOfRange(String min, String max);
+
   /// 3D wizard wall step heading, e.g. 'A devor'.
   ///
   /// In uz, this message translates to:
@@ -3079,7 +3121,7 @@ abstract class AppLocalizations {
   /// Unsupported-device sheet body explaining LiDAR requirements and offering alternatives.
   ///
   /// In uz, this message translates to:
-  /// **'LiDAR skaner faqat iPhone 12 Pro, 13 Pro, 14 Pro, 15 Pro, 16 Pro yoki iPad Pro\'da ishlaydi. Xonani boshqa usulda qo\'shing:'**
+  /// **'LiDAR skaner faqat LiDAR\'li qurilmalarda ishlaydi: iPhone Pro (12 Pro va undan yangilari) yoki iPad Pro. Xonani boshqa usulda qo\'shing:'**
   String get scanLidarUnavailableBody;
 
   /// Room-scan screen: 'Scanning the room…' progress label.
@@ -3607,14 +3649,20 @@ abstract class AppLocalizations {
   /// No description provided for @businessFieldPriceMin.
   ///
   /// In uz, this message translates to:
-  /// **'Narx: dan (so\'m)'**
+  /// **'Dan'**
   String get businessFieldPriceMin;
 
   /// No description provided for @businessFieldPriceMax.
   ///
   /// In uz, this message translates to:
-  /// **'Narx: gacha (so\'m)'**
+  /// **'Gacha'**
   String get businessFieldPriceMax;
+
+  /// Usta apply/edit forms: heading above the two price fields (from / up to), so the fields themselves can carry short labels that fit half the width.
+  ///
+  /// In uz, this message translates to:
+  /// **'Narx (so\'m)'**
+  String get businessFieldPriceTitle;
 
   /// No description provided for @businessSubmit.
   ///
@@ -4582,6 +4630,18 @@ abstract class AppLocalizations {
   /// **'Elektr'**
   String get shopCategoryElektr;
 
+  /// Shop category chip/label: doors (server category `eshik`).
+  ///
+  /// In uz, this message translates to:
+  /// **'Eshik'**
+  String get shopCategoryEshik;
+
+  /// Shop category chip/label: windows (server category `deraza`).
+  ///
+  /// In uz, this message translates to:
+  /// **'Deraza'**
+  String get shopCategoryDeraza;
+
   /// No description provided for @tradeBoshqa.
   ///
   /// In uz, this message translates to:
@@ -4623,6 +4683,492 @@ abstract class AppLocalizations {
   /// In uz, this message translates to:
   /// **'© OpenStreetMap hissadorlari'**
   String get mapAttribution;
+
+  /// Title of the one-time dialog asking whether to send push notifications.
+  ///
+  /// In uz, this message translates to:
+  /// **'Xabar beraylikmi?'**
+  String get pushPromptTitle;
+
+  /// Body of the one-time push notification dialog.
+  ///
+  /// In uz, this message translates to:
+  /// **'Dizayningiz tayyor bo\'lganda yoki buyurtma holati o\'zgarganda xabar beramiz.'**
+  String get pushPromptBody;
+
+  /// Confirm button of the push notification dialog; triggers the system permission request.
+  ///
+  /// In uz, this message translates to:
+  /// **'Ha'**
+  String get pushPromptYes;
+
+  /// Dismiss button of the push notification dialog.
+  ///
+  /// In uz, this message translates to:
+  /// **'Keyinroq'**
+  String get pushPromptLater;
+
+  /// Settings screen: notifications row title; opens system settings.
+  ///
+  /// In uz, this message translates to:
+  /// **'Bildirishnomalar'**
+  String get settingsNotificationsTitle;
+
+  /// Settings screen: notifications row subtitle when permission is granted.
+  ///
+  /// In uz, this message translates to:
+  /// **'Yoqilgan'**
+  String get settingsNotificationsOn;
+
+  /// Settings screen: notifications row subtitle when permission is not granted.
+  ///
+  /// In uz, this message translates to:
+  /// **'O\'chirilgan'**
+  String get settingsNotificationsOff;
+
+  /// Android notification channel name shown in system settings.
+  ///
+  /// In uz, this message translates to:
+  /// **'Andoza yangiliklari'**
+  String get pushChannelName;
+
+  /// Share screen (a pin shared from the Pinterest app): app-bar title.
+  ///
+  /// In uz, this message translates to:
+  /// **'Pinterest pin'**
+  String get sharePinTitle;
+
+  /// Share screen: heading above the list of the user's rooms.
+  ///
+  /// In uz, this message translates to:
+  /// **'Qaysi xonaga qo\'llaymiz?'**
+  String get sharePinChooseRoom;
+
+  /// Share screen: what happens after a room is picked.
+  ///
+  /// In uz, this message translates to:
+  /// **'Studio\'dagi AI dizayner shu pin bilan ochiladi.'**
+  String get sharePinHint;
+
+  /// Share screen: shown when the user has no rooms to apply the pin to.
+  ///
+  /// In uz, this message translates to:
+  /// **'Hali xona yo\'q. Avval \"+\" orqali xona qo\'shing.'**
+  String get sharePinNoRooms;
+
+  /// Share screen: the shared text has no Pinterest pin link (same wording as the API's 422).
+  ///
+  /// In uz, this message translates to:
+  /// **'Bu Pinterest pin havolasi emas'**
+  String get sharePinNotPin;
+
+  /// Share screen: how to share a pin, under the not-a-pin message.
+  ///
+  /// In uz, this message translates to:
+  /// **'Pinterest ilovasida pinni oching va \"Ulashish\" → Andoza AI ni tanlang.'**
+  String get sharePinNotPinHint;
+
+  /// Seller product forms: heading above the furniture style chips.
+  ///
+  /// In uz, this message translates to:
+  /// **'Uslublar'**
+  String get furnitureStylesLabel;
+
+  /// Seller product forms: shown under the style chips when none is picked.
+  ///
+  /// In uz, this message translates to:
+  /// **'Hamma uslubga mos'**
+  String get furnitureStylesAll;
+
+  /// Furniture style chip (API id neoklassika).
+  ///
+  /// In uz, this message translates to:
+  /// **'Neoklassika'**
+  String get furnitureStyleNeoklassika;
+
+  /// Furniture style chip (API id klassik).
+  ///
+  /// In uz, this message translates to:
+  /// **'Klassik'**
+  String get furnitureStyleKlassik;
+
+  /// Furniture style chip (API id zamonaviy).
+  ///
+  /// In uz, this message translates to:
+  /// **'Zamonaviy'**
+  String get furnitureStyleZamonaviy;
+
+  /// Furniture style chip (API id hitech).
+  ///
+  /// In uz, this message translates to:
+  /// **'Hi-Tech'**
+  String get furnitureStyleHitech;
+
+  /// Furniture style chip (API id minimalist).
+  ///
+  /// In uz, this message translates to:
+  /// **'Minimalist'**
+  String get furnitureStyleMinimalist;
+
+  /// Furniture style chip (API id skandinav).
+  ///
+  /// In uz, this message translates to:
+  /// **'Skandinav'**
+  String get furnitureStyleSkandinav;
+
+  /// Furniture style chip (API id loft).
+  ///
+  /// In uz, this message translates to:
+  /// **'Loft'**
+  String get furnitureStyleLoft;
+
+  /// Furniture style chip (API id milliy).
+  ///
+  /// In uz, this message translates to:
+  /// **'Milliy'**
+  String get furnitureStyleMilliy;
+
+  /// E1 smeta: floor type chosen without a product; the server priced it from the median shop product.
+  ///
+  /// In uz, this message translates to:
+  /// **'Pol mahsuloti tanlanmagan — narx do\'kondagi o\'rtacha poldan olindi (taxminiy).'**
+  String get estimateFloorStandIn;
+
+  /// Scan screen: title of the sheet choosing one room or several rooms (iPhones that support it).
+  ///
+  /// In uz, this message translates to:
+  /// **'Nimani skanerlaymiz?'**
+  String get scanChoiceTitle;
+
+  /// Scan choice sheet: option to scan a single room.
+  ///
+  /// In uz, this message translates to:
+  /// **'Bitta xona'**
+  String get scanChoiceOneRoom;
+
+  /// Scan choice sheet: option to scan several rooms in one session.
+  ///
+  /// In uz, this message translates to:
+  /// **'Bir nechta xona (kvartira)'**
+  String get scanChoiceFlat;
+
+  /// Scan choice sheet: hint under the several-rooms option.
+  ///
+  /// In uz, this message translates to:
+  /// **'Xonalarni ketma-ket skanerlang — ular rejada o\'z joyiga tushadi'**
+  String get scanChoiceFlatHint;
+
+  /// Multi-room scanner button: finish this room and start the next.
+  ///
+  /// In uz, this message translates to:
+  /// **'Keyingi xona'**
+  String get scanNextRoom;
+
+  /// Multi-room scanner button: end the session.
+  ///
+  /// In uz, this message translates to:
+  /// **'Tugatish'**
+  String get scanFinish;
+
+  /// Multi-room scanner: the current room's number, and the default name of scanned room n.
+  ///
+  /// In uz, this message translates to:
+  /// **'{n}-xona'**
+  String scanRoomN(int n);
+
+  /// Title of the review page after a multi-room scan.
+  ///
+  /// In uz, this message translates to:
+  /// **'Skanerlangan xonalar'**
+  String get flatReviewTitle;
+
+  /// Multi-room review: label of a room's name field.
+  ///
+  /// In uz, this message translates to:
+  /// **'Xona nomi'**
+  String get flatReviewRoomName;
+
+  /// Multi-room review: button that saves the rooms and opens the 3D studio.
+  ///
+  /// In uz, this message translates to:
+  /// **'Studiyada ochish'**
+  String get flatReviewContinue;
+
+  /// Multi-room review: the session ended early (app went to the background); n rooms were kept.
+  ///
+  /// In uz, this message translates to:
+  /// **'Skaner to\'xtadi — {n} ta xona saqlandi'**
+  String flatReviewPartial(int n);
+
+  /// Multi-room review: n scanned rooms could not be converted into a plan.
+  ///
+  /// In uz, this message translates to:
+  /// **'{n} ta xona o\'qilmadi va qo\'shilmadi'**
+  String flatReviewDropped(int n);
+
+  /// Multi-room review: saving stopped part-way; only some rooms were saved (the rest are lost and must be scanned again).
+  ///
+  /// In uz, this message translates to:
+  /// **'{total} ta xonadan {saved} tasi saqlandi — qolganlarini qayta skanerlang'**
+  String flatReviewSavedSome(int saved, int total);
+
+  /// Login: black button (iOS only) that signs in with an Apple ID.
+  ///
+  /// In uz, this message translates to:
+  /// **'Apple bilan kirish'**
+  String get loginWithApple;
+
+  /// Login error: Sign in with Apple failed (invalid token or Apple error).
+  ///
+  /// In uz, this message translates to:
+  /// **'Apple orqali kirib bo\'lmadi. Qayta urinib ko\'ring.'**
+  String get loginAppleFailed;
+
+  /// Menu item on a craftsman profile / product: opens the report sheet.
+  ///
+  /// In uz, this message translates to:
+  /// **'Shikoyat qilish'**
+  String get reportAction;
+
+  /// Report sheet: title.
+  ///
+  /// In uz, this message translates to:
+  /// **'Shikoyat'**
+  String get reportTitle;
+
+  /// Report sheet: one-line explanation under the title.
+  ///
+  /// In uz, this message translates to:
+  /// **'Nima noto\'g\'ri? Shikoyatingizni moderatorlar ko\'rib chiqadi.'**
+  String get reportHint;
+
+  /// Report reason option.
+  ///
+  /// In uz, this message translates to:
+  /// **'Spam yoki reklama'**
+  String get reportReasonSpam;
+
+  /// Report reason option: offensive or objectionable material.
+  ///
+  /// In uz, this message translates to:
+  /// **'Nomaqbul kontent'**
+  String get reportReasonInappropriate;
+
+  /// Report reason option.
+  ///
+  /// In uz, this message translates to:
+  /// **'Firibgarlik'**
+  String get reportReasonFraud;
+
+  /// Report reason option.
+  ///
+  /// In uz, this message translates to:
+  /// **'Boshqa'**
+  String get reportReasonOther;
+
+  /// Report sheet: label of the optional free-text field.
+  ///
+  /// In uz, this message translates to:
+  /// **'Izoh (ixtiyoriy)'**
+  String get reportDetails;
+
+  /// Report sheet: submit button.
+  ///
+  /// In uz, this message translates to:
+  /// **'Yuborish'**
+  String get reportSend;
+
+  /// Snackbar after a report was sent.
+  ///
+  /// In uz, this message translates to:
+  /// **'Rahmat! Shikoyatingiz yuborildi.'**
+  String get reportSent;
+
+  /// Menu item on a craftsman profile: hide this craftsman.
+  ///
+  /// In uz, this message translates to:
+  /// **'Bloklash'**
+  String get blockUstaAction;
+
+  /// Block confirmation dialog: title.
+  ///
+  /// In uz, this message translates to:
+  /// **'Ustani bloklaysizmi?'**
+  String get blockUstaTitle;
+
+  /// Block confirmation dialog: what blocking does.
+  ///
+  /// In uz, this message translates to:
+  /// **'U endi xaritada va ro\'yxatda sizga ko\'rinmaydi.'**
+  String get blockUstaBody;
+
+  /// Block confirmation dialog: confirm button.
+  ///
+  /// In uz, this message translates to:
+  /// **'Bloklash'**
+  String get blockUstaConfirm;
+
+  /// Snackbar after blocking a craftsman.
+  ///
+  /// In uz, this message translates to:
+  /// **'Usta bloklandi'**
+  String get blockUstaDone;
+
+  /// Heading of the shops' furniture (3D models) section on the shop home and a shop's page.
+  ///
+  /// In uz, this message translates to:
+  /// **'Mebel'**
+  String get shopFurnitureSection;
+
+  /// Furniture card/page when the shop set no price.
+  ///
+  /// In uz, this message translates to:
+  /// **'Narxi kelishiladi'**
+  String get shopFurnitureNoPrice;
+
+  /// Row on a product page that opens the page of the shop selling it.
+  ///
+  /// In uz, this message translates to:
+  /// **'{name} do\'koni'**
+  String storePageOpen(String name);
+
+  /// A shop's page could not load, or the shop is closed.
+  ///
+  /// In uz, this message translates to:
+  /// **'Do\'konni ochib bo\'lmadi'**
+  String get storeLoadFailed;
+
+  /// Call button on a shop's page.
+  ///
+  /// In uz, this message translates to:
+  /// **'Qo\'ng\'iroq'**
+  String get storeCall;
+
+  /// Telegram button on a shop's page.
+  ///
+  /// In uz, this message translates to:
+  /// **'Telegram'**
+  String get storeTelegram;
+
+  /// A shop's page with no products.
+  ///
+  /// In uz, this message translates to:
+  /// **'Bu do\'konda hozircha mahsulot yo\'q'**
+  String get storeNoProducts;
+
+  /// Menu item on a shop's page that reports the shop.
+  ///
+  /// In uz, this message translates to:
+  /// **'Do\'kon haqida shikoyat'**
+  String get storeReport;
+
+  /// Label of the size row on a furniture page.
+  ///
+  /// In uz, this message translates to:
+  /// **'O\'lchami'**
+  String get furnitureSize;
+
+  /// A furniture size, e.g. "220 × 90 × 80 cm".
+  ///
+  /// In uz, this message translates to:
+  /// **'{size} sm'**
+  String furnitureSizeValue(String size);
+
+  /// Button that opens one of the user's rooms in the Studio with this furniture placed in it.
+  ///
+  /// In uz, this message translates to:
+  /// **'Xonamga qo\'yish'**
+  String get furniturePlaceInRoom;
+
+  /// Title of the room picker before placing furniture.
+  ///
+  /// In uz, this message translates to:
+  /// **'Qaysi xonaga qo\'yamiz?'**
+  String get furniturePickRoom;
+
+  /// Shown when the user has no room to place furniture in.
+  ///
+  /// In uz, this message translates to:
+  /// **'Avval xona yarating yoki skanerlang'**
+  String get furnitureNoRooms;
+
+  /// Furniture page of a photo-only listing.
+  ///
+  /// In uz, this message translates to:
+  /// **'Bu mahsulotning 3D modeli yo\'q, uni xonaga qo\'yib bo\'lmaydi'**
+  String get furnitureNoModel;
+
+  /// A furniture page could not load, or the item is off sale.
+  ///
+  /// In uz, this message translates to:
+  /// **'Mahsulotni ochib bo\'lmadi'**
+  String get furnitureLoadFailed;
+
+  /// Profile menu: opens the web furniture workshop (cabinet parts, cut lists, price) in a WebView. Same text as the web's profile.mebel.
+  ///
+  /// In uz, this message translates to:
+  /// **'Mebel ishlab chiqarish'**
+  String get profileMenuMebel;
+
+  /// Profile menu: line under the furniture-workshop entry. Same text as the web's profile.mebel_izoh.
+  ///
+  /// In uz, this message translates to:
+  /// **'Ustaxonalar uchun: shkaf detallari, kromka va narx'**
+  String get profileMenuMebelHint;
+
+  /// Furniture workshop: the PDF or CSV export could not be opened or shared.
+  ///
+  /// In uz, this message translates to:
+  /// **'Faylni ochib bo\'lmadi'**
+  String get mebelExportFailed;
+
+  /// LiDAR scanner: hint at the bottom when the scan starts.
+  ///
+  /// In uz, this message translates to:
+  /// **'Xonani sekin aylanib skanerlang'**
+  String get scanHintStart;
+
+  /// LiDAR scanner coaching: the phone is too far from the wall.
+  ///
+  /// In uz, this message translates to:
+  /// **'Telefonni devorga yaqinroq tuting'**
+  String get scanCoachMoveCloser;
+
+  /// LiDAR scanner coaching: the phone is too close to the wall.
+  ///
+  /// In uz, this message translates to:
+  /// **'Telefonni devordan birozroq uzoqlashtiring'**
+  String get scanCoachMoveAway;
+
+  /// LiDAR scanner coaching: the phone moves too fast.
+  ///
+  /// In uz, this message translates to:
+  /// **'Juda tez harakatlanyapsiz — sekinroq aylaning'**
+  String get scanCoachSlowDown;
+
+  /// LiDAR scanner coaching: not enough light.
+  ///
+  /// In uz, this message translates to:
+  /// **'Xona qorong\'i — yorug\'likni yoqing'**
+  String get scanCoachTurnOnLight;
+
+  /// LiDAR scanner coaching: the surface has too little texture to track.
+  ///
+  /// In uz, this message translates to:
+  /// **'Bu yuza silliq/bir xil — kamerani boshqa tomonga burang'**
+  String get scanCoachLowTexture;
+
+  /// LiDAR scanner coaching: everything is fine, keep going.
+  ///
+  /// In uz, this message translates to:
+  /// **'Zo\'r ketyapti — xonani shu tezlikda aylanib chiqing'**
+  String get scanCoachGood;
+
+  /// LiDAR scanner coaching: fallback for an instruction the app does not know.
+  ///
+  /// In uz, this message translates to:
+  /// **'Skanerlashda davom eting'**
+  String get scanCoachKeepGoing;
 }
 
 class _AppLocalizationsDelegate

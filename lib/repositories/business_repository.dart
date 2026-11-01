@@ -71,10 +71,22 @@ class BusinessRepository {
       );
 
   /// Changes only what is passed; [priceUzs] of null leaves the price alone.
-  Future<ShopProduct> updateProduct(String id, {String? name, int? priceUzs, bool? isActive}) =>
+  /// [styles] of null leaves the styles alone, `[]` clears them.
+  Future<ShopProduct> updateProduct(
+    String id, {
+    String? name,
+    int? priceUzs,
+    bool? isActive,
+    List<String>? styles,
+  }) =>
       _client.patch<ShopProduct>(
         '/seller/furniture/$id',
-        data: {'name_uz': ?name, 'price_uzs': ?priceUzs, 'is_active': ?isActive},
+        data: {
+          'name_uz': ?name,
+          'price_uzs': ?priceUzs,
+          'is_active': ?isActive,
+          'styles': ?styles,
+        },
         fromJson: (j) => ShopProduct.fromJson(j as Map<String, dynamic>),
       );
 
@@ -127,6 +139,7 @@ class BusinessRepository {
     required String placement,
     String? roomType,
     int? priceUzs,
+    List<String> styles = const [],
   }) =>
       _client.uploadFiles<ShopProduct>(
         '/seller/furniture',
@@ -140,6 +153,8 @@ class BusinessRepository {
           'placement': placement,
           'room_type': ?roomType,
           'price_uzs': ?priceUzs?.toString(),
+          // Comma-separated in the multipart form; none = suits every style.
+          if (styles.isNotEmpty) 'styles': styles.join(','),
         },
         fromJson: (j) => ShopProduct.fromJson(j as Map<String, dynamic>),
       );
@@ -202,10 +217,21 @@ class BusinessRepository {
 
   /// A customer's request to an usta (`POST /leads`). The server attaches the
   /// room's latest estimate as the request's snapshot, so [roomId] is only sent
-  /// when it is a saved room's id.
-  Future<void> sendLead(String ustaId, {String? roomId, String? message}) => _client.post<void>(
+  /// when it is a saved room's id. [contactPhone] is the number the usta calls
+  /// back; their inbox shows it ahead of the account's own phone.
+  Future<void> sendLead(
+    String ustaId, {
+    String? roomId,
+    String? message,
+    String? contactPhone,
+  }) => _client.post<void>(
         '/leads',
-        data: {'usta_id': ustaId, 'room_id': ?roomId, 'message': ?_blankToNull(message)},
+        data: {
+          'usta_id': ustaId,
+          'room_id': ?roomId,
+          'message': ?_blankToNull(message),
+          'contact_phone': ?_blankToNull(contactPhone),
+        },
         fromJson: (_) {},
       );
 

@@ -1,9 +1,12 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../config/design_tokens.dart';
 import '../../l10n/app_localizations.dart';
 import '../../models/shop_model.dart';
 import '../../providers/cart_provider.dart';
+import '../../providers/catalog_provider.dart';
 import '../../providers/shop_provider.dart';
 import '../../utils/currency.dart';
 import '../../widgets/common/app_image.dart';
@@ -29,28 +32,45 @@ class _E10SearchResultsScreenState
     extends ConsumerState<E10SearchResultsScreen> {
   late final _controller = TextEditingController(text: widget.initialQuery);
   _ResultFilter _filter = _ResultFilter.all;
+  // What the server is asked for: the typed text, once typing pauses.
+  late String _search = shopSearchQuery(widget.initialQuery);
+  Timer? _debounce;
 
   @override
   void dispose() {
+    _debounce?.cancel();
     _controller.dispose();
     super.dispose();
+  }
+
+  void _onQuery(String text) {
+    setState(() {}); // the clear button
+    _debounce?.cancel();
+    _debounce = Timer(const Duration(milliseconds: 350), () {
+      if (mounted) setState(() => _search = shopSearchQuery(text));
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final catalog = ref.watch(shopCatalogProvider);
-    final status = loadStatus(
-      isEmpty: catalog.isEmpty,
-      loading: ref.watch(shopCatalogLoadingProvider),
-      error: ref.watch(shopCatalogErrorProvider),
-      onRetry: () => shopCatalogSources.forEach(ref.invalidate),
-    );
-    final query = _controller.text.trim().toLowerCase();
-
-    var results = query.isEmpty
-        ? catalog
-        : catalog.where((p) => p.name.toLowerCase().contains(query)).toList();
+    // A search goes to the server, so it covers the whole catalog.
+    final found = _search.isEmpty ? null : ref.watch(shopSearchProvider(_search));
+    var results = found == null ? catalog : (found.valueOrNull ?? const <Product>[]);
+    final status = found == null
+        ? loadStatus(
+            isEmpty: catalog.isEmpty,
+            loading: ref.watch(shopCatalogLoadingProvider),
+            error: ref.watch(shopCatalogErrorProvider),
+            onRetry: () => shopCatalogSources.forEach(ref.invalidate),
+          )
+        : loadStatus(
+            isEmpty: results.isEmpty,
+            loading: found.isLoading,
+            error: found.error,
+            onRetry: () => ref.invalidate(materialSearchProvider(_search)),
+          );
 
     results = switch (_filter) {
       _ResultFilter.all => results,
@@ -93,10 +113,14 @@ class _E10SearchResultsScreenState
                       : IconButton(
                           icon: const Icon(Icons.close),
                           tooltip: l10n.actionClose,
-                          onPressed: () => setState(_controller.clear),
+                          onPressed: () => setState(() {
+                            _controller.clear();
+                            _debounce?.cancel();
+                            _search = '';
+                          }),
                         ),
                 ),
-                onChanged: (_) => setState(() {}),
+                onChanged: _onQuery,
               ),
             ),
           ),

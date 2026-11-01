@@ -3,7 +3,9 @@ import '../l10n/app_localizations.dart';
 import '../models/design_selection_model.dart';
 import '../models/estimate_model.dart';
 import '../utils/project_areas.dart';
+import 'apartment_provider.dart';
 import 'design_provider.dart';
+import 'room_persistence_provider.dart';
 import 'room_provider.dart';
 import 'shop_provider.dart';
 
@@ -285,6 +287,37 @@ final estimateProvider = Provider<Estimate>((ref) {
     tier: tier,
     diy: diy,
   );
+});
+
+/// The whole-renovation estimate for a saved room, as one number — what Home's
+/// project card shows, so it agrees with E1's header. The open room uses
+/// [estimateProvider] itself (it knows the room's condition, tier and DIY
+/// choice). Any other room is priced the same way from the server's measured
+/// areas, with the default tier and nothing excluded. The server's own
+/// preview prices only what was picked in the Studio and has no labour, so it
+/// read "0.7 mln" next to a 21 million smeta.
+final roomEstimateTotalProvider =
+    FutureProvider.autoDispose.family<double, String>((ref, roomId) async {
+  final persisted = ref.watch(roomPersistenceProvider).valueOrNull;
+  if (persisted?.roomId == roomId) {
+    return ref.watch(estimateProvider).totalPrice;
+  }
+  final room = await ref.watch(serverRoomProvider(roomId).future);
+  return buildEstimate(
+    roomId: roomId,
+    areas: computeProjectAreasFromRoomOut(room),
+    electrical: const ElectricalNeed(
+      outletCount: 8,
+      wireMeters: 72.0,
+      switchCount: 4,
+      lightCount: 6,
+      pipeCount: 4,
+    ),
+    furnitureCount: room.furnitureLayout?.length ?? 0,
+    excludedStages: const {},
+    tier: QualityTier.standart,
+    diy: false,
+  ).totalPrice;
 });
 
 /// Materials total (E1's "Materiallar" column) — sum of non-excluded

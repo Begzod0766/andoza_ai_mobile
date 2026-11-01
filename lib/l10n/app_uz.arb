@@ -243,6 +243,8 @@
   "@loginErrorUsernameShort": {
     "description": "Register error: username must be at least 3 characters."
   },
+  "loginErrorUsernameLong": "Login 50 ta belgidan oshmasin.",
+  "@loginErrorUsernameLong": {"description": "Register error: username is longer than the 50 characters the server accepts."},
   "loginErrorPasswordShort": "Parol kamida 6 ta belgidan iborat bo'lishi kerak.",
   "@loginErrorPasswordShort": {
     "description": "Register error: password must be at least 6 characters."
@@ -946,6 +948,10 @@
   "@mastersCommentHint": {
     "description": "U5 send-smeta sheet: optional comment field hint."
   },
+  "phoneErrorInvalid": "Telefon raqami noto'g'ri. Masalan: +998 90 123 45 67",
+  "@phoneErrorInvalid": {"description": "Shared form error (checkout, call-an-usta, shop/usta forms): the phone is not an Uzbek number; same text as the web app."},
+  "mastersPhoneLabel": "Telefon raqamingiz",
+  "@mastersPhoneLabel": {"description": "U5 send-to-usta screen: label of the phone field the usta calls back on."},
   "mastersEstimateNote": "Usta smetani ko'rib, o'z narxini taklif qiladi",
   "@mastersEstimateNote": {
     "description": "U5 send-smeta sheet: note explaining the master will review and propose a price."
@@ -1399,6 +1405,10 @@
   "@estimateStageFallback": {
     "description": "E1 estimation: generic fallback stage label in the savings banner ('Stage')."
   },
+  "estimateFloorUnpriced": "Pol turi tanlangan, lekin mahsulot tanlanmagan — pol smetaga kirmadi.",
+  "@estimateFloorUnpriced": {"description": "E1 smeta: warning banner when the Studio has a floor type but no floor product, so the floor is missing from the estimate."},
+  "estimateFloorPick": "Polni tanlash",
+  "@estimateFloorPick": {"description": "E1 smeta: button on the floor warning that opens the Studio to pick a floor product."},
   "estimateAdjust": "Smeta sozlash",
   "@estimateAdjust": {
     "description": "Estimate adjust: E1 tooltip and E3 app bar title ('Adjust estimate')."
@@ -1501,6 +1511,10 @@
   "studioAiHint": "Masalan: \"Devorlarni iliq bej rangga bo'ya va divan qo'sh\"",
   "@studioAiHint": {
     "description": "AI builder sheet: example prompt hint in the request text field."
+  },
+  "studioAiStyleLabel": "Uslub (ixtiyoriy)",
+  "@studioAiStyleLabel": {
+    "description": "AI builder sheet: heading over the optional furniture style chips; the chosen style is put in front of the request."
   },
   "studioGenerating": "Ishlanmoqda…",
   "@studioGenerating": {
@@ -1897,6 +1911,8 @@
   "@wizardExactValue": {
     "description": "3D wizard ceiling step: exact-value field label."
   },
+  "wizardCeilingOutOfRange": "Shift balandligi {min} m dan {max} m gacha bo'lishi kerak",
+  "@wizardCeilingOutOfRange": {"description": "Room wizard, ceiling step: the typed height is not a number in the accepted range; Next stays disabled.", "placeholders": {"min": {"type": "String"}, "max": {"type": "String"}}},
   "wizardWallTitle": "{letter} devor",
   "@wizardWallTitle": {
     "description": "3D wizard wall step heading, e.g. 'A devor'.",
@@ -2209,7 +2225,7 @@
   "@scanLidarUnavailableTitle": {
     "description": "Unsupported-device sheet title ('LiDAR not available')."
   },
-  "scanLidarUnavailableBody": "LiDAR skaner faqat iPhone 12 Pro, 13 Pro, 14 Pro, 15 Pro, 16 Pro yoki iPad Pro'da ishlaydi. Xonani boshqa usulda qo'shing:",
+  "scanLidarUnavailableBody": "LiDAR skaner faqat LiDAR'li qurilmalarda ishlaydi: iPhone Pro (12 Pro va undan yangilari) yoki iPad Pro. Xonani boshqa usulda qo'shing:",
   "@scanLidarUnavailableBody": {
     "description": "Unsupported-device sheet body explaining LiDAR requirements and offering alternatives."
   },
@@ -2543,8 +2559,10 @@
   "businessFieldDistrict": "Tuman",
   "businessFieldPhone": "Telefon (+998...)",
   "businessFieldTelegram": "Telegram (ixtiyoriy)",
-  "businessFieldPriceMin": "Narx: dan (so'm)",
-  "businessFieldPriceMax": "Narx: gacha (so'm)",
+  "businessFieldPriceMin": "Dan",
+  "businessFieldPriceMax": "Gacha",
+  "businessFieldPriceTitle": "Narx (so'm)",
+  "@businessFieldPriceTitle": {"description": "Usta apply/edit forms: heading above the two price fields (from / up to), so the fields themselves can carry short labels that fit half the width."},
   "businessSubmit": "Arizani yuborish",
   "businessSkip": "Keyinroq",
   "businessErrorName": "Nomni kiriting",
@@ -2720,11 +2738,303 @@
   "shopCategorySement": "Sement",
   "shopCategorySantexnika": "Santexnika",
   "shopCategoryElektr": "Elektr",
+  "shopCategoryEshik": "Eshik",
+  "@shopCategoryEshik": {"description": "Shop category chip/label: doors (server category `eshik`)."},
+  "shopCategoryDeraza": "Deraza",
+  "@shopCategoryDeraza": {"description": "Shop category chip/label: windows (server category `deraza`)."},
   "tradeBoshqa": "Boshqa usta",
   "qualityTierEkonom": "Ekonom",
   "qualityTierStandart": "Standart",
   "qualityTierPremium": "Premium",
   "estimateOpen3dStudio": "3D Studio",
   "actionDelete": "O'chirish",
-  "mapAttribution": "© OpenStreetMap hissadorlari"
+  "mapAttribution": "© OpenStreetMap hissadorlari",
+  "pushPromptTitle": "Xabar beraylikmi?",
+  "@pushPromptTitle": {"description": "Title of the one-time dialog asking whether to send push notifications."},
+  "pushPromptBody": "Dizayningiz tayyor bo'lganda yoki buyurtma holati o'zgarganda xabar beramiz.",
+  "@pushPromptBody": {"description": "Body of the one-time push notification dialog."},
+  "pushPromptYes": "Ha",
+  "@pushPromptYes": {"description": "Confirm button of the push notification dialog; triggers the system permission request."},
+  "pushPromptLater": "Keyinroq",
+  "@pushPromptLater": {"description": "Dismiss button of the push notification dialog."},
+  "settingsNotificationsTitle": "Bildirishnomalar",
+  "@settingsNotificationsTitle": {"description": "Settings screen: notifications row title; opens system settings."},
+  "settingsNotificationsOn": "Yoqilgan",
+  "@settingsNotificationsOn": {"description": "Settings screen: notifications row subtitle when permission is granted."},
+  "settingsNotificationsOff": "O'chirilgan",
+  "@settingsNotificationsOff": {"description": "Settings screen: notifications row subtitle when permission is not granted."},
+  "pushChannelName": "Andoza yangiliklari",
+  "@pushChannelName": {"description": "Android notification channel name shown in system settings."},
+  "sharePinTitle": "Pinterest pin",
+  "@sharePinTitle": {"description": "Share screen (a pin shared from the Pinterest app): app-bar title."},
+  "sharePinChooseRoom": "Qaysi xonaga qo'llaymiz?",
+  "@sharePinChooseRoom": {"description": "Share screen: heading above the list of the user's rooms."},
+  "sharePinHint": "Studio'dagi AI dizayner shu pin bilan ochiladi.",
+  "@sharePinHint": {"description": "Share screen: what happens after a room is picked."},
+  "sharePinNoRooms": "Hali xona yo'q. Avval \"+\" orqali xona qo'shing.",
+  "@sharePinNoRooms": {"description": "Share screen: shown when the user has no rooms to apply the pin to."},
+  "sharePinNotPin": "Bu Pinterest pin havolasi emas",
+  "@sharePinNotPin": {"description": "Share screen: the shared text has no Pinterest pin link (same wording as the API's 422)."},
+  "sharePinNotPinHint": "Pinterest ilovasida pinni oching va \"Ulashish\" → Andoza AI ni tanlang.",
+  "@sharePinNotPinHint": {"description": "Share screen: how to share a pin, under the not-a-pin message."},
+  "furnitureStylesLabel": "Uslublar",
+  "@furnitureStylesLabel": {"description": "Seller product forms: heading above the furniture style chips."},
+  "furnitureStylesAll": "Hamma uslubga mos",
+  "@furnitureStylesAll": {"description": "Seller product forms: shown under the style chips when none is picked."},
+  "furnitureStyleNeoklassika": "Neoklassika",
+  "@furnitureStyleNeoklassika": {"description": "Furniture style chip (API id neoklassika)."},
+  "furnitureStyleKlassik": "Klassik",
+  "@furnitureStyleKlassik": {"description": "Furniture style chip (API id klassik)."},
+  "furnitureStyleZamonaviy": "Zamonaviy",
+  "@furnitureStyleZamonaviy": {"description": "Furniture style chip (API id zamonaviy)."},
+  "furnitureStyleHitech": "Hi-Tech",
+  "@furnitureStyleHitech": {"description": "Furniture style chip (API id hitech)."},
+  "furnitureStyleMinimalist": "Minimalist",
+  "@furnitureStyleMinimalist": {"description": "Furniture style chip (API id minimalist)."},
+  "furnitureStyleSkandinav": "Skandinav",
+  "@furnitureStyleSkandinav": {"description": "Furniture style chip (API id skandinav)."},
+  "furnitureStyleLoft": "Loft",
+  "@furnitureStyleLoft": {"description": "Furniture style chip (API id loft)."},
+  "furnitureStyleMilliy": "Milliy",
+  "@furnitureStyleMilliy": {"description": "Furniture style chip (API id milliy)."},
+  "estimateFloorStandIn": "Pol mahsuloti tanlanmagan — narx do'kondagi o'rtacha poldan olindi (taxminiy).",
+  "@estimateFloorStandIn": {"description": "E1 smeta: floor type chosen without a product; the server priced it from the median shop product."},
+  "scanChoiceTitle": "Nimani skanerlaymiz?",
+  "@scanChoiceTitle": {
+    "description": "Scan screen: title of the sheet choosing one room or several rooms (iPhones that support it)."
+  },
+  "scanChoiceOneRoom": "Bitta xona",
+  "@scanChoiceOneRoom": {
+    "description": "Scan choice sheet: option to scan a single room."
+  },
+  "scanChoiceFlat": "Bir nechta xona (kvartira)",
+  "@scanChoiceFlat": {
+    "description": "Scan choice sheet: option to scan several rooms in one session."
+  },
+  "scanChoiceFlatHint": "Xonalarni ketma-ket skanerlang — ular rejada o'z joyiga tushadi",
+  "@scanChoiceFlatHint": {
+    "description": "Scan choice sheet: hint under the several-rooms option."
+  },
+  "scanNextRoom": "Keyingi xona",
+  "@scanNextRoom": {
+    "description": "Multi-room scanner button: finish this room and start the next."
+  },
+  "scanFinish": "Tugatish",
+  "@scanFinish": {
+    "description": "Multi-room scanner button: end the session."
+  },
+  "scanRoomN": "{n}-xona",
+  "@scanRoomN": {
+    "description": "Multi-room scanner: the current room's number, and the default name of scanned room n.",
+    "placeholders": { "n": { "type": "int" } }
+  },
+  "flatReviewTitle": "Skanerlangan xonalar",
+  "@flatReviewTitle": {
+    "description": "Title of the review page after a multi-room scan."
+  },
+  "flatReviewRoomName": "Xona nomi",
+  "@flatReviewRoomName": {
+    "description": "Multi-room review: label of a room's name field."
+  },
+  "flatReviewContinue": "Studiyada ochish",
+  "@flatReviewContinue": {
+    "description": "Multi-room review: button that saves the rooms and opens the 3D studio."
+  },
+  "flatReviewPartial": "Skaner to'xtadi — {n} ta xona saqlandi",
+  "@flatReviewPartial": {
+    "description": "Multi-room review: the session ended early (app went to the background); n rooms were kept.",
+    "placeholders": { "n": { "type": "int" } }
+  },
+  "flatReviewDropped": "{n} ta xona o'qilmadi va qo'shilmadi",
+  "@flatReviewDropped": {
+    "description": "Multi-room review: n scanned rooms could not be converted into a plan.",
+    "placeholders": { "n": { "type": "int" } }
+  },
+  "flatReviewSavedSome": "{total} ta xonadan {saved} tasi saqlandi — qolganlarini qayta skanerlang",
+  "@flatReviewSavedSome": {
+    "description": "Multi-room review: saving stopped part-way; only some rooms were saved (the rest are lost and must be scanned again).",
+    "placeholders": { "saved": { "type": "int" }, "total": { "type": "int" } }
+  },
+  "loginWithApple": "Apple bilan kirish",
+  "@loginWithApple": {
+    "description": "Login: black button (iOS only) that signs in with an Apple ID."
+  },
+  "loginAppleFailed": "Apple orqali kirib bo'lmadi. Qayta urinib ko'ring.",
+  "@loginAppleFailed": {
+    "description": "Login error: Sign in with Apple failed (invalid token or Apple error)."
+  },
+  "reportAction": "Shikoyat qilish",
+  "@reportAction": {
+    "description": "Menu item on a craftsman profile / product: opens the report sheet."
+  },
+  "reportTitle": "Shikoyat",
+  "@reportTitle": {
+    "description": "Report sheet: title."
+  },
+  "reportHint": "Nima noto'g'ri? Shikoyatingizni moderatorlar ko'rib chiqadi.",
+  "@reportHint": {
+    "description": "Report sheet: one-line explanation under the title."
+  },
+  "reportReasonSpam": "Spam yoki reklama",
+  "@reportReasonSpam": {
+    "description": "Report reason option."
+  },
+  "reportReasonInappropriate": "Nomaqbul kontent",
+  "@reportReasonInappropriate": {
+    "description": "Report reason option: offensive or objectionable material."
+  },
+  "reportReasonFraud": "Firibgarlik",
+  "@reportReasonFraud": {
+    "description": "Report reason option."
+  },
+  "reportReasonOther": "Boshqa",
+  "@reportReasonOther": {
+    "description": "Report reason option."
+  },
+  "reportDetails": "Izoh (ixtiyoriy)",
+  "@reportDetails": {
+    "description": "Report sheet: label of the optional free-text field."
+  },
+  "reportSend": "Yuborish",
+  "@reportSend": {
+    "description": "Report sheet: submit button."
+  },
+  "reportSent": "Rahmat! Shikoyatingiz yuborildi.",
+  "@reportSent": {
+    "description": "Snackbar after a report was sent."
+  },
+  "blockUstaAction": "Bloklash",
+  "@blockUstaAction": {
+    "description": "Menu item on a craftsman profile: hide this craftsman."
+  },
+  "blockUstaTitle": "Ustani bloklaysizmi?",
+  "@blockUstaTitle": {
+    "description": "Block confirmation dialog: title."
+  },
+  "blockUstaBody": "U endi xaritada va ro'yxatda sizga ko'rinmaydi.",
+  "@blockUstaBody": {
+    "description": "Block confirmation dialog: what blocking does."
+  },
+  "blockUstaConfirm": "Bloklash",
+  "@blockUstaConfirm": {
+    "description": "Block confirmation dialog: confirm button."
+  },
+  "blockUstaDone": "Usta bloklandi",
+  "@blockUstaDone": {
+    "description": "Snackbar after blocking a craftsman."
+  },
+  "shopFurnitureSection": "Mebel",
+  "@shopFurnitureSection": {
+    "description": "Heading of the shops' furniture (3D models) section on the shop home and a shop's page."
+  },
+  "shopFurnitureNoPrice": "Narxi kelishiladi",
+  "@shopFurnitureNoPrice": {
+    "description": "Furniture card/page when the shop set no price."
+  },
+  "storePageOpen": "{name} do'koni",
+  "@storePageOpen": {
+    "description": "Row on a product page that opens the page of the shop selling it.",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "storeLoadFailed": "Do'konni ochib bo'lmadi",
+  "@storeLoadFailed": {
+    "description": "A shop's page could not load, or the shop is closed."
+  },
+  "storeCall": "Qo'ng'iroq",
+  "@storeCall": {
+    "description": "Call button on a shop's page."
+  },
+  "storeTelegram": "Telegram",
+  "@storeTelegram": {
+    "description": "Telegram button on a shop's page."
+  },
+  "storeNoProducts": "Bu do'konda hozircha mahsulot yo'q",
+  "@storeNoProducts": {
+    "description": "A shop's page with no products."
+  },
+  "storeReport": "Do'kon haqida shikoyat",
+  "@storeReport": {
+    "description": "Menu item on a shop's page that reports the shop."
+  },
+  "furnitureSize": "O'lchami",
+  "@furnitureSize": {
+    "description": "Label of the size row on a furniture page."
+  },
+  "furnitureSizeValue": "{size} sm",
+  "@furnitureSizeValue": {
+    "description": "A furniture size, e.g. \"220 × 90 × 80 cm\".",
+    "placeholders": {
+      "size": {
+        "type": "String"
+      }
+    }
+  },
+  "furniturePlaceInRoom": "Xonamga qo'yish",
+  "@furniturePlaceInRoom": {
+    "description": "Button that opens one of the user's rooms in the Studio with this furniture placed in it."
+  },
+  "furniturePickRoom": "Qaysi xonaga qo'yamiz?",
+  "@furniturePickRoom": {
+    "description": "Title of the room picker before placing furniture."
+  },
+  "furnitureNoRooms": "Avval xona yarating yoki skanerlang",
+  "@furnitureNoRooms": {
+    "description": "Shown when the user has no room to place furniture in."
+  },
+  "furnitureNoModel": "Bu mahsulotning 3D modeli yo'q, uni xonaga qo'yib bo'lmaydi",
+  "@furnitureNoModel": {
+    "description": "Furniture page of a photo-only listing."
+  },
+  "furnitureLoadFailed": "Mahsulotni ochib bo'lmadi",
+  "@furnitureLoadFailed": {
+    "description": "A furniture page could not load, or the item is off sale."
+  },
+  "profileMenuMebel": "Mebel ishlab chiqarish",
+  "@profileMenuMebel": {
+    "description": "Profile menu: opens the web furniture workshop (cabinet parts, cut lists, price) in a WebView. Same text as the web's profile.mebel."
+  },
+  "profileMenuMebelHint": "Ustaxonalar uchun: shkaf detallari, kromka va narx",
+  "@profileMenuMebelHint": {
+    "description": "Profile menu: line under the furniture-workshop entry. Same text as the web's profile.mebel_izoh."
+  },
+  "mebelExportFailed": "Faylni ochib bo'lmadi",
+  "@mebelExportFailed": {
+    "description": "Furniture workshop: the PDF or CSV export could not be opened or shared."
+  },
+  "scanHintStart": "Xonani sekin aylanib skanerlang",
+  "@scanHintStart": {
+    "description": "LiDAR scanner: hint at the bottom when the scan starts."
+  },
+  "scanCoachMoveCloser": "Telefonni devorga yaqinroq tuting",
+  "@scanCoachMoveCloser": {
+    "description": "LiDAR scanner coaching: the phone is too far from the wall."
+  },
+  "scanCoachMoveAway": "Telefonni devordan birozroq uzoqlashtiring",
+  "@scanCoachMoveAway": {
+    "description": "LiDAR scanner coaching: the phone is too close to the wall."
+  },
+  "scanCoachSlowDown": "Juda tez harakatlanyapsiz — sekinroq aylaning",
+  "@scanCoachSlowDown": {
+    "description": "LiDAR scanner coaching: the phone moves too fast."
+  },
+  "scanCoachTurnOnLight": "Xona qorong'i — yorug'likni yoqing",
+  "@scanCoachTurnOnLight": {
+    "description": "LiDAR scanner coaching: not enough light."
+  },
+  "scanCoachLowTexture": "Bu yuza silliq/bir xil — kamerani boshqa tomonga burang",
+  "@scanCoachLowTexture": {
+    "description": "LiDAR scanner coaching: the surface has too little texture to track."
+  },
+  "scanCoachGood": "Zo'r ketyapti — xonani shu tezlikda aylanib chiqing",
+  "@scanCoachGood": {
+    "description": "LiDAR scanner coaching: everything is fine, keep going."
+  },
+  "scanCoachKeepGoing": "Skanerlashda davom eting",
+  "@scanCoachKeepGoing": {
+    "description": "LiDAR scanner coaching: fallback for an instruction the app does not know."
+  }
 }

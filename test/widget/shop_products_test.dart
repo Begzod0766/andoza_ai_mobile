@@ -22,8 +22,14 @@ class _FakeRepo implements BusinessRepository {
   Future<List<ShopProduct>> fetchProducts() async => items;
 
   @override
-  Future<ShopProduct> updateProduct(String id, {String? name, int? priceUzs, bool? isActive}) async {
-    calls.add('update $id active=$isActive');
+  Future<ShopProduct> updateProduct(
+    String id, {
+    String? name,
+    int? priceUzs,
+    bool? isActive,
+    List<String>? styles,
+  }) async {
+    calls.add(styles == null ? 'update $id active=$isActive' : 'update $id styles=${styles.join(',')}');
     return items.first;
   }
 
@@ -67,5 +73,34 @@ void main() {
     ));
     await tester.pumpAndSettle();
     expect(find.byTooltip('Orqaga'), findsOneWidget);
+  });
+
+  testWidgets('editing a product sends the styles picked, in the API order', (tester) async {
+    final repo = _FakeRepo();
+    await tester.binding.setSurfaceSize(const Size(800, 1400));
+    addTearDown(() => tester.binding.setSurfaceSize(null));
+    await tester.pumpWidget(ProviderScope(
+      overrides: [businessRepositoryProvider.overrideWithValue(repo)],
+      child: const MaterialApp(
+        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        supportedLocales: AppLocalizations.supportedLocales,
+        locale: Locale('uz'),
+        home: ShopProductsScreen(),
+      ),
+    ));
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text('Divan Milano'));
+    await tester.pumpAndSettle();
+    expect(find.text('Hamma uslubga mos'), findsOneWidget);
+    await tester.tap(find.text('Loft'));
+    await tester.pump();
+    await tester.tap(find.text('Zamonaviy'));
+    await tester.pumpAndSettle();
+    expect(find.text('Hamma uslubga mos'), findsNothing);
+
+    await tester.tap(find.text('Saqlash'));
+    await tester.pumpAndSettle();
+    expect(repo.calls, ['update a styles=zamonaviy,loft']);
   });
 }

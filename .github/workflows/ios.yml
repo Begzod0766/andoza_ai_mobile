@@ -9,7 +9,7 @@ name: iOS Build & TestFlight
 #   IOS_P12_PASSWORD     password used when the .p12 was exported
 #   IOS_PROFILE_BASE64   base64 of the App Store provisioning .mobileprovision
 #   IOS_TEAM_ID          10-char Apple Developer Team ID
-#   IOS_BUNDLE_ID        com.tamiruy.tamirUyMobileFlutter  (the iOS bundle id)
+#   IOS_BUNDLE_ID        uz.andozaai.app  (the iOS bundle id)
 #   IOS_PROFILE_NAME     the provisioning profile's exact name
 #   ASC_KEY_BASE64       base64 of the App Store Connect API key AuthKey_XXXX.p8
 #   ASC_KEY_ID           the API key id (the XXXX in the filename)
@@ -39,15 +39,20 @@ concurrency:
 
 jobs:
   build-ios:
-    runs-on: macos-14
+    # firebase-ios-sdk 12 needs Swift tools 6.1 (Xcode 16.3+); macos-14 ships
+    # Xcode 15, which cannot resolve its Swift package.
+    runs-on: macos-15
     steps:
+      - name: Xcode version
+        run: xcodebuild -version
+
       - name: Checkout
         uses: actions/checkout@v4
 
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.44.8'
+          flutter-version: '3.47.5'
           channel: stable
           cache: true
 
@@ -108,7 +113,12 @@ jobs:
           plutil -p ios/ExportOptions.plist | sed "s|${IOS_TEAM_ID}|***TEAM_ID***|g"
 
       - name: Flutter pub get
-        run: flutter pub get
+        # Flutter 3.47 copies each plugin into build/{ios,macos}/SourcePackages with
+        # rsync; the runner's rsync 2.6.9 cannot create that missing parent on a
+        # fresh checkout ("mkdir ... failed: No such file or directory").
+        run: |
+          mkdir -p build/ios/SourcePackages build/macos/SourcePackages
+          flutter pub get
 
       - name: Code generation (freezed / json_serializable / riverpod)
         run: dart run build_runner build --delete-conflicting-outputs

@@ -171,11 +171,15 @@ class ShopProduct {
     this.priceUzs,
     this.thumbnailUrl,
     this.moderationNote,
+    this.styles = const [],
   });
 
   final String id;
   final String name;
   final String category;
+  /// The design styles the model suits ([furnitureStyles] ids); empty means
+  /// every style. A ready-made style in the Studio picks its own first.
+  final List<String> styles;
   final int? priceUzs;
   final String? thumbnailUrl;
   final ModerationStatus status;
@@ -191,8 +195,24 @@ class ShopProduct {
         status: ModerationStatus.parse(json['status']),
         isActive: json['is_active'] as bool? ?? false,
         moderationNote: json['moderation_note'] as String?,
+        styles: [
+          for (final s in json['styles'] as List<dynamic>? ?? const []) s as String,
+        ],
       );
 }
+
+/// The furniture styles the API accepts, in its own order
+/// (`FURNITURE_STYLES` in the backend's `app/schemas/admin_catalog.py`).
+const furnitureStyles = [
+  'neoklassika',
+  'klassik',
+  'zamonaviy',
+  'hitech',
+  'minimalist',
+  'skandinav',
+  'loft',
+  'milliy',
+];
 
 /// A "3D model from a photo" background job (`GET /jobs/{id}`).
 class ModelJob {

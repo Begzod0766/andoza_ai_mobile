@@ -6,6 +6,7 @@ import '../features/room_scan/pending_scan_store.dart';
 import '../providers/business_provider.dart';
 import '../l10n/app_localizations.dart';
 import 'room_setup/new_project_sheet.dart';
+import 'scanning/flat_scan_review_page.dart';
 import 'scanning/room_scan_review_page.dart';
 
 /// Shared app shell: the bottom navigation bar (Uy / Do'kon / Ustalar /
@@ -53,7 +54,8 @@ class _AppShellState extends ConsumerState<AppShell> {
   }
 
   Future<void> _offerPendingScan() async {
-    if (!await PendingScanStore.hasPending()) return;
+    final flat = await PendingScanStore.hasPendingFlat();
+    if (!flat && !await PendingScanStore.hasPending()) return;
     if (!mounted) return;
     final l10n = AppLocalizations.of(context)!;
     final resume = await showDialog<bool>(
@@ -76,6 +78,16 @@ class _AppShellState extends ConsumerState<AppShell> {
     );
     if (resume != true) {
       await PendingScanStore.clear();
+      await PendingScanStore.clearFlat();
+      return;
+    }
+    if (flat) {
+      final loadedFlat = await PendingScanStore.loadFlat();
+      if (loadedFlat == null || !mounted) return;
+      GoRouter.of(context).push(
+        '/scanning/roomplan/review-flat',
+        extra: FlatScanReviewArgs(drafts: loadedFlat.drafts, scans: loadedFlat.scans),
+      );
       return;
     }
     final loaded = await PendingScanStore.load();

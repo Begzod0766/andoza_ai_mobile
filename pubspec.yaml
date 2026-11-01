@@ -16,10 +16,10 @@ publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 # https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html
 # In Windows, build-name is used as the major, minor, and patch parts
 # of the product and file versions while build-number is used as the build suffix.
-version: 1.0.0+8
+version: 1.0.0+28
 
 environment:
-  sdk: ^3.12.1
+  sdk: ^3.13.0
 
 # Dependencies specify other packages that your package needs in order to work.
 # To automatically upgrade your package dependencies to the latest versions
@@ -70,6 +70,8 @@ dependencies:
 
   # WebView host for the 3D Studio (embeds the React/Three.js editor)
   webview_flutter: ^4.10.0
+  # Android file chooser for the Studio's image uploads (AndroidWebViewController).
+  webview_flutter_android: ^4.13.0
 
   # Image picking for wallpaper uploads to the shared library
   image_picker: ^1.1.2
@@ -81,7 +83,14 @@ dependencies:
   shared_preferences: ^2.5.5
   package_info_plus: ^9.0.1
   google_sign_in: ^7.2.0
-
+  firebase_core: ^4.15.0
+  firebase_crashlytics: ^5.4.0
+  firebase_analytics: ^12.6.0
+  firebase_messaging: ^16.7.0
+  flutter_local_notifications: ^22.3.2
+  sign_in_with_apple: ^8.2.0
+  printing: ^5.15.1
+  pdf: ^3.13.1
 dev_dependencies:
   flutter_test:
     sdk: flutter

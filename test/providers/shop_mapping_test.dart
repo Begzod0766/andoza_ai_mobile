@@ -84,7 +84,7 @@ void main() {
       expect(catalog.single.category, ShopCategory.boyoq);
     });
 
-    test('server-only + unknown categories fall back to sement, never throw',
+    test('doors and windows get their own category; unknown falls back to sement',
         () async {
       final catalog = await _catalog([
         _material(id: 'door', category: 'eshik'),
@@ -92,8 +92,8 @@ void main() {
         _material(id: 'weird', category: 'totally_unknown_category'),
       ]);
       final byId = {for (final p in catalog) p.id: p.category};
-      expect(byId['door'], ShopCategory.sement);
-      expect(byId['window'], ShopCategory.sement);
+      expect(byId['door'], ShopCategory.eshik);
+      expect(byId['window'], ShopCategory.deraza);
       expect(byId['weird'], ShopCategory.sement);
     });
   });

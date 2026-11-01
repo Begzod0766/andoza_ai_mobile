@@ -5,7 +5,7 @@ import '../../config/design_tokens.dart';
 import '../../l10n/app_localizations.dart';
 import '../../models/design_selection_model.dart';
 import '../../providers/apartment_provider.dart';
-import '../../providers/estimate_api_provider.dart';
+import '../../providers/estimate_provider.dart';
 import '../../widgets/common/error_view.dart';
 import '../../widgets/common/skeleton_loader.dart';
 import '../../widgets/design/room_thumbnail.dart';
@@ -565,9 +565,9 @@ class _EstimateChip extends ConsumerWidget {
     if (!active || roomId == null) {
       return _StatChip(value: l10n.homeStatDash, label: l10n.homeStatEstimateLabel);
     }
-    final estimate = ref.watch(estimatePreviewProvider(roomId));
+    final estimate = ref.watch(roomEstimateTotalProvider(roomId));
     final value = estimate.when(
-      data: (e) => l10n.homeEstimateMln((e.totalUzs / 1000000).toStringAsFixed(1)),
+      data: (total) => l10n.homeEstimateMln((total / 1000000).toStringAsFixed(1)),
       loading: () => '…',
       error: (_, _) => l10n.homeStatDash,
     );

@@ -90,6 +90,44 @@ void main() {
     expect(form.fields, isEmpty);
   });
 
+  test('createProduct sends the styles comma-separated, and none when empty', () async {
+    Future<void> create(List<String> styles) async {
+      try {
+        await repo.createProduct(
+          glb: [1],
+          thumbnail: [2],
+          thumbnailType: 'image/jpeg',
+          name: 'Divan',
+          category: 'divan',
+          placement: 'pol',
+          styles: styles,
+        );
+      } catch (_) {} // the fake returns a job body, not a product
+    }
+
+    await create(['zamonaviy', 'loft']);
+    var form = adapter.last!.data as FormData;
+    expect(
+      form.fields.where((f) => f.key == 'styles').map((f) => f.value),
+      ['zamonaviy,loft'],
+    );
+
+    await create(const []);
+    form = adapter.last!.data as FormData;
+    expect(form.fields.where((f) => f.key == 'styles'), isEmpty);
+  });
+
+  test('updateProduct sends styles only when given; [] clears them', () async {
+    try {
+      await repo.updateProduct('f1', name: 'Stol');
+    } catch (_) {}
+    expect(adapter.last!.data, {'name_uz': 'Stol'});
+    try {
+      await repo.updateProduct('f1', styles: const []);
+    } catch (_) {}
+    expect(adapter.last!.data, {'styles': <String>[]});
+  });
+
   test('deletePortfolioItem calls DELETE', () async {
     try {
       await repo.deletePortfolioItem('p1');

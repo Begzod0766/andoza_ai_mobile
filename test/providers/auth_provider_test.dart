@@ -38,6 +38,13 @@ class _FakeAuthRepository implements AuthRepository {
   }
 
   @override
+  Future<AuthResponse> loginWithApple(String identityToken,
+      {String? name}) async {
+    if (_loginError != null) throw _loginError;
+    return _loginResult!;
+  }
+
+  @override
   Future<void> requestOtp(String phone) async {}
 
   @override

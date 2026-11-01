@@ -6,6 +6,7 @@ import '../../config/design_tokens.dart';
 import '../../l10n/app_localizations.dart';
 import '../../models/business_profile.dart';
 import '../../providers/business_provider.dart';
+import '../../utils/phone.dart';
 
 /// Edit the shop's own public profile. Moderation status is not the owner's to change.
 class EditShopScreen extends ConsumerStatefulWidget {
@@ -20,13 +21,27 @@ class _EditShopScreenState extends ConsumerState<EditShopScreen> {
   final _district = TextEditingController();
   final _phone = TextEditingController();
   final _telegram = TextEditingController();
+  late final _fields = [_name, _district, _phone, _telegram];
   bool _loaded = false;
   bool _saving = false;
   String? _error;
 
   @override
+  void initState() {
+    super.initState();
+    // A message about the last save no longer holds once a field changes.
+    for (final c in _fields) {
+      c.addListener(_clearError);
+    }
+  }
+
+  void _clearError() {
+    if (_error != null) setState(() => _error = null);
+  }
+
+  @override
   void dispose() {
-    for (final c in [_name, _district, _phone, _telegram]) {
+    for (final c in _fields) {
       c.dispose();
     }
     super.dispose();
@@ -43,15 +58,26 @@ class _EditShopScreenState extends ConsumerState<EditShopScreen> {
   Future<void> _save() async {
     final l10n = AppLocalizations.of(context)!;
     final router = GoRouter.of(context);
+    // A name of spaces alone is refused by the API with a 422, and a number
+    // has to be an Uzbek one; say which, here.
+    if (_name.text.trim().isEmpty) {
+      setState(() => _error = l10n.businessErrorName);
+      return;
+    }
+    final phone = normalizeUzPhone(_phone.text);
+    if (phone == null && !isPhoneBlank(_phone.text)) {
+      setState(() => _error = l10n.phoneErrorInvalid);
+      return;
+    }
     setState(() {
       _saving = true;
       _error = null;
     });
     try {
       await ref.read(businessRepositoryProvider).updateShop(
-            name: _name.text,
+            name: _name.text.trim(),
             district: _district.text.trim(),
-            phone: _phone.text,
+            phone: phone,
             telegram: _telegram.text.trim(),
           );
       ref.invalidate(myShopProvider);

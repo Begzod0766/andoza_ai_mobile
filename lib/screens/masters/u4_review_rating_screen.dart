@@ -4,6 +4,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:latlong2/latlong.dart';
 import '../../config/design_tokens.dart';
+import '../../features/moderation/blocked_ustalar.dart';
+import '../../features/moderation/report_repository.dart';
+import '../../features/moderation/report_sheet.dart';
 import '../../l10n/app_localizations.dart';
 import '../../providers/business_provider.dart';
 import '../../providers/masters_provider.dart';
@@ -31,6 +34,7 @@ class U4ReviewRatingScreen extends ConsumerWidget {
       appBar: AppBar(
         backgroundColor: DesignTokens.backgroundLight,
         elevation: 0,
+        actions: [_ModerationMenu(ustaId: m.master.id)],
       ),
       body: SafeArea(
         child: SingleChildScrollView(
@@ -291,6 +295,68 @@ class _ServiceRow extends StatelessWidget {
           Text(label, style: DesignTokens.body2),
         ],
       ),
+    );
+  }
+}
+
+enum _ModerationAction { report, block }
+
+/// ⋮ → "Shikoyat qilish" / "Bloklash" (App Store guideline 1.2: content other
+/// users publish can be reported, and its author blocked).
+class _ModerationMenu extends ConsumerWidget {
+  const _ModerationMenu({required this.ustaId});
+
+  final String ustaId;
+
+  Future<void> _block(BuildContext context, WidgetRef ref) async {
+    final l10n = AppLocalizations.of(context)!;
+    final ok = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text(l10n.blockUstaTitle),
+        content: Text(l10n.blockUstaBody),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, false),
+            child: Text(l10n.actionCancel),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, true),
+            child: Text(l10n.blockUstaConfirm),
+          ),
+        ],
+      ),
+    );
+    if (ok != true || !context.mounted) return;
+    final messenger = ScaffoldMessenger.of(context);
+    await ref.read(blockedUstalarProvider.notifier).block(ustaId);
+    if (context.mounted) Navigator.of(context).maybePop();
+    messenger.showSnackBar(SnackBar(content: Text(l10n.blockUstaDone)));
+  }
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context)!;
+    return PopupMenuButton<_ModerationAction>(
+      icon: const Icon(Icons.more_vert),
+      onSelected: (a) => switch (a) {
+        _ModerationAction.report => showReportSheet(
+            context,
+            target: ReportTarget.usta,
+            targetId: ustaId,
+          ),
+        _ModerationAction.block => _block(context, ref),
+      },
+      itemBuilder: (_) => [
+        PopupMenuItem(
+          value: _ModerationAction.report,
+          child: Text(l10n.reportAction),
+        ),
+        PopupMenuItem(
+          value: _ModerationAction.block,
+          child: Text(l10n.blockUstaAction),
+        ),
+      ],
     );
   }
 }

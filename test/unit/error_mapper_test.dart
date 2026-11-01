@@ -336,4 +336,43 @@ void main() {
           'ApiException(statusCode: 401)');
     });
   });
+
+  group('mapErrorWithServerDetail — the two shapes of a 422', () {
+    test('a sentence from the server is shown as written', () {
+      expect(
+        mapErrorWithServerDetail(ApiException(
+          message: 'Validation error',
+          statusCode: 422,
+          response: {'detail': "Noto'g'ri qiymat yuborildi."},
+        )),
+        "Noto'g'ri qiymat yuborildi.",
+      );
+    });
+
+    test("pydantic's English field list keeps the generic text", () {
+      expect(
+        mapErrorWithServerDetail(ApiException(
+          message: 'Validation error',
+          statusCode: 422,
+          response: {
+            'detail': [
+              {'loc': ['body', 'phone'], 'msg': 'Value error', 'type': 'value_error'},
+            ],
+          },
+        )),
+        errorValidation,
+      );
+    });
+
+    test('a 415 says which file was refused', () {
+      expect(
+        mapErrorWithServerDetail(ApiException(
+          message: 'Unsupported',
+          statusCode: 415,
+          response: {'detail': 'Fayl haqiqiy .glb emas'},
+        )),
+        'Fayl haqiqiy .glb emas',
+      );
+    });
+  });
 }

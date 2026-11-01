@@ -103,13 +103,22 @@ class _E1EstimationIntroScreenState
         ? _backendSavingsLabel(backendDelta!, l10n)
         : (stageLabel(savingsStage.name) ?? l10n.estimateStageFallback);
 
-    // Real server smeta total once the room is persisted; the header keeps
-    // showing the local total until then (and if the backend is unreachable).
-    final backendEstimate = roomId == null
+    // The header is the whole-renovation estimate: materials + labour, the
+    // same figure as the stage list below and the usta's summary in U5. The
+    // server preview used to replace it once the room was saved, but that
+    // prices only what was picked in the Studio and has no labour, so the
+    // card read "703 000" over a 14 + 7 million split. The server smeta still
+    // backs the PDF and the snapshot an usta receives.
+    final displayTotal = estimate.totalPrice;
+    final serverRoom = roomId == null
         ? null
-        : ref.watch(estimatePreviewProvider(roomId)).valueOrNull;
-    final displayTotal =
-        backendEstimate?.totalUzs.toDouble() ?? estimate.totalPrice;
+        : ref.watch(serverRoomProvider(roomId)).valueOrNull;
+    // The server smeta prices a floor type picked without a product from the
+    // median shop product; the note says whether it did.
+    final serverLines = roomId == null
+        ? null
+        : ref.watch(estimatePreviewProvider(roomId)).valueOrNull?.lines;
+    final floor = serverRoom == null ? null : floorNote(serverRoom, serverLines);
 
     return Scaffold(
       backgroundColor: DesignTokens.backgroundLight,
@@ -137,6 +146,13 @@ class _E1EstimationIntroScreenState
                 DesignTokens.screenPaddingHorizontal,
               ),
               children: [
+                if (floor != null) ...[
+                  _FloorNoteBanner(
+                    note: floor,
+                    onPick: () => context.push('/studio/$roomId'),
+                  ),
+                  const SizedBox(height: DesignTokens.spacingMd),
+                ],
                 Container(
                   width: double.infinity,
                   padding: const EdgeInsets.all(DesignTokens.spacingLg),
@@ -406,6 +422,48 @@ class _StageRow extends StatelessWidget {
             ),
           ],
         ),
+      ),
+    );
+  }
+}
+
+/// Shown when the Studio has a floor type but no floor product: the server
+/// either priced it from the median shop product (approximate) or left it out.
+/// Either way it leads back to the Studio to pick one.
+class _FloorNoteBanner extends StatelessWidget {
+  const _FloorNoteBanner({required this.note, required this.onPick});
+
+  final FloorNote note;
+  final VoidCallback onPick;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    return Container(
+      padding: const EdgeInsets.all(DesignTokens.spacingMd),
+      decoration: BoxDecoration(
+        color: DesignTokens.accentOrange.withValues(alpha: 0.1),
+        borderRadius: BorderRadius.circular(DesignTokens.radiusMd),
+        border: Border.all(color: DesignTokens.accentOrange),
+      ),
+      child: Row(
+        children: [
+          const Icon(Icons.warning_amber_rounded,
+              color: DesignTokens.accentOrange),
+          const SizedBox(width: DesignTokens.spacingSm),
+          Expanded(
+            child: Text(
+              note == FloorNote.standIn
+                  ? l10n.estimateFloorStandIn
+                  : l10n.estimateFloorUnpriced,
+              style: DesignTokens.body2,
+            ),
+          ),
+          TextButton(
+            onPressed: onPick,
+            child: Text(l10n.estimateFloorPick),
+          ),
+        ],
       ),
     );
   }

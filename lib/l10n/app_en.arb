@@ -228,6 +228,7 @@
     "description": "Login error: the username or password is incorrect."
   },
   "loginErrorUsernameShort": "Username must be at least 3 characters.",
+  "loginErrorUsernameLong": "Username must be at most 50 characters.",
   "@loginErrorUsernameShort": {
     "description": "Register error: username must be at least 3 characters."
   },
@@ -822,6 +823,8 @@
     }
   },
   "mastersCommentHint": "Comment (optional)",
+  "phoneErrorInvalid": "Invalid phone number. Example: +998 90 123 45 67",
+  "mastersPhoneLabel": "Your phone number",
   "@mastersCommentHint": {
     "description": "U5 send-smeta sheet: optional comment field hint."
   },
@@ -1282,6 +1285,8 @@
     "description": "E1 estimation: fallback label in the savings banner for already-done work ('Some work')."
   },
   "estimateStageFallback": "Stage",
+  "estimateFloorUnpriced": "A floor type is chosen but no product is, so the floor is not in this estimate.",
+  "estimateFloorPick": "Pick a floor",
   "@estimateStageFallback": {
     "description": "E1 estimation: generic fallback stage label in the savings banner ('Stage')."
   },
@@ -1395,6 +1400,7 @@
   "@studioAiHint": {
     "description": "AI builder sheet: example prompt hint in the request text field."
   },
+  "studioAiStyleLabel": "Style (optional)",
   "studioGenerating": "Generating…",
   "@studioGenerating": {
     "description": "AI builder sheet: generate button label while the AI is working."
@@ -1813,6 +1819,7 @@
     "description": "3D wizard ceiling step hint ('Usually between 2.5–3.2 metres')."
   },
   "wizardExactValue": "Exact value (m)",
+  "wizardCeilingOutOfRange": "Ceiling height must be between {min} m and {max} m",
   "@wizardExactValue": {
     "description": "3D wizard ceiling step: exact-value field label."
   },
@@ -2140,7 +2147,7 @@
   "@scanLidarUnavailableTitle": {
     "description": "Unsupported-device sheet title ('LiDAR not available')."
   },
-  "scanLidarUnavailableBody": "LiDAR scanning only works on iPhone 12 Pro, 13 Pro, 14 Pro, 15 Pro, 16 Pro or iPad Pro. Add the room another way:",
+  "scanLidarUnavailableBody": "LiDAR scanning only works on devices with LiDAR: iPhone Pro (12 Pro or newer) or iPad Pro. Add the room another way:",
   "@scanLidarUnavailableBody": {
     "description": "Unsupported-device sheet body explaining LiDAR requirements and offering alternatives."
   },
@@ -2491,8 +2498,9 @@
   "businessFieldDistrict": "District",
   "businessFieldPhone": "Phone (+998...)",
   "businessFieldTelegram": "Telegram (optional)",
-  "businessFieldPriceMin": "Price: from (UZS)",
-  "businessFieldPriceMax": "Price: up to (UZS)",
+  "businessFieldPriceMin": "From",
+  "businessFieldPriceMax": "Up to",
+  "businessFieldPriceTitle": "Price (UZS)",
   "businessSubmit": "Submit application",
   "businessSkip": "Later",
   "businessErrorName": "Enter a name",
@@ -2668,11 +2676,108 @@
   "shopCategorySement": "Cement",
   "shopCategorySantexnika": "Plumbing",
   "shopCategoryElektr": "Electrical",
+  "shopCategoryEshik": "Doors",
+  "shopCategoryDeraza": "Windows",
   "tradeBoshqa": "Other tradesperson",
   "qualityTierEkonom": "Economy",
   "qualityTierStandart": "Standard",
   "qualityTierPremium": "Premium",
   "estimateOpen3dStudio": "3D Studio",
   "actionDelete": "Delete",
-  "mapAttribution": "© OpenStreetMap contributors"
+  "mapAttribution": "© OpenStreetMap contributors",
+  "pushPromptTitle": "Shall we notify you?",
+  "pushPromptBody": "We'll tell you when your design is ready or your order status changes.",
+  "pushPromptYes": "Yes",
+  "pushPromptLater": "Later",
+  "settingsNotificationsTitle": "Notifications",
+  "settingsNotificationsOn": "On",
+  "settingsNotificationsOff": "Off",
+  "pushChannelName": "Andoza updates",
+  "sharePinTitle": "Pinterest pin",
+  "sharePinChooseRoom": "Which room is it for?",
+  "sharePinHint": "The Studio's AI designer opens with this pin.",
+  "sharePinNoRooms": "No rooms yet. Add one with \"+\" first.",
+  "sharePinNotPin": "This is not a Pinterest pin link",
+  "sharePinNotPinHint": "Open the pin in the Pinterest app and choose Share → Andoza AI.",
+  "furnitureStylesLabel": "Styles",
+  "furnitureStylesAll": "Suits every style",
+  "furnitureStyleNeoklassika": "Neoclassical",
+  "furnitureStyleKlassik": "Classic",
+  "furnitureStyleZamonaviy": "Modern",
+  "furnitureStyleHitech": "Hi-Tech",
+  "furnitureStyleMinimalist": "Minimalist",
+  "furnitureStyleSkandinav": "Scandinavian",
+  "furnitureStyleLoft": "Loft",
+  "furnitureStyleMilliy": "National",
+  "estimateFloorStandIn": "No floor product is chosen, so the price is the shops' median floor (approximate).",
+  "scanChoiceTitle": "What are we scanning?",
+  "scanChoiceOneRoom": "One room",
+  "scanChoiceFlat": "Several rooms (apartment)",
+  "scanChoiceFlatHint": "Scan the rooms one after another — they land in place on the plan",
+  "scanNextRoom": "Next room",
+  "scanFinish": "Finish",
+  "scanRoomN": "Room {n}",
+  "flatReviewTitle": "Scanned rooms",
+  "flatReviewRoomName": "Room name",
+  "flatReviewContinue": "Open in the studio",
+  "flatReviewPartial": "The scan stopped — {n} rooms kept",
+  "flatReviewDropped": "{n} rooms could not be read and were left out",
+  "flatReviewSavedSome": "{saved} of {total} rooms saved — scan the rest again",
+  "loginWithApple": "Sign in with Apple",
+  "loginAppleFailed": "Couldn't sign in with Apple. Please try again.",
+  "reportAction": "Report",
+  "reportTitle": "Report",
+  "reportHint": "What's wrong? Our moderators will review your report.",
+  "reportReasonSpam": "Spam or advertising",
+  "reportReasonInappropriate": "Inappropriate content",
+  "reportReasonFraud": "Fraud or scam",
+  "reportReasonOther": "Other",
+  "reportDetails": "Details (optional)",
+  "reportSend": "Send",
+  "reportSent": "Thanks! Your report has been sent.",
+  "blockUstaAction": "Block",
+  "blockUstaTitle": "Block this craftsman?",
+  "blockUstaBody": "They will no longer appear on your map or list.",
+  "blockUstaConfirm": "Block",
+  "blockUstaDone": "Craftsman blocked",
+  "shopFurnitureSection": "Furniture",
+  "shopFurnitureNoPrice": "Price on request",
+  "storePageOpen": "{name} shop",
+  "@storePageOpen": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "storeLoadFailed": "Couldn't open the shop",
+  "storeCall": "Call",
+  "storeTelegram": "Telegram",
+  "storeNoProducts": "This shop has no products yet",
+  "storeReport": "Report this shop",
+  "furnitureSize": "Size",
+  "furnitureSizeValue": "{size} cm",
+  "@furnitureSizeValue": {
+    "placeholders": {
+      "size": {
+        "type": "String"
+      }
+    }
+  },
+  "furniturePlaceInRoom": "Place in my room",
+  "furniturePickRoom": "Which room?",
+  "furnitureNoRooms": "Create or scan a room first",
+  "furnitureNoModel": "This product has no 3D model, so it can't be placed in a room",
+  "furnitureLoadFailed": "Couldn't open the product",
+  "profileMenuMebel": "Furniture manufacturing",
+  "profileMenuMebelHint": "For workshops: cabinet parts, edge banding and price",
+  "mebelExportFailed": "Couldn't open the file",
+  "scanHintStart": "Walk slowly around the room to scan it",
+  "scanCoachMoveCloser": "Hold the phone closer to the wall",
+  "scanCoachMoveAway": "Move the phone a little away from the wall",
+  "scanCoachSlowDown": "You're moving too fast — slow down",
+  "scanCoachTurnOnLight": "The room is dark — turn on the light",
+  "scanCoachLowTexture": "This surface is too plain — point the camera elsewhere",
+  "scanCoachGood": "Going well — keep walking around the room at this pace",
+  "scanCoachKeepGoing": "Keep scanning"
 }

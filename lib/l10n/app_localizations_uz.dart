@@ -1,5 +1,6 @@
 // ignore: unused_import
 import 'package:intl/intl.dart' as intl;
+
 import 'app_localizations.dart';
 
 // ignore_for_file: type=lint
@@ -187,6 +188,9 @@ class AppLocalizationsUz extends AppLocalizations {
   @override
   String get loginErrorUsernameShort =>
       'Login kamida 3 ta belgidan iborat bo\'lishi kerak.';
+
+  @override
+  String get loginErrorUsernameLong => 'Login 50 ta belgidan oshmasin.';
 
   @override
   String get loginErrorPasswordShort =>
@@ -718,6 +722,13 @@ class AppLocalizationsUz extends AppLocalizations {
   String get mastersCommentHint => 'Izoh (ixtiyoriy)';
 
   @override
+  String get phoneErrorInvalid =>
+      'Telefon raqami noto\'g\'ri. Masalan: +998 90 123 45 67';
+
+  @override
+  String get mastersPhoneLabel => 'Telefon raqamingiz';
+
+  @override
   String get mastersEstimateNote =>
       'Usta smetani ko\'rib, o\'z narxini taklif qiladi';
 
@@ -1064,6 +1075,13 @@ class AppLocalizationsUz extends AppLocalizations {
   String get estimateStageFallback => 'Bosqich';
 
   @override
+  String get estimateFloorUnpriced =>
+      'Pol turi tanlangan, lekin mahsulot tanlanmagan — pol smetaga kirmadi.';
+
+  @override
+  String get estimateFloorPick => 'Polni tanlash';
+
+  @override
   String get estimateAdjust => 'Smeta sozlash';
 
   @override
@@ -1139,6 +1157,9 @@ class AppLocalizationsUz extends AppLocalizations {
   @override
   String get studioAiHint =>
       'Masalan: \"Devorlarni iliq bej rangga bo\'ya va divan qo\'sh\"';
+
+  @override
+  String get studioAiStyleLabel => 'Uslub (ixtiyoriy)';
 
   @override
   String get studioGenerating => 'Ishlanmoqda…';
@@ -1433,6 +1454,11 @@ class AppLocalizationsUz extends AppLocalizations {
   String get wizardExactValue => 'Aniq qiymat (m)';
 
   @override
+  String wizardCeilingOutOfRange(String min, String max) {
+    return 'Shift balandligi $min m dan $max m gacha bo\'lishi kerak';
+  }
+
+  @override
   String wizardWallTitle(String letter) {
     return '$letter devor';
   }
@@ -1665,7 +1691,7 @@ class AppLocalizationsUz extends AppLocalizations {
 
   @override
   String get scanLidarUnavailableBody =>
-      'LiDAR skaner faqat iPhone 12 Pro, 13 Pro, 14 Pro, 15 Pro, 16 Pro yoki iPad Pro\'da ishlaydi. Xonani boshqa usulda qo\'shing:';
+      'LiDAR skaner faqat LiDAR\'li qurilmalarda ishlaydi: iPhone Pro (12 Pro va undan yangilari) yoki iPad Pro. Xonani boshqa usulda qo\'shing:';
 
   @override
   String get scanInProgress => 'Xona skanerlanmoqda…';
@@ -1958,10 +1984,13 @@ class AppLocalizationsUz extends AppLocalizations {
   String get businessFieldTelegram => 'Telegram (ixtiyoriy)';
 
   @override
-  String get businessFieldPriceMin => 'Narx: dan (so\'m)';
+  String get businessFieldPriceMin => 'Dan';
 
   @override
-  String get businessFieldPriceMax => 'Narx: gacha (so\'m)';
+  String get businessFieldPriceMax => 'Gacha';
+
+  @override
+  String get businessFieldPriceTitle => 'Narx (so\'m)';
 
   @override
   String get businessSubmit => 'Arizani yuborish';
@@ -2487,6 +2516,12 @@ class AppLocalizationsUz extends AppLocalizations {
   String get shopCategoryElektr => 'Elektr';
 
   @override
+  String get shopCategoryEshik => 'Eshik';
+
+  @override
+  String get shopCategoryDeraza => 'Deraza';
+
+  @override
   String get tradeBoshqa => 'Boshqa usta';
 
   @override
@@ -2506,4 +2541,272 @@ class AppLocalizationsUz extends AppLocalizations {
 
   @override
   String get mapAttribution => '© OpenStreetMap hissadorlari';
+
+  @override
+  String get pushPromptTitle => 'Xabar beraylikmi?';
+
+  @override
+  String get pushPromptBody =>
+      'Dizayningiz tayyor bo\'lganda yoki buyurtma holati o\'zgarganda xabar beramiz.';
+
+  @override
+  String get pushPromptYes => 'Ha';
+
+  @override
+  String get pushPromptLater => 'Keyinroq';
+
+  @override
+  String get settingsNotificationsTitle => 'Bildirishnomalar';
+
+  @override
+  String get settingsNotificationsOn => 'Yoqilgan';
+
+  @override
+  String get settingsNotificationsOff => 'O\'chirilgan';
+
+  @override
+  String get pushChannelName => 'Andoza yangiliklari';
+
+  @override
+  String get sharePinTitle => 'Pinterest pin';
+
+  @override
+  String get sharePinChooseRoom => 'Qaysi xonaga qo\'llaymiz?';
+
+  @override
+  String get sharePinHint => 'Studio\'dagi AI dizayner shu pin bilan ochiladi.';
+
+  @override
+  String get sharePinNoRooms =>
+      'Hali xona yo\'q. Avval \"+\" orqali xona qo\'shing.';
+
+  @override
+  String get sharePinNotPin => 'Bu Pinterest pin havolasi emas';
+
+  @override
+  String get sharePinNotPinHint =>
+      'Pinterest ilovasida pinni oching va \"Ulashish\" → Andoza AI ni tanlang.';
+
+  @override
+  String get furnitureStylesLabel => 'Uslublar';
+
+  @override
+  String get furnitureStylesAll => 'Hamma uslubga mos';
+
+  @override
+  String get furnitureStyleNeoklassika => 'Neoklassika';
+
+  @override
+  String get furnitureStyleKlassik => 'Klassik';
+
+  @override
+  String get furnitureStyleZamonaviy => 'Zamonaviy';
+
+  @override
+  String get furnitureStyleHitech => 'Hi-Tech';
+
+  @override
+  String get furnitureStyleMinimalist => 'Minimalist';
+
+  @override
+  String get furnitureStyleSkandinav => 'Skandinav';
+
+  @override
+  String get furnitureStyleLoft => 'Loft';
+
+  @override
+  String get furnitureStyleMilliy => 'Milliy';
+
+  @override
+  String get estimateFloorStandIn =>
+      'Pol mahsuloti tanlanmagan — narx do\'kondagi o\'rtacha poldan olindi (taxminiy).';
+
+  @override
+  String get scanChoiceTitle => 'Nimani skanerlaymiz?';
+
+  @override
+  String get scanChoiceOneRoom => 'Bitta xona';
+
+  @override
+  String get scanChoiceFlat => 'Bir nechta xona (kvartira)';
+
+  @override
+  String get scanChoiceFlatHint =>
+      'Xonalarni ketma-ket skanerlang — ular rejada o\'z joyiga tushadi';
+
+  @override
+  String get scanNextRoom => 'Keyingi xona';
+
+  @override
+  String get scanFinish => 'Tugatish';
+
+  @override
+  String scanRoomN(int n) {
+    return '$n-xona';
+  }
+
+  @override
+  String get flatReviewTitle => 'Skanerlangan xonalar';
+
+  @override
+  String get flatReviewRoomName => 'Xona nomi';
+
+  @override
+  String get flatReviewContinue => 'Studiyada ochish';
+
+  @override
+  String flatReviewPartial(int n) {
+    return 'Skaner to\'xtadi — $n ta xona saqlandi';
+  }
+
+  @override
+  String flatReviewDropped(int n) {
+    return '$n ta xona o\'qilmadi va qo\'shilmadi';
+  }
+
+  @override
+  String flatReviewSavedSome(int saved, int total) {
+    return '$total ta xonadan $saved tasi saqlandi — qolganlarini qayta skanerlang';
+  }
+
+  @override
+  String get loginWithApple => 'Apple bilan kirish';
+
+  @override
+  String get loginAppleFailed =>
+      'Apple orqali kirib bo\'lmadi. Qayta urinib ko\'ring.';
+
+  @override
+  String get reportAction => 'Shikoyat qilish';
+
+  @override
+  String get reportTitle => 'Shikoyat';
+
+  @override
+  String get reportHint =>
+      'Nima noto\'g\'ri? Shikoyatingizni moderatorlar ko\'rib chiqadi.';
+
+  @override
+  String get reportReasonSpam => 'Spam yoki reklama';
+
+  @override
+  String get reportReasonInappropriate => 'Nomaqbul kontent';
+
+  @override
+  String get reportReasonFraud => 'Firibgarlik';
+
+  @override
+  String get reportReasonOther => 'Boshqa';
+
+  @override
+  String get reportDetails => 'Izoh (ixtiyoriy)';
+
+  @override
+  String get reportSend => 'Yuborish';
+
+  @override
+  String get reportSent => 'Rahmat! Shikoyatingiz yuborildi.';
+
+  @override
+  String get blockUstaAction => 'Bloklash';
+
+  @override
+  String get blockUstaTitle => 'Ustani bloklaysizmi?';
+
+  @override
+  String get blockUstaBody =>
+      'U endi xaritada va ro\'yxatda sizga ko\'rinmaydi.';
+
+  @override
+  String get blockUstaConfirm => 'Bloklash';
+
+  @override
+  String get blockUstaDone => 'Usta bloklandi';
+
+  @override
+  String get shopFurnitureSection => 'Mebel';
+
+  @override
+  String get shopFurnitureNoPrice => 'Narxi kelishiladi';
+
+  @override
+  String storePageOpen(String name) {
+    return '$name do\'koni';
+  }
+
+  @override
+  String get storeLoadFailed => 'Do\'konni ochib bo\'lmadi';
+
+  @override
+  String get storeCall => 'Qo\'ng\'iroq';
+
+  @override
+  String get storeTelegram => 'Telegram';
+
+  @override
+  String get storeNoProducts => 'Bu do\'konda hozircha mahsulot yo\'q';
+
+  @override
+  String get storeReport => 'Do\'kon haqida shikoyat';
+
+  @override
+  String get furnitureSize => 'O\'lchami';
+
+  @override
+  String furnitureSizeValue(String size) {
+    return '$size sm';
+  }
+
+  @override
+  String get furniturePlaceInRoom => 'Xonamga qo\'yish';
+
+  @override
+  String get furniturePickRoom => 'Qaysi xonaga qo\'yamiz?';
+
+  @override
+  String get furnitureNoRooms => 'Avval xona yarating yoki skanerlang';
+
+  @override
+  String get furnitureNoModel =>
+      'Bu mahsulotning 3D modeli yo\'q, uni xonaga qo\'yib bo\'lmaydi';
+
+  @override
+  String get furnitureLoadFailed => 'Mahsulotni ochib bo\'lmadi';
+
+  @override
+  String get profileMenuMebel => 'Mebel ishlab chiqarish';
+
+  @override
+  String get profileMenuMebelHint =>
+      'Ustaxonalar uchun: shkaf detallari, kromka va narx';
+
+  @override
+  String get mebelExportFailed => 'Faylni ochib bo\'lmadi';
+
+  @override
+  String get scanHintStart => 'Xonani sekin aylanib skanerlang';
+
+  @override
+  String get scanCoachMoveCloser => 'Telefonni devorga yaqinroq tuting';
+
+  @override
+  String get scanCoachMoveAway => 'Telefonni devordan birozroq uzoqlashtiring';
+
+  @override
+  String get scanCoachSlowDown =>
+      'Juda tez harakatlanyapsiz — sekinroq aylaning';
+
+  @override
+  String get scanCoachTurnOnLight => 'Xona qorong\'i — yorug\'likni yoqing';
+
+  @override
+  String get scanCoachLowTexture =>
+      'Bu yuza silliq/bir xil — kamerani boshqa tomonga burang';
+
+  @override
+  String get scanCoachGood =>
+      'Zo\'r ketyapti — xonani shu tezlikda aylanib chiqing';
+
+  @override
+  String get scanCoachKeepGoing => 'Skanerlashda davom eting';
 }

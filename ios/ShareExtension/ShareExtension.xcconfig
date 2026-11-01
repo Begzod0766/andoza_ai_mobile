@@ -1,0 +1,4 @@
+// The extension's version must match the app's (App Store validation), so it
+// reads Flutter's build name/number like Runner does. No Pods here: the
+// extension uses only UIKit.
+#include "../Flutter/Generated.xcconfig"

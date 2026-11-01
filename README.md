@@ -16,9 +16,9 @@ Backend va veb-studiya: [`andoza_ai`](https://github.com/Begzod10/andoza_ai) rep
 flutter pub get
 dart run build_runner build --delete-conflicting-outputs
 flutter run \
-  --dart-define=API_URL=https://andoza.jumaniyozov.uz/api/v1 \
-  --dart-define=API_BASE_URL=https://andoza.jumaniyozov.uz \
-  --dart-define=STUDIO_BASE_URL=https://andoza.jumaniyozov.uz
+  --dart-define=API_URL=https://andozaai.uz/api/v1 \
+  --dart-define=API_BASE_URL=https://andozaai.uz \
+  --dart-define=STUDIO_BASE_URL=https://andozaai.uz
 ```
 
 `--dart-define` berilmasa, ilova Android emulyatoridagi lokal backend'ga (`10.0.2.2`) ulanadi.

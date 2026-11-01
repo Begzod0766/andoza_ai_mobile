@@ -1,5 +1,6 @@
 // ignore: unused_import
 import 'package:intl/intl.dart' as intl;
+
 import 'app_localizations.dart';
 
 // ignore_for_file: type=lint
@@ -189,6 +190,10 @@ class AppLocalizationsRu extends AppLocalizations {
   @override
   String get loginErrorUsernameShort =>
       'Имя пользователя должно содержать не менее 3 символов.';
+
+  @override
+  String get loginErrorUsernameLong =>
+      'Имя пользователя должно быть не длиннее 50 символов.';
 
   @override
   String get loginErrorPasswordShort =>
@@ -718,6 +723,13 @@ class AppLocalizationsRu extends AppLocalizations {
   String get mastersCommentHint => 'Комментарий (необязательно)';
 
   @override
+  String get phoneErrorInvalid =>
+      'Неверный номер телефона. Пример: +998 90 123 45 67';
+
+  @override
+  String get mastersPhoneLabel => 'Ваш номер телефона';
+
+  @override
   String get mastersEstimateNote =>
       'Мастер рассмотрит смету и предложит свою цену';
 
@@ -1072,6 +1084,13 @@ class AppLocalizationsRu extends AppLocalizations {
   String get estimateStageFallback => 'Этап';
 
   @override
+  String get estimateFloorUnpriced =>
+      'Тип пола выбран, но товар не выбран — пол не вошёл в смету.';
+
+  @override
+  String get estimateFloorPick => 'Выбрать пол';
+
+  @override
   String get estimateAdjust => 'Настройка сметы';
 
   @override
@@ -1146,6 +1165,9 @@ class AppLocalizationsRu extends AppLocalizations {
   @override
   String get studioAiHint =>
       'Например: \"Покрась стены в тёплый бежевый и добавь диван\"';
+
+  @override
+  String get studioAiStyleLabel => 'Стиль (необязательно)';
 
   @override
   String get studioGenerating => 'Обрабатывается…';
@@ -1439,6 +1461,11 @@ class AppLocalizationsRu extends AppLocalizations {
   String get wizardExactValue => 'Точное значение (м)';
 
   @override
+  String wizardCeilingOutOfRange(String min, String max) {
+    return 'Высота потолка должна быть от $min до $max м';
+  }
+
+  @override
   String wizardWallTitle(String letter) {
     return 'Стена $letter';
   }
@@ -1670,7 +1697,7 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get scanLidarUnavailableBody =>
-      'LiDAR сканер работает только на iPhone 12 Pro, 13 Pro, 14 Pro, 15 Pro, 16 Pro или iPad Pro. Добавьте комнату другим способом:';
+      'LiDAR сканер работает только на устройствах с LiDAR: iPhone Pro (12 Pro и новее) или iPad Pro. Добавьте комнату другим способом:';
 
   @override
   String get scanInProgress => 'Комната сканируется…';
@@ -1964,10 +1991,13 @@ class AppLocalizationsRu extends AppLocalizations {
   String get businessFieldTelegram => 'Telegram (необязательно)';
 
   @override
-  String get businessFieldPriceMin => 'Цена: от (сум)';
+  String get businessFieldPriceMin => 'От';
 
   @override
-  String get businessFieldPriceMax => 'Цена: до (сум)';
+  String get businessFieldPriceMax => 'До';
+
+  @override
+  String get businessFieldPriceTitle => 'Цена (сум)';
 
   @override
   String get businessSubmit => 'Отправить заявку';
@@ -2491,6 +2521,12 @@ class AppLocalizationsRu extends AppLocalizations {
   String get shopCategoryElektr => 'Электрика';
 
   @override
+  String get shopCategoryEshik => 'Двери';
+
+  @override
+  String get shopCategoryDeraza => 'Окна';
+
+  @override
   String get tradeBoshqa => 'Другой мастер';
 
   @override
@@ -2510,4 +2546,269 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get mapAttribution => '© участники OpenStreetMap';
+
+  @override
+  String get pushPromptTitle => 'Сообщать вам?';
+
+  @override
+  String get pushPromptBody =>
+      'Сообщим, когда дизайн будет готов или изменится статус заказа.';
+
+  @override
+  String get pushPromptYes => 'Да';
+
+  @override
+  String get pushPromptLater => 'Позже';
+
+  @override
+  String get settingsNotificationsTitle => 'Уведомления';
+
+  @override
+  String get settingsNotificationsOn => 'Включены';
+
+  @override
+  String get settingsNotificationsOff => 'Выключены';
+
+  @override
+  String get pushChannelName => 'Новости Andoza';
+
+  @override
+  String get sharePinTitle => 'Пин из Pinterest';
+
+  @override
+  String get sharePinChooseRoom => 'К какой комнате применить?';
+
+  @override
+  String get sharePinHint => 'AI-дизайнер в Студии откроется с этим пином.';
+
+  @override
+  String get sharePinNoRooms =>
+      'Комнат пока нет. Сначала добавьте комнату через «+».';
+
+  @override
+  String get sharePinNotPin => 'Это не ссылка на пин Pinterest';
+
+  @override
+  String get sharePinNotPinHint =>
+      'Откройте пин в приложении Pinterest и выберите «Поделиться» → Andoza AI.';
+
+  @override
+  String get furnitureStylesLabel => 'Стили';
+
+  @override
+  String get furnitureStylesAll => 'Подходит ко всем стилям';
+
+  @override
+  String get furnitureStyleNeoklassika => 'Неоклассика';
+
+  @override
+  String get furnitureStyleKlassik => 'Классика';
+
+  @override
+  String get furnitureStyleZamonaviy => 'Современный';
+
+  @override
+  String get furnitureStyleHitech => 'Хай-тек';
+
+  @override
+  String get furnitureStyleMinimalist => 'Минимализм';
+
+  @override
+  String get furnitureStyleSkandinav => 'Скандинавский';
+
+  @override
+  String get furnitureStyleLoft => 'Лофт';
+
+  @override
+  String get furnitureStyleMilliy => 'Национальный';
+
+  @override
+  String get estimateFloorStandIn =>
+      'Товар для пола не выбран — цена взята по средней в магазинах (примерно).';
+
+  @override
+  String get scanChoiceTitle => 'Что сканируем?';
+
+  @override
+  String get scanChoiceOneRoom => 'Одну комнату';
+
+  @override
+  String get scanChoiceFlat => 'Несколько комнат (квартира)';
+
+  @override
+  String get scanChoiceFlatHint =>
+      'Сканируйте комнаты подряд — они встанут на свои места в плане';
+
+  @override
+  String get scanNextRoom => 'Следующая комната';
+
+  @override
+  String get scanFinish => 'Готово';
+
+  @override
+  String scanRoomN(int n) {
+    return 'Комната $n';
+  }
+
+  @override
+  String get flatReviewTitle => 'Отсканированные комнаты';
+
+  @override
+  String get flatReviewRoomName => 'Название комнаты';
+
+  @override
+  String get flatReviewContinue => 'Открыть в студии';
+
+  @override
+  String flatReviewPartial(int n) {
+    return 'Сканирование прервалось — сохранено комнат: $n';
+  }
+
+  @override
+  String flatReviewDropped(int n) {
+    return 'Не удалось распознать комнат: $n, они не добавлены';
+  }
+
+  @override
+  String flatReviewSavedSome(int saved, int total) {
+    return 'Сохранено комнат: $saved из $total — остальные отсканируйте заново';
+  }
+
+  @override
+  String get loginWithApple => 'Войти через Apple';
+
+  @override
+  String get loginAppleFailed =>
+      'Не удалось войти через Apple. Попробуйте ещё раз.';
+
+  @override
+  String get reportAction => 'Пожаловаться';
+
+  @override
+  String get reportTitle => 'Жалоба';
+
+  @override
+  String get reportHint => 'Что не так? Модераторы рассмотрят жалобу.';
+
+  @override
+  String get reportReasonSpam => 'Спам или реклама';
+
+  @override
+  String get reportReasonInappropriate => 'Неприемлемый контент';
+
+  @override
+  String get reportReasonFraud => 'Мошенничество';
+
+  @override
+  String get reportReasonOther => 'Другое';
+
+  @override
+  String get reportDetails => 'Комментарий (необязательно)';
+
+  @override
+  String get reportSend => 'Отправить';
+
+  @override
+  String get reportSent => 'Спасибо! Жалоба отправлена.';
+
+  @override
+  String get blockUstaAction => 'Заблокировать';
+
+  @override
+  String get blockUstaTitle => 'Заблокировать мастера?';
+
+  @override
+  String get blockUstaBody =>
+      'Он больше не будет виден вам на карте и в списке.';
+
+  @override
+  String get blockUstaConfirm => 'Заблокировать';
+
+  @override
+  String get blockUstaDone => 'Мастер заблокирован';
+
+  @override
+  String get shopFurnitureSection => 'Мебель';
+
+  @override
+  String get shopFurnitureNoPrice => 'Цена по договорённости';
+
+  @override
+  String storePageOpen(String name) {
+    return 'Магазин «$name»';
+  }
+
+  @override
+  String get storeLoadFailed => 'Не удалось открыть магазин';
+
+  @override
+  String get storeCall => 'Позвонить';
+
+  @override
+  String get storeTelegram => 'Telegram';
+
+  @override
+  String get storeNoProducts => 'В этом магазине пока нет товаров';
+
+  @override
+  String get storeReport => 'Пожаловаться на магазин';
+
+  @override
+  String get furnitureSize => 'Размер';
+
+  @override
+  String furnitureSizeValue(String size) {
+    return '$size см';
+  }
+
+  @override
+  String get furniturePlaceInRoom => 'Поставить в мою комнату';
+
+  @override
+  String get furniturePickRoom => 'В какую комнату поставить?';
+
+  @override
+  String get furnitureNoRooms => 'Сначала создайте или отсканируйте комнату';
+
+  @override
+  String get furnitureNoModel =>
+      'У этого товара нет 3D-модели, его нельзя поставить в комнату';
+
+  @override
+  String get furnitureLoadFailed => 'Не удалось открыть товар';
+
+  @override
+  String get profileMenuMebel => 'Производство мебели';
+
+  @override
+  String get profileMenuMebelHint => 'Для цехов: детали шкафа, кромка и цена';
+
+  @override
+  String get mebelExportFailed => 'Не удалось открыть файл';
+
+  @override
+  String get scanHintStart => 'Медленно обойдите комнату, сканируя её';
+
+  @override
+  String get scanCoachMoveCloser => 'Поднесите телефон ближе к стене';
+
+  @override
+  String get scanCoachMoveAway => 'Отодвиньте телефон немного от стены';
+
+  @override
+  String get scanCoachSlowDown => 'Вы двигаетесь слишком быстро — помедленнее';
+
+  @override
+  String get scanCoachTurnOnLight => 'В комнате темно — включите свет';
+
+  @override
+  String get scanCoachLowTexture =>
+      'Поверхность слишком однородная — направьте камеру в другую сторону';
+
+  @override
+  String get scanCoachGood =>
+      'Отлично — продолжайте обходить комнату в том же темпе';
+
+  @override
+  String get scanCoachKeepGoing => 'Продолжайте сканирование';
 }

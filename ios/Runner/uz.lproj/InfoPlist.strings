@@ -1,0 +1,4 @@
+/* Shown when the app first asks for the camera. */
+"NSCameraUsageDescription" = "Xonani LiDAR bilan skanerlash va oboy uchun rasmga olishda kamera ishlatiladi.";
+/* Shown when the app first asks for the photo library. */
+"NSPhotoLibraryUsageDescription" = "Oboy yoki xona rasmini galereyadan qo'shish uchun galereyaga ruxsat kerak.";

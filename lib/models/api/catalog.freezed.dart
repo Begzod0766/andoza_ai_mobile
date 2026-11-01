@@ -598,7 +598,7 @@ as int,
 /// @nodoc
 mixin _$Furniture {
 
- String get id;@JsonKey(name: 'store_id') String? get storeId; String get category;@JsonKey(name: 'name_uz') String get nameUz;@JsonKey(name: 'price_uzs') int? get priceUzs;@JsonKey(name: 'glb_key') String? get glbKey;@JsonKey(name: 'footprint_w') double? get footprintW;@JsonKey(name: 'footprint_d') double? get footprintD;
+ String get id;@JsonKey(name: 'store_id') String? get storeId;@JsonKey(name: 'store_name') String? get storeName; String get category;@JsonKey(name: 'name_uz') String get nameUz;@JsonKey(name: 'price_uzs') int? get priceUzs;@JsonKey(name: 'glb_url') String? get glbUrl;@JsonKey(name: 'thumbnail_url') String? get thumbnailUrl;@JsonKey(name: 'footprint_w') double? get footprintW;@JsonKey(name: 'footprint_d') double? get footprintD;@JsonKey(name: 'height_cm') double? get heightCm;
 /// Create a copy of Furniture
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -612,20 +612,20 @@ $FurnitureCopyWith<Furniture> get copyWith => _$FurnitureCopyWithImpl<Furniture>
 @override
 bool operator ==(Object other) {
   final _this = this as Furniture;
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is Furniture&&(identical(other.id, _this.id) || other.id == _this.id)&&(identical(other.storeId, _this.storeId) || other.storeId == _this.storeId)&&(identical(other.category, _this.category) || other.category == _this.category)&&(identical(other.nameUz, _this.nameUz) || other.nameUz == _this.nameUz)&&(identical(other.priceUzs, _this.priceUzs) || other.priceUzs == _this.priceUzs)&&(identical(other.glbKey, _this.glbKey) || other.glbKey == _this.glbKey)&&(identical(other.footprintW, _this.footprintW) || other.footprintW == _this.footprintW)&&(identical(other.footprintD, _this.footprintD) || other.footprintD == _this.footprintD));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is Furniture&&(identical(other.id, _this.id) || other.id == _this.id)&&(identical(other.storeId, _this.storeId) || other.storeId == _this.storeId)&&(identical(other.storeName, _this.storeName) || other.storeName == _this.storeName)&&(identical(other.category, _this.category) || other.category == _this.category)&&(identical(other.nameUz, _this.nameUz) || other.nameUz == _this.nameUz)&&(identical(other.priceUzs, _this.priceUzs) || other.priceUzs == _this.priceUzs)&&(identical(other.glbUrl, _this.glbUrl) || other.glbUrl == _this.glbUrl)&&(identical(other.thumbnailUrl, _this.thumbnailUrl) || other.thumbnailUrl == _this.thumbnailUrl)&&(identical(other.footprintW, _this.footprintW) || other.footprintW == _this.footprintW)&&(identical(other.footprintD, _this.footprintD) || other.footprintD == _this.footprintD)&&(identical(other.heightCm, _this.heightCm) || other.heightCm == _this.heightCm));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
 int get hashCode {
   final _this = this as Furniture;
-  return Object.hash(runtimeType,_this.id,_this.storeId,_this.category,_this.nameUz,_this.priceUzs,_this.glbKey,_this.footprintW,_this.footprintD);
+  return Object.hash(runtimeType,_this.id,_this.storeId,_this.storeName,_this.category,_this.nameUz,_this.priceUzs,_this.glbUrl,_this.thumbnailUrl,_this.footprintW,_this.footprintD,_this.heightCm);
 }
 
 @override
 String toString() {
   final _this = this as Furniture;
-  return 'Furniture(id: ${_this.id}, storeId: ${_this.storeId}, category: ${_this.category}, nameUz: ${_this.nameUz}, priceUzs: ${_this.priceUzs}, glbKey: ${_this.glbKey}, footprintW: ${_this.footprintW}, footprintD: ${_this.footprintD})';
+  return 'Furniture(id: ${_this.id}, storeId: ${_this.storeId}, storeName: ${_this.storeName}, category: ${_this.category}, nameUz: ${_this.nameUz}, priceUzs: ${_this.priceUzs}, glbUrl: ${_this.glbUrl}, thumbnailUrl: ${_this.thumbnailUrl}, footprintW: ${_this.footprintW}, footprintD: ${_this.footprintD}, heightCm: ${_this.heightCm})';
 }
 
 
@@ -636,7 +636,7 @@ abstract mixin class $FurnitureCopyWith<$Res>  {
   factory $FurnitureCopyWith(Furniture value, $Res Function(Furniture) _then) = _$FurnitureCopyWithImpl;
 @useResult
 $Res call({
- String id,@JsonKey(name: 'store_id') String? storeId, String category,@JsonKey(name: 'name_uz') String nameUz,@JsonKey(name: 'price_uzs') int? priceUzs,@JsonKey(name: 'glb_key') String? glbKey,@JsonKey(name: 'footprint_w') double? footprintW,@JsonKey(name: 'footprint_d') double? footprintD
+ String id,@JsonKey(name: 'store_id') String? storeId,@JsonKey(name: 'store_name') String? storeName, String category,@JsonKey(name: 'name_uz') String nameUz,@JsonKey(name: 'price_uzs') int? priceUzs,@JsonKey(name: 'glb_url') String? glbUrl,@JsonKey(name: 'thumbnail_url') String? thumbnailUrl,@JsonKey(name: 'footprint_w') double? footprintW,@JsonKey(name: 'footprint_d') double? footprintD,@JsonKey(name: 'height_cm') double? heightCm
 });
 
 
@@ -653,16 +653,19 @@ class _$FurnitureCopyWithImpl<$Res>
 
 /// Create a copy of Furniture
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? storeId = freezed,Object? category = null,Object? nameUz = null,Object? priceUzs = freezed,Object? glbKey = freezed,Object? footprintW = freezed,Object? footprintD = freezed,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? storeId = freezed,Object? storeName = freezed,Object? category = null,Object? nameUz = null,Object? priceUzs = freezed,Object? glbUrl = freezed,Object? thumbnailUrl = freezed,Object? footprintW = freezed,Object? footprintD = freezed,Object? heightCm = freezed,}) {
   return _then(Furniture(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,storeId: freezed == storeId ? _self.storeId : storeId // ignore: cast_nullable_to_non_nullable
+as String?,storeName: freezed == storeName ? _self.storeName : storeName // ignore: cast_nullable_to_non_nullable
 as String?,category: null == category ? _self.category : category // ignore: cast_nullable_to_non_nullable
 as String,nameUz: null == nameUz ? _self.nameUz : nameUz // ignore: cast_nullable_to_non_nullable
 as String,priceUzs: freezed == priceUzs ? _self.priceUzs : priceUzs // ignore: cast_nullable_to_non_nullable
-as int?,glbKey: freezed == glbKey ? _self.glbKey : glbKey // ignore: cast_nullable_to_non_nullable
+as int?,glbUrl: freezed == glbUrl ? _self.glbUrl : glbUrl // ignore: cast_nullable_to_non_nullable
+as String?,thumbnailUrl: freezed == thumbnailUrl ? _self.thumbnailUrl : thumbnailUrl // ignore: cast_nullable_to_non_nullable
 as String?,footprintW: freezed == footprintW ? _self.footprintW : footprintW // ignore: cast_nullable_to_non_nullable
 as double?,footprintD: freezed == footprintD ? _self.footprintD : footprintD // ignore: cast_nullable_to_non_nullable
+as double?,heightCm: freezed == heightCm ? _self.heightCm : heightCm // ignore: cast_nullable_to_non_nullable
 as double?,
   ));
 }
@@ -748,10 +751,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id, @JsonKey(name: 'store_id')  String? storeId,  String category, @JsonKey(name: 'name_uz')  String nameUz, @JsonKey(name: 'price_uzs')  int? priceUzs, @JsonKey(name: 'glb_key')  String? glbKey, @JsonKey(name: 'footprint_w')  double? footprintW, @JsonKey(name: 'footprint_d')  double? footprintD)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id, @JsonKey(name: 'store_id')  String? storeId, @JsonKey(name: 'store_name')  String? storeName,  String category, @JsonKey(name: 'name_uz')  String nameUz, @JsonKey(name: 'price_uzs')  int? priceUzs, @JsonKey(name: 'glb_url')  String? glbUrl, @JsonKey(name: 'thumbnail_url')  String? thumbnailUrl, @JsonKey(name: 'footprint_w')  double? footprintW, @JsonKey(name: 'footprint_d')  double? footprintD, @JsonKey(name: 'height_cm')  double? heightCm)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _Furniture() when $default != null:
-return $default(_that.id,_that.storeId,_that.category,_that.nameUz,_that.priceUzs,_that.glbKey,_that.footprintW,_that.footprintD);case _:
+return $default(_that.id,_that.storeId,_that.storeName,_that.category,_that.nameUz,_that.priceUzs,_that.glbUrl,_that.thumbnailUrl,_that.footprintW,_that.footprintD,_that.heightCm);case _:
   return orElse();
 
 }
@@ -769,10 +772,10 @@ return $default(_that.id,_that.storeId,_that.category,_that.nameUz,_that.priceUz
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id, @JsonKey(name: 'store_id')  String? storeId,  String category, @JsonKey(name: 'name_uz')  String nameUz, @JsonKey(name: 'price_uzs')  int? priceUzs, @JsonKey(name: 'glb_key')  String? glbKey, @JsonKey(name: 'footprint_w')  double? footprintW, @JsonKey(name: 'footprint_d')  double? footprintD)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id, @JsonKey(name: 'store_id')  String? storeId, @JsonKey(name: 'store_name')  String? storeName,  String category, @JsonKey(name: 'name_uz')  String nameUz, @JsonKey(name: 'price_uzs')  int? priceUzs, @JsonKey(name: 'glb_url')  String? glbUrl, @JsonKey(name: 'thumbnail_url')  String? thumbnailUrl, @JsonKey(name: 'footprint_w')  double? footprintW, @JsonKey(name: 'footprint_d')  double? footprintD, @JsonKey(name: 'height_cm')  double? heightCm)  $default,) {final _that = this;
 switch (_that) {
 case _Furniture():
-return $default(_that.id,_that.storeId,_that.category,_that.nameUz,_that.priceUzs,_that.glbKey,_that.footprintW,_that.footprintD);case _:
+return $default(_that.id,_that.storeId,_that.storeName,_that.category,_that.nameUz,_that.priceUzs,_that.glbUrl,_that.thumbnailUrl,_that.footprintW,_that.footprintD,_that.heightCm);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -789,10 +792,10 @@ return $default(_that.id,_that.storeId,_that.category,_that.nameUz,_that.priceUz
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id, @JsonKey(name: 'store_id')  String? storeId,  String category, @JsonKey(name: 'name_uz')  String nameUz, @JsonKey(name: 'price_uzs')  int? priceUzs, @JsonKey(name: 'glb_key')  String? glbKey, @JsonKey(name: 'footprint_w')  double? footprintW, @JsonKey(name: 'footprint_d')  double? footprintD)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id, @JsonKey(name: 'store_id')  String? storeId, @JsonKey(name: 'store_name')  String? storeName,  String category, @JsonKey(name: 'name_uz')  String nameUz, @JsonKey(name: 'price_uzs')  int? priceUzs, @JsonKey(name: 'glb_url')  String? glbUrl, @JsonKey(name: 'thumbnail_url')  String? thumbnailUrl, @JsonKey(name: 'footprint_w')  double? footprintW, @JsonKey(name: 'footprint_d')  double? footprintD, @JsonKey(name: 'height_cm')  double? heightCm)?  $default,) {final _that = this;
 switch (_that) {
 case _Furniture() when $default != null:
-return $default(_that.id,_that.storeId,_that.category,_that.nameUz,_that.priceUzs,_that.glbKey,_that.footprintW,_that.footprintD);case _:
+return $default(_that.id,_that.storeId,_that.storeName,_that.category,_that.nameUz,_that.priceUzs,_that.glbUrl,_that.thumbnailUrl,_that.footprintW,_that.footprintD,_that.heightCm);case _:
   return null;
 
 }
@@ -804,17 +807,20 @@ return $default(_that.id,_that.storeId,_that.category,_that.nameUz,_that.priceUz
 @JsonSerializable()
 
 class _Furniture implements Furniture {
-  const _Furniture({required this.id, @JsonKey(name: 'store_id') this.storeId, required this.category, @JsonKey(name: 'name_uz') required this.nameUz, @JsonKey(name: 'price_uzs') this.priceUzs, @JsonKey(name: 'glb_key') this.glbKey, @JsonKey(name: 'footprint_w') this.footprintW, @JsonKey(name: 'footprint_d') this.footprintD});
+  const _Furniture({required this.id, @JsonKey(name: 'store_id') this.storeId, @JsonKey(name: 'store_name') this.storeName, required this.category, @JsonKey(name: 'name_uz') required this.nameUz, @JsonKey(name: 'price_uzs') this.priceUzs, @JsonKey(name: 'glb_url') this.glbUrl, @JsonKey(name: 'thumbnail_url') this.thumbnailUrl, @JsonKey(name: 'footprint_w') this.footprintW, @JsonKey(name: 'footprint_d') this.footprintD, @JsonKey(name: 'height_cm') this.heightCm});
   factory _Furniture.fromJson(Map<String, dynamic> json) => _$FurnitureFromJson(json);
 
 @override final  String id;
 @override@JsonKey(name: 'store_id') final  String? storeId;
+@override@JsonKey(name: 'store_name') final  String? storeName;
 @override final  String category;
 @override@JsonKey(name: 'name_uz') final  String nameUz;
 @override@JsonKey(name: 'price_uzs') final  int? priceUzs;
-@override@JsonKey(name: 'glb_key') final  String? glbKey;
+@override@JsonKey(name: 'glb_url') final  String? glbUrl;
+@override@JsonKey(name: 'thumbnail_url') final  String? thumbnailUrl;
 @override@JsonKey(name: 'footprint_w') final  double? footprintW;
 @override@JsonKey(name: 'footprint_d') final  double? footprintD;
+@override@JsonKey(name: 'height_cm') final  double? heightCm;
 
 /// Create a copy of Furniture
 /// with the given fields replaced by the non-null parameter values.
@@ -829,18 +835,18 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-    return identical(this, other) || (other.runtimeType == runtimeType&&other is _Furniture&&(identical(other.id, id) || other.id == id)&&(identical(other.storeId, storeId) || other.storeId == storeId)&&(identical(other.category, category) || other.category == category)&&(identical(other.nameUz, nameUz) || other.nameUz == nameUz)&&(identical(other.priceUzs, priceUzs) || other.priceUzs == priceUzs)&&(identical(other.glbKey, glbKey) || other.glbKey == glbKey)&&(identical(other.footprintW, footprintW) || other.footprintW == footprintW)&&(identical(other.footprintD, footprintD) || other.footprintD == footprintD));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is _Furniture&&(identical(other.id, id) || other.id == id)&&(identical(other.storeId, storeId) || other.storeId == storeId)&&(identical(other.storeName, storeName) || other.storeName == storeName)&&(identical(other.category, category) || other.category == category)&&(identical(other.nameUz, nameUz) || other.nameUz == nameUz)&&(identical(other.priceUzs, priceUzs) || other.priceUzs == priceUzs)&&(identical(other.glbUrl, glbUrl) || other.glbUrl == glbUrl)&&(identical(other.thumbnailUrl, thumbnailUrl) || other.thumbnailUrl == thumbnailUrl)&&(identical(other.footprintW, footprintW) || other.footprintW == footprintW)&&(identical(other.footprintD, footprintD) || other.footprintD == footprintD)&&(identical(other.heightCm, heightCm) || other.heightCm == heightCm));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
 int get hashCode {
-    return Object.hash(runtimeType,id,storeId,category,nameUz,priceUzs,glbKey,footprintW,footprintD);
+    return Object.hash(runtimeType,id,storeId,storeName,category,nameUz,priceUzs,glbUrl,thumbnailUrl,footprintW,footprintD,heightCm);
 }
 
 @override
 String toString() {
-    return 'Furniture(id: $id, storeId: $storeId, category: $category, nameUz: $nameUz, priceUzs: $priceUzs, glbKey: $glbKey, footprintW: $footprintW, footprintD: $footprintD)';
+    return 'Furniture(id: $id, storeId: $storeId, storeName: $storeName, category: $category, nameUz: $nameUz, priceUzs: $priceUzs, glbUrl: $glbUrl, thumbnailUrl: $thumbnailUrl, footprintW: $footprintW, footprintD: $footprintD, heightCm: $heightCm)';
 }
 
 
@@ -851,7 +857,7 @@ abstract mixin class _$FurnitureCopyWith<$Res> implements $FurnitureCopyWith<$Re
   factory _$FurnitureCopyWith(_Furniture value, $Res Function(_Furniture) _then) = __$FurnitureCopyWithImpl;
 @override @useResult
 $Res call({
- String id,@JsonKey(name: 'store_id') String? storeId, String category,@JsonKey(name: 'name_uz') String nameUz,@JsonKey(name: 'price_uzs') int? priceUzs,@JsonKey(name: 'glb_key') String? glbKey,@JsonKey(name: 'footprint_w') double? footprintW,@JsonKey(name: 'footprint_d') double? footprintD
+ String id,@JsonKey(name: 'store_id') String? storeId,@JsonKey(name: 'store_name') String? storeName, String category,@JsonKey(name: 'name_uz') String nameUz,@JsonKey(name: 'price_uzs') int? priceUzs,@JsonKey(name: 'glb_url') String? glbUrl,@JsonKey(name: 'thumbnail_url') String? thumbnailUrl,@JsonKey(name: 'footprint_w') double? footprintW,@JsonKey(name: 'footprint_d') double? footprintD,@JsonKey(name: 'height_cm') double? heightCm
 });
 
 
@@ -868,16 +874,19 @@ class __$FurnitureCopyWithImpl<$Res>
 
 /// Create a copy of Furniture
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? storeId = freezed,Object? category = null,Object? nameUz = null,Object? priceUzs = freezed,Object? glbKey = freezed,Object? footprintW = freezed,Object? footprintD = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? storeId = freezed,Object? storeName = freezed,Object? category = null,Object? nameUz = null,Object? priceUzs = freezed,Object? glbUrl = freezed,Object? thumbnailUrl = freezed,Object? footprintW = freezed,Object? footprintD = freezed,Object? heightCm = freezed,}) {
   return _then(_Furniture(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,storeId: freezed == storeId ? _self.storeId : storeId // ignore: cast_nullable_to_non_nullable
+as String?,storeName: freezed == storeName ? _self.storeName : storeName // ignore: cast_nullable_to_non_nullable
 as String?,category: null == category ? _self.category : category // ignore: cast_nullable_to_non_nullable
 as String,nameUz: null == nameUz ? _self.nameUz : nameUz // ignore: cast_nullable_to_non_nullable
 as String,priceUzs: freezed == priceUzs ? _self.priceUzs : priceUzs // ignore: cast_nullable_to_non_nullable
-as int?,glbKey: freezed == glbKey ? _self.glbKey : glbKey // ignore: cast_nullable_to_non_nullable
+as int?,glbUrl: freezed == glbUrl ? _self.glbUrl : glbUrl // ignore: cast_nullable_to_non_nullable
+as String?,thumbnailUrl: freezed == thumbnailUrl ? _self.thumbnailUrl : thumbnailUrl // ignore: cast_nullable_to_non_nullable
 as String?,footprintW: freezed == footprintW ? _self.footprintW : footprintW // ignore: cast_nullable_to_non_nullable
 as double?,footprintD: freezed == footprintD ? _self.footprintD : footprintD // ignore: cast_nullable_to_non_nullable
+as double?,heightCm: freezed == heightCm ? _self.heightCm : heightCm // ignore: cast_nullable_to_non_nullable
 as double?,
   ));
 }

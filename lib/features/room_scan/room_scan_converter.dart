@@ -47,7 +47,16 @@ class RoomScanDraft {
   final RoomPlan plan;
   final List<ScanObjectPlacement> objects;
 
-  const RoomScanDraft({required this.plan, required this.objects});
+  /// Where [plan]'s origin (its bounding-box min corner) sits in the scan's
+  /// world, on the floor plane (x = world X, y = world Z), metres. Rooms of
+  /// one multi-room scan share that world, so this places them in the flat.
+  final Vec2 worldOrigin;
+
+  const RoomScanDraft({
+    required this.plan,
+    required this.objects,
+    this.worldOrigin = const Vec2(0, 0),
+  });
 }
 
 /// Converts an Apple RoomPlan [CapturedRoom] into the app's unified room
@@ -174,7 +183,7 @@ class RoomScanConverter {
     //    unused from here down.
     const objects = <ScanObjectPlacement>[];
 
-    return RoomScanDraft(plan: plan, objects: objects);
+    return RoomScanDraft(plan: plan, objects: objects, worldOrigin: origin);
   }
 
   // ── corners ──────────────────────────────────────────────────────────────

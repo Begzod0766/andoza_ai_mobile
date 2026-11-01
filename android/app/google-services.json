@@ -1,0 +1,46 @@
+{
+  "project_info": {
+    "project_number": "632412937266",
+    "project_id": "andoza-ai",
+    "storage_bucket": "andoza-ai.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:632412937266:android:b7a9edcf94e9a18435702b",
+        "android_client_info": {
+          "package_name": "andozaai.com"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "632412937266-ruq48osgghaa4jn0fk8vjd7mr270ccb0.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBUUqqM4yuR6y8lb_T-x7O2EcBjk1imPGQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "632412937266-ruq48osgghaa4jn0fk8vjd7mr270ccb0.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "632412937266-nb16ekesaj9ubuahnmio29187nu5uhre.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.tamiruy.tamirUyMobileFlutter"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

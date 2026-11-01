@@ -14,6 +14,12 @@
 	<string>$(PRODUCT_BUNDLE_IDENTIFIER)</string>
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
+	<key>CFBundleLocalizations</key>
+	<array>
+		<string>en</string>
+		<string>ru</string>
+		<string>uz</string>
+	</array>
 	<key>CFBundleName</key>
 	<string>tamir_uy_mobile_flutter</string>
 	<key>CFBundlePackageType</key>
@@ -24,14 +30,17 @@
 	<string>????</string>
 	<key>CFBundleVersion</key>
 	<string>$(FLUTTER_BUILD_NUMBER)</string>
+	<!-- HTTPS only, standard encryption: no export-compliance question per build. -->
+	<key>ITSAppUsesNonExemptEncryption</key>
+	<false/>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>LSSupportsOpeningDocumentsInPlace</key>
 	<false/>
 	<key>NSCameraUsageDescription</key>
-	<string>Xonani LiDAR bilan skanerlash va oboy uchun rasmga olishda kamera ishlatiladi.</string>
+	<string>The camera is used to scan your room with LiDAR and to photograph wallpaper.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
-	<string>Oboy rasmini kutubxonaga qo'shish uchun galereyaga ruxsat kerak.</string>
+	<string>Photo library access lets you add a wallpaper or room photo from your gallery.</string>
 	<key>UIApplicationSceneManifest</key>
 	<dict>
 		<key>UIApplicationSupportsMultipleScenes</key>
@@ -67,13 +76,6 @@
 		<string>UIInterfaceOrientationLandscapeLeft</string>
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
-	<key>UISupportedInterfaceOrientations~ipad</key>
-	<array>
-		<string>UIInterfaceOrientationPortrait</string>
-		<string>UIInterfaceOrientationPortraitUpsideDown</string>
-		<string>UIInterfaceOrientationLandscapeLeft</string>
-		<string>UIInterfaceOrientationLandscapeRight</string>
-	</array>
 	<!-- Google Sign-In. GIDClientID = the iOS OAuth client; GIDServerClientID =
 	     the web client (the ID token's audience, verified by POST /auth/google).
 	     The URL scheme is the reversed iOS client id, needed for the OAuth
@@ -82,6 +84,10 @@
 	<string>632412937266-nb16ekesaj9ubuahnmio29187nu5uhre.apps.googleusercontent.com</string>
 	<key>GIDServerClientID</key>
 	<string>632412937266-ruq48osgghaa4jn0fk8vjd7mr270ccb0.apps.googleusercontent.com</string>
+	<key>FIREBASE_ANALYTICS_COLLECTION_ENABLED</key>
+	<false/>
+	<key>FirebaseCrashlyticsCollectionEnabled</key>
+	<false/>
 	<key>CFBundleURLTypes</key>
 	<array>
 		<dict>
@@ -92,6 +98,23 @@
 				<string>com.googleusercontent.apps.632412937266-nb16ekesaj9ubuahnmio29187nu5uhre</string>
 			</array>
 		</dict>
+		<dict>
+			<!-- The Share Extension hands a shared Pinterest pin to the app:
+			     andozaai-share://pin?text=… (SceneDelegate → ShareChannel). -->
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>CFBundleURLName</key>
+			<string>uz.andozaai.app.share</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>andozaai-share</string>
+			</array>
+		</dict>
 	</array>
+	<!-- No Flutter route pushes from URLs: a URL opening the app would skip the
+	     splash (which restores the session) and land on login. The only app URL
+	     is the share one above, handled natively. -->
+	<key>FlutterDeepLinkingEnabled</key>
+	<false/>
 </dict>
 </plist>

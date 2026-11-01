@@ -3,7 +3,7 @@
   Network security policy for release + debug builds.
 
   Base config forbids cleartext (plaintext HTTP) traffic to ANY host, so the
-  production API/Studio over https://andoza.jumaniyozov.uz can never be
+  production API/Studio over https://andozaai.uz can never be
   silently downgraded to HTTP (MITM / downgrade protection). This replaces the
   old application-wide android:usesCleartextTraffic="true", which permitted
   plaintext to every host.

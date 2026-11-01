@@ -1,5 +1,6 @@
 // ignore: unused_import
 import 'package:intl/intl.dart' as intl;
+
 import 'app_localizations.dart';
 
 // ignore_for_file: type=lint
@@ -190,6 +191,10 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get loginErrorUsernameShort =>
       'Username must be at least 3 characters.';
+
+  @override
+  String get loginErrorUsernameLong =>
+      'Username must be at most 50 characters.';
 
   @override
   String get loginErrorPasswordShort =>
@@ -726,6 +731,13 @@ class AppLocalizationsEn extends AppLocalizations {
   String get mastersCommentHint => 'Comment (optional)';
 
   @override
+  String get phoneErrorInvalid =>
+      'Invalid phone number. Example: +998 90 123 45 67';
+
+  @override
+  String get mastersPhoneLabel => 'Your phone number';
+
+  @override
   String get mastersEstimateNote =>
       'The master will review the estimate and propose their price';
 
@@ -1077,6 +1089,13 @@ class AppLocalizationsEn extends AppLocalizations {
   String get estimateStageFallback => 'Stage';
 
   @override
+  String get estimateFloorUnpriced =>
+      'A floor type is chosen but no product is, so the floor is not in this estimate.';
+
+  @override
+  String get estimateFloorPick => 'Pick a floor';
+
+  @override
   String get estimateAdjust => 'Adjust estimate';
 
   @override
@@ -1152,6 +1171,9 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get studioAiHint =>
       'For example: \"Paint the walls warm beige and add a sofa\"';
+
+  @override
+  String get studioAiStyleLabel => 'Style (optional)';
 
   @override
   String get studioGenerating => 'Generating…';
@@ -1446,6 +1468,11 @@ class AppLocalizationsEn extends AppLocalizations {
   String get wizardExactValue => 'Exact value (m)';
 
   @override
+  String wizardCeilingOutOfRange(String min, String max) {
+    return 'Ceiling height must be between $min m and $max m';
+  }
+
+  @override
   String wizardWallTitle(String letter) {
     return 'Wall $letter';
   }
@@ -1677,7 +1704,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get scanLidarUnavailableBody =>
-      'LiDAR scanning only works on iPhone 12 Pro, 13 Pro, 14 Pro, 15 Pro, 16 Pro or iPad Pro. Add the room another way:';
+      'LiDAR scanning only works on devices with LiDAR: iPhone Pro (12 Pro or newer) or iPad Pro. Add the room another way:';
 
   @override
   String get scanInProgress => 'Scanning room…';
@@ -1963,10 +1990,13 @@ class AppLocalizationsEn extends AppLocalizations {
   String get businessFieldTelegram => 'Telegram (optional)';
 
   @override
-  String get businessFieldPriceMin => 'Price: from (UZS)';
+  String get businessFieldPriceMin => 'From';
 
   @override
-  String get businessFieldPriceMax => 'Price: up to (UZS)';
+  String get businessFieldPriceMax => 'Up to';
+
+  @override
+  String get businessFieldPriceTitle => 'Price (UZS)';
 
   @override
   String get businessSubmit => 'Submit application';
@@ -2492,6 +2522,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get shopCategoryElektr => 'Electrical';
 
   @override
+  String get shopCategoryEshik => 'Doors';
+
+  @override
+  String get shopCategoryDeraza => 'Windows';
+
+  @override
   String get tradeBoshqa => 'Other tradesperson';
 
   @override
@@ -2511,4 +2547,269 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get mapAttribution => '© OpenStreetMap contributors';
+
+  @override
+  String get pushPromptTitle => 'Shall we notify you?';
+
+  @override
+  String get pushPromptBody =>
+      'We\'ll tell you when your design is ready or your order status changes.';
+
+  @override
+  String get pushPromptYes => 'Yes';
+
+  @override
+  String get pushPromptLater => 'Later';
+
+  @override
+  String get settingsNotificationsTitle => 'Notifications';
+
+  @override
+  String get settingsNotificationsOn => 'On';
+
+  @override
+  String get settingsNotificationsOff => 'Off';
+
+  @override
+  String get pushChannelName => 'Andoza updates';
+
+  @override
+  String get sharePinTitle => 'Pinterest pin';
+
+  @override
+  String get sharePinChooseRoom => 'Which room is it for?';
+
+  @override
+  String get sharePinHint => 'The Studio\'s AI designer opens with this pin.';
+
+  @override
+  String get sharePinNoRooms => 'No rooms yet. Add one with \"+\" first.';
+
+  @override
+  String get sharePinNotPin => 'This is not a Pinterest pin link';
+
+  @override
+  String get sharePinNotPinHint =>
+      'Open the pin in the Pinterest app and choose Share → Andoza AI.';
+
+  @override
+  String get furnitureStylesLabel => 'Styles';
+
+  @override
+  String get furnitureStylesAll => 'Suits every style';
+
+  @override
+  String get furnitureStyleNeoklassika => 'Neoclassical';
+
+  @override
+  String get furnitureStyleKlassik => 'Classic';
+
+  @override
+  String get furnitureStyleZamonaviy => 'Modern';
+
+  @override
+  String get furnitureStyleHitech => 'Hi-Tech';
+
+  @override
+  String get furnitureStyleMinimalist => 'Minimalist';
+
+  @override
+  String get furnitureStyleSkandinav => 'Scandinavian';
+
+  @override
+  String get furnitureStyleLoft => 'Loft';
+
+  @override
+  String get furnitureStyleMilliy => 'National';
+
+  @override
+  String get estimateFloorStandIn =>
+      'No floor product is chosen, so the price is the shops\' median floor (approximate).';
+
+  @override
+  String get scanChoiceTitle => 'What are we scanning?';
+
+  @override
+  String get scanChoiceOneRoom => 'One room';
+
+  @override
+  String get scanChoiceFlat => 'Several rooms (apartment)';
+
+  @override
+  String get scanChoiceFlatHint =>
+      'Scan the rooms one after another — they land in place on the plan';
+
+  @override
+  String get scanNextRoom => 'Next room';
+
+  @override
+  String get scanFinish => 'Finish';
+
+  @override
+  String scanRoomN(int n) {
+    return 'Room $n';
+  }
+
+  @override
+  String get flatReviewTitle => 'Scanned rooms';
+
+  @override
+  String get flatReviewRoomName => 'Room name';
+
+  @override
+  String get flatReviewContinue => 'Open in the studio';
+
+  @override
+  String flatReviewPartial(int n) {
+    return 'The scan stopped — $n rooms kept';
+  }
+
+  @override
+  String flatReviewDropped(int n) {
+    return '$n rooms could not be read and were left out';
+  }
+
+  @override
+  String flatReviewSavedSome(int saved, int total) {
+    return '$saved of $total rooms saved — scan the rest again';
+  }
+
+  @override
+  String get loginWithApple => 'Sign in with Apple';
+
+  @override
+  String get loginAppleFailed =>
+      'Couldn\'t sign in with Apple. Please try again.';
+
+  @override
+  String get reportAction => 'Report';
+
+  @override
+  String get reportTitle => 'Report';
+
+  @override
+  String get reportHint =>
+      'What\'s wrong? Our moderators will review your report.';
+
+  @override
+  String get reportReasonSpam => 'Spam or advertising';
+
+  @override
+  String get reportReasonInappropriate => 'Inappropriate content';
+
+  @override
+  String get reportReasonFraud => 'Fraud or scam';
+
+  @override
+  String get reportReasonOther => 'Other';
+
+  @override
+  String get reportDetails => 'Details (optional)';
+
+  @override
+  String get reportSend => 'Send';
+
+  @override
+  String get reportSent => 'Thanks! Your report has been sent.';
+
+  @override
+  String get blockUstaAction => 'Block';
+
+  @override
+  String get blockUstaTitle => 'Block this craftsman?';
+
+  @override
+  String get blockUstaBody => 'They will no longer appear on your map or list.';
+
+  @override
+  String get blockUstaConfirm => 'Block';
+
+  @override
+  String get blockUstaDone => 'Craftsman blocked';
+
+  @override
+  String get shopFurnitureSection => 'Furniture';
+
+  @override
+  String get shopFurnitureNoPrice => 'Price on request';
+
+  @override
+  String storePageOpen(String name) {
+    return '$name shop';
+  }
+
+  @override
+  String get storeLoadFailed => 'Couldn\'t open the shop';
+
+  @override
+  String get storeCall => 'Call';
+
+  @override
+  String get storeTelegram => 'Telegram';
+
+  @override
+  String get storeNoProducts => 'This shop has no products yet';
+
+  @override
+  String get storeReport => 'Report this shop';
+
+  @override
+  String get furnitureSize => 'Size';
+
+  @override
+  String furnitureSizeValue(String size) {
+    return '$size cm';
+  }
+
+  @override
+  String get furniturePlaceInRoom => 'Place in my room';
+
+  @override
+  String get furniturePickRoom => 'Which room?';
+
+  @override
+  String get furnitureNoRooms => 'Create or scan a room first';
+
+  @override
+  String get furnitureNoModel =>
+      'This product has no 3D model, so it can\'t be placed in a room';
+
+  @override
+  String get furnitureLoadFailed => 'Couldn\'t open the product';
+
+  @override
+  String get profileMenuMebel => 'Furniture manufacturing';
+
+  @override
+  String get profileMenuMebelHint =>
+      'For workshops: cabinet parts, edge banding and price';
+
+  @override
+  String get mebelExportFailed => 'Couldn\'t open the file';
+
+  @override
+  String get scanHintStart => 'Walk slowly around the room to scan it';
+
+  @override
+  String get scanCoachMoveCloser => 'Hold the phone closer to the wall';
+
+  @override
+  String get scanCoachMoveAway => 'Move the phone a little away from the wall';
+
+  @override
+  String get scanCoachSlowDown => 'You\'re moving too fast — slow down';
+
+  @override
+  String get scanCoachTurnOnLight => 'The room is dark — turn on the light';
+
+  @override
+  String get scanCoachLowTexture =>
+      'This surface is too plain — point the camera elsewhere';
+
+  @override
+  String get scanCoachGood =>
+      'Going well — keep walking around the room at this pace';
+
+  @override
+  String get scanCoachKeepGoing => 'Keep scanning';
 }

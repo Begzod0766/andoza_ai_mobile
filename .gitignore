@@ -68,3 +68,6 @@ ios_dist.key
 
 # Gradle build output (the root-level /build/ rule above does not cover it)
 android/build/
+
+# Claude Code: per-machine permissions, never shared
+.claude/settings.local.json

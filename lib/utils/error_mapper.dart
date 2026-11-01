@@ -157,6 +157,10 @@ String _mapStatus(int? statusCode) {
 /// Like [mapErrorToMessage], but when the server explained a 400/403/409 itself
 /// (FastAPI `{"detail": "..."}`, in Uzbek) that sentence is shown instead of
 /// the generic status text — "which line was refused" beats "invalid data".
+///
+/// A 422 comes in two shapes: a plain sentence (a value the database refused,
+/// "Noto'g'ri qiymat yuborildi.") is shown like the others; pydantic's list of
+/// `{loc, msg, type}` is English and per-field, so it keeps the generic text.
 String mapErrorWithServerDetail(Object? error) {
   if (error is ApiException &&
       (error.statusCode == 400 ||
@@ -164,6 +168,7 @@ String mapErrorWithServerDetail(Object? error) {
           error.statusCode == 409 ||
           error.statusCode == 413 ||
           error.statusCode == 415 ||
+          error.statusCode == 422 ||
           error.statusCode == 429)) {
     final body = error.response;
     final detail = body is Map ? body['detail'] : null;

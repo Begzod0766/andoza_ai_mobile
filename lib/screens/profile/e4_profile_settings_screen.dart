@@ -131,6 +131,14 @@ class E4ProfileSettingsScreen extends ConsumerWidget {
                 : l10n.profileMenuBecomePartner,
             onTap: () => context.push('/business'),
           ),
+          // The web mebel workshop; on the web too a phone reaches it only
+          // from the profile.
+          _MenuTile(
+            icon: Icons.chair_outlined,
+            label: l10n.profileMenuMebel,
+            subtitle: l10n.profileMenuMebelHint,
+            onTap: () => context.push('/mebel'),
+          ),
           _MenuTile(
             icon: Icons.architecture_outlined,
             label: l10n.profileMenuProjects,
@@ -219,6 +227,7 @@ class _MenuTile extends StatelessWidget {
     required this.onTap,
     this.isDestructive = false,
     this.trailing,
+    this.subtitle,
   });
 
   final IconData icon;
@@ -226,6 +235,7 @@ class _MenuTile extends StatelessWidget {
   final VoidCallback onTap;
   final bool isDestructive;
   final String? trailing;
+  final String? subtitle;
 
   @override
   Widget build(BuildContext context) {
@@ -247,10 +257,26 @@ class _MenuTile extends StatelessWidget {
             ),
             const SizedBox(width: DesignTokens.spacingMd),
             Expanded(
-              child: Text(
-                label,
-                style: DesignTokens.body2.copyWith(color: color),
-              ),
+              child: subtitle == null
+                  ? Text(
+                      label,
+                      style: DesignTokens.body2.copyWith(color: color),
+                    )
+                  : Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          label,
+                          style: DesignTokens.body2.copyWith(color: color),
+                        ),
+                        Text(
+                          subtitle!,
+                          style: DesignTokens.caption.copyWith(
+                            color: DesignTokens.textGray,
+                          ),
+                        ),
+                      ],
+                    ),
             ),
             if (trailing != null) ...[
               Text(

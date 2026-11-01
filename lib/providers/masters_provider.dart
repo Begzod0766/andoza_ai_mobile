@@ -1,4 +1,5 @@
 import 'package:riverpod/riverpod.dart';
+import '../features/moderation/blocked_ustalar.dart';
 import '../l10n/app_localizations.dart';
 import '../models/api/usta.dart';
 import '../repositories/masters_repository.dart';
@@ -114,12 +115,17 @@ class MockMaster {
 /// Ustalar shown on the U1 map / U3 list, built from the real backend
 /// `/ustalar` directory. Kept a synchronous [Provider] so the map/list
 /// consumers stay unchanged; while the request is loading (or on error) it
-/// yields an empty list rather than throwing.
+/// yields an empty list rather than throwing. Ustalar the person blocked
+/// ([blockedUstalarProvider]) are left out.
 final mockMastersProvider = Provider<List<MockMaster>>((ref) {
+  final blocked = ref.watch(blockedUstalarProvider);
   return ref
       .watch(ustalarProvider(_allUstalarFilter))
       .maybeWhen(
-        data: (list) => list.map(_toMockMaster).toList(),
+        data: (list) => list
+            .where((u) => !blocked.contains(u.id))
+            .map(_toMockMaster)
+            .toList(),
         orElse: () => const <MockMaster>[],
       );
 });

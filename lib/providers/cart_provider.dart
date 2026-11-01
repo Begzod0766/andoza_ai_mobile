@@ -1,6 +1,11 @@
 import 'package:riverpod/riverpod.dart';
 import '../models/shop_model.dart';
 
+/// The most of one product a single order line may ask for; the API refuses
+/// more with a 422 (`OrderLineCreate.quantity`, le=100 000), so the cart never
+/// holds more than that.
+const double maxLineQuantity = 100000;
+
 /// Local-only Do'kon cart — no backend `/cart` endpoint exists, same
 /// rationale as shop_provider.dart's mock catalog.
 class CartNotifier extends StateNotifier<List<CartLine>> {
@@ -14,14 +19,20 @@ class CartNotifier extends StateNotifier<List<CartLine>> {
       final existing = state[index];
       state = [
         ...state.sublist(0, index),
-        existing.copyWith(quantity: existing.quantity + quantity),
+        existing.copyWith(
+          quantity: (existing.quantity + quantity).clamp(0.0, maxLineQuantity),
+        ),
         ...state.sublist(index + 1),
       ];
       return;
     }
     state = [
       ...state,
-      CartLine(product: product, dealer: dealer, quantity: quantity),
+      CartLine(
+        product: product,
+        dealer: dealer,
+        quantity: quantity.clamp(0.0, maxLineQuantity),
+      ),
     ];
   }
 
@@ -33,7 +44,7 @@ class CartNotifier extends StateNotifier<List<CartLine>> {
     state = [
       for (final line in state)
         if (line.product.id == productId && line.dealer.id == dealerId)
-          line.copyWith(quantity: quantity)
+          line.copyWith(quantity: quantity.clamp(0.0, maxLineQuantity))
         else
           line,
     ];

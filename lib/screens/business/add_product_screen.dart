@@ -11,6 +11,8 @@ import '../../l10n/app_localizations.dart';
 import '../../providers/business_provider.dart';
 import '../../services/api_client.dart';
 import '../../widgets/common/unsaved_changes_guard.dart';
+import '../../utils/error_mapper.dart';
+import 'style_chips.dart';
 
 const _categories = ['divan', 'stol', 'stul', 'karavot', 'shkaf', 'lampa', 'boshqa'];
 const _rooms = ['mehmonxona', 'oshxona', 'yotoqxona', 'hammom', 'balkon'];
@@ -35,6 +37,7 @@ class _AddProductScreenState extends ConsumerState<AddProductScreen> {
   String _category = 'divan';
   String? _room;
   String _placement = 'pol';
+  List<String> _styles = const [];
   String? _step; // null: idle; else what is in progress
   String? _error;
   bool _cancelled = false;
@@ -171,6 +174,9 @@ class _AddProductScreenState extends ConsumerState<AddProductScreen> {
       switch (e.statusCode) {
         case 503:
           return l.addProductUnavailable;
+        // The model the app downloaded is not a real .glb; the server says so.
+        case 415:
+          return mapErrorWithServerDetail(e);
         case 429:
           return e.message.isNotEmpty && e.message.contains('Tasdiqlanmagan') ? l.addProductTooMany : l.addProductLimit;
       }
@@ -229,6 +235,7 @@ class _AddProductScreenState extends ConsumerState<AddProductScreen> {
         placement: _placement,
         roomType: _room,
         priceUzs: int.tryParse(_price.text.trim()),
+        styles: _styles,
       );
       ref.invalidate(myProductsProvider);
       messenger.showSnackBar(SnackBar(content: Text(l10n.addProductDone)));
@@ -345,6 +352,12 @@ class _AddProductScreenState extends ConsumerState<AddProductScreen> {
             decoration: InputDecoration(labelText: l10n.addProductPlacement),
             items: [for (final p in _placements) DropdownMenuItem(value: p, child: Text(_placementLabel(l10n, p)))],
             onChanged: busy ? null : (v) => setState(() => _placement = v ?? _placement),
+          ),
+          const SizedBox(height: DesignTokens.spacingMd),
+          StyleChips(
+            value: _styles,
+            enabled: !busy,
+            onChanged: (v) => setState(() => _styles = v),
           ),
           const SizedBox(height: DesignTokens.spacingMd),
           if (_error != null)

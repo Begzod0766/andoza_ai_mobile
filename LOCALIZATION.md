@@ -5,10 +5,26 @@ This app uses Flutter's official localization stack: `flutter_localizations`
 `AppLocalizations` class.
 
 Three locales ship: **Uzbek (`uz`, default and template), Russian (`ru`) and
-English (`en`)**, each with the same 702 keys. Users switch language in-app
-(Profil → Sozlamalar → Til, `lib/screens/settings/language_picker_sheet.dart`);
-the choice is kept by `lib/providers/locale_provider.dart` under the
-`SharedPreferences` key `app_locale` and fed to `MaterialApp.router`'s `locale:`.
+English (`en`)**, each with the same 834 keys. Users switch language in-app
+(Profil → Sozlamalar → Til, or the button at the top of the login screen;
+`lib/screens/settings/language_picker_sheet.dart`); the choice is kept by
+`lib/providers/locale_provider.dart` under the `SharedPreferences` key
+`app_locale` and fed to `MaterialApp.router`'s `locale:`. Until the user picks
+one, the app follows the phone's language when it is one of the three, else
+Uzbek.
+
+The language also reaches the server:
+- every API request carries it as `Accept-Language`, so server messages come
+  back in it;
+- a picked language is saved on the account (`PATCH /auth/me {language}`, by
+  `lib/providers/account_language_provider.dart`); until that succeeds it is
+  kept as pending (`app_locale_pending`);
+- at sign-in, as on the web, a pending choice is saved, otherwise the app takes
+  the account's language from `/auth/me`;
+- sign-up, Google and Apple sign-in send the app language, so a new account
+  starts in it;
+- a change registers the push token again, so pushes are written in it;
+- the Studio WebView opens with `?lang=`.
 
 ## How the setup works
 

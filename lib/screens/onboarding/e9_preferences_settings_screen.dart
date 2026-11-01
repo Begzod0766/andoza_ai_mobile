@@ -1,13 +1,16 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:path_provider/path_provider.dart';
 import '../../config/design_tokens.dart';
+import '../../features/ar_scan/ar_scan_service.dart';
 import '../../l10n/app_localizations.dart';
+import '../../services/push_permission.dart';
 
 /// Public privacy policy page on the web app.
-const _privacyPolicyUrl = 'https://andoza.jumaniyozov.uz/privacy';
+const _privacyPolicyUrl = 'https://andozaai.uz/privacy';
 
 /// E9: App Preferences & Settings
 /// Customize app behavior, notifications, and display settings
@@ -20,7 +23,9 @@ class E9PreferencesSettingsScreen extends ConsumerStatefulWidget {
 }
 
 class _E9PreferencesSettingsScreenState
-    extends ConsumerState<E9PreferencesSettingsScreen> {
+    extends ConsumerState<E9PreferencesSettingsScreen>
+    with WidgetsBindingObserver {
+  bool _notificationsOn = false;
   bool _clearingCache = false;
   String? _appVersion;
   String? _buildNumber;
@@ -28,7 +33,35 @@ class _E9PreferencesSettingsScreenState
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     _loadPackageInfo();
+    _refreshNotifications();
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  // Back from the OS settings page: pick up a changed permission.
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) _refreshNotifications();
+  }
+
+  Future<void> _refreshNotifications() async {
+    final on = await ref.read(pushPermissionProvider).isGranted();
+    if (!mounted) return;
+    setState(() => _notificationsOn = on);
+  }
+
+  Future<void> _openNotificationSettings() async {
+    if (defaultTargetPlatform == TargetPlatform.iOS) {
+      await launchUrl(Uri.parse('app-settings:'));
+    } else {
+      await ref.read(arScanServiceProvider).openAppSettings();
+    }
   }
 
   Future<void> _loadPackageInfo() async {
@@ -102,6 +135,15 @@ class _E9PreferencesSettingsScreenState
                     style: DesignTokens.subtitle1.copyWith(
                       color: DesignTokens.text,
                     ),
+                  ),
+                  const SizedBox(height: DesignTokens.spacing12),
+                  _ActionTile(
+                    title: l10n.settingsNotificationsTitle,
+                    subtitle: _notificationsOn
+                        ? l10n.settingsNotificationsOn
+                        : l10n.settingsNotificationsOff,
+                    icon: Icons.notifications_outlined,
+                    onTap: _openNotificationSettings,
                   ),
                   const SizedBox(height: DesignTokens.spacing12),
                   _ActionTile(

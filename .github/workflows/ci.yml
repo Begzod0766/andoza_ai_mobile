@@ -1,7 +1,8 @@
 name: CI
 
-# Static analysis + unit/widget tests on every push to main and on PRs.
-# Deliberately does NOT build a release, sign, or touch secrets — this is a
+# Static analysis, unit/widget tests and an Android build on every push to
+# main and on PRs.
+# Deliberately does NOT sign with the upload key or touch secrets — this is a
 # fast correctness gate only.
 on:
   push:
@@ -18,7 +19,7 @@ jobs:
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: 3.44.8
+          flutter-version: 3.47.5
           channel: stable
           cache: true
 
@@ -32,3 +33,36 @@ jobs:
 
       - name: Test
         run: flutter test
+
+  # Builds an Android release APK (debug-signed: no keystore, no secrets) so a
+  # Flutter, Gradle or AGP mismatch fails here instead of at release time.
+  # Flutter 3.47.5 stopped compiling on Gradle 8.14.3 and nothing noticed,
+  # because no job built Android.
+  build-android:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Java 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: 3.47.5
+          channel: stable
+          cache: true
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Build APK (release, debug-signed)
+        run: |
+          flutter build apk --release \
+            --dart-define=API_URL=https://andozaai.uz/api/v1 \
+            --dart-define=API_BASE_URL=https://andozaai.uz \
+            --dart-define=STUDIO_BASE_URL=https://andozaai.uz

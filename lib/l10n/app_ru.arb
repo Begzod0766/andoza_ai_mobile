@@ -228,6 +228,7 @@
     "description": "Login error: the username or password is incorrect."
   },
   "loginErrorUsernameShort": "Имя пользователя должно содержать не менее 3 символов.",
+  "loginErrorUsernameLong": "Имя пользователя должно быть не длиннее 50 символов.",
   "@loginErrorUsernameShort": {
     "description": "Register error: username must be at least 3 characters."
   },
@@ -822,6 +823,8 @@
     }
   },
   "mastersCommentHint": "Комментарий (необязательно)",
+  "phoneErrorInvalid": "Неверный номер телефона. Пример: +998 90 123 45 67",
+  "mastersPhoneLabel": "Ваш номер телефона",
   "@mastersCommentHint": {
     "description": "U5 send-smeta sheet: optional comment field hint."
   },
@@ -1282,6 +1285,8 @@
     "description": "E1 estimation: fallback label in the savings banner for already-done work ('Some work')."
   },
   "estimateStageFallback": "Этап",
+  "estimateFloorUnpriced": "Тип пола выбран, но товар не выбран — пол не вошёл в смету.",
+  "estimateFloorPick": "Выбрать пол",
   "@estimateStageFallback": {
     "description": "E1 estimation: generic fallback stage label in the savings banner ('Stage')."
   },
@@ -1395,6 +1400,7 @@
   "@studioAiHint": {
     "description": "AI builder sheet: example prompt hint in the request text field."
   },
+  "studioAiStyleLabel": "Стиль (необязательно)",
   "studioGenerating": "Обрабатывается…",
   "@studioGenerating": {
     "description": "AI builder sheet: generate button label while the AI is working."
@@ -1813,6 +1819,7 @@
     "description": "3D wizard ceiling step hint ('Usually between 2.5–3.2 metres')."
   },
   "wizardExactValue": "Точное значение (м)",
+  "wizardCeilingOutOfRange": "Высота потолка должна быть от {min} до {max} м",
   "@wizardExactValue": {
     "description": "3D wizard ceiling step: exact-value field label."
   },
@@ -2140,7 +2147,7 @@
   "@scanLidarUnavailableTitle": {
     "description": "Unsupported-device sheet title ('LiDAR not available')."
   },
-  "scanLidarUnavailableBody": "LiDAR сканер работает только на iPhone 12 Pro, 13 Pro, 14 Pro, 15 Pro, 16 Pro или iPad Pro. Добавьте комнату другим способом:",
+  "scanLidarUnavailableBody": "LiDAR сканер работает только на устройствах с LiDAR: iPhone Pro (12 Pro и новее) или iPad Pro. Добавьте комнату другим способом:",
   "@scanLidarUnavailableBody": {
     "description": "Unsupported-device sheet body explaining LiDAR requirements and offering alternatives."
   },
@@ -2491,8 +2498,9 @@
   "businessFieldDistrict": "Район",
   "businessFieldPhone": "Телефон (+998...)",
   "businessFieldTelegram": "Telegram (необязательно)",
-  "businessFieldPriceMin": "Цена: от (сум)",
-  "businessFieldPriceMax": "Цена: до (сум)",
+  "businessFieldPriceMin": "От",
+  "businessFieldPriceMax": "До",
+  "businessFieldPriceTitle": "Цена (сум)",
   "businessSubmit": "Отправить заявку",
   "businessSkip": "Позже",
   "businessErrorName": "Укажите название",
@@ -2668,11 +2676,108 @@
   "shopCategorySement": "Цемент",
   "shopCategorySantexnika": "Сантехника",
   "shopCategoryElektr": "Электрика",
+  "shopCategoryEshik": "Двери",
+  "shopCategoryDeraza": "Окна",
   "tradeBoshqa": "Другой мастер",
   "qualityTierEkonom": "Эконом",
   "qualityTierStandart": "Стандарт",
   "qualityTierPremium": "Премиум",
   "estimateOpen3dStudio": "3D-студия",
   "actionDelete": "Удалить",
-  "mapAttribution": "© участники OpenStreetMap"
+  "mapAttribution": "© участники OpenStreetMap",
+  "pushPromptTitle": "Сообщать вам?",
+  "pushPromptBody": "Сообщим, когда дизайн будет готов или изменится статус заказа.",
+  "pushPromptYes": "Да",
+  "pushPromptLater": "Позже",
+  "settingsNotificationsTitle": "Уведомления",
+  "settingsNotificationsOn": "Включены",
+  "settingsNotificationsOff": "Выключены",
+  "pushChannelName": "Новости Andoza",
+  "sharePinTitle": "Пин из Pinterest",
+  "sharePinChooseRoom": "К какой комнате применить?",
+  "sharePinHint": "AI-дизайнер в Студии откроется с этим пином.",
+  "sharePinNoRooms": "Комнат пока нет. Сначала добавьте комнату через «+».",
+  "sharePinNotPin": "Это не ссылка на пин Pinterest",
+  "sharePinNotPinHint": "Откройте пин в приложении Pinterest и выберите «Поделиться» → Andoza AI.",
+  "furnitureStylesLabel": "Стили",
+  "furnitureStylesAll": "Подходит ко всем стилям",
+  "furnitureStyleNeoklassika": "Неоклассика",
+  "furnitureStyleKlassik": "Классика",
+  "furnitureStyleZamonaviy": "Современный",
+  "furnitureStyleHitech": "Хай-тек",
+  "furnitureStyleMinimalist": "Минимализм",
+  "furnitureStyleSkandinav": "Скандинавский",
+  "furnitureStyleLoft": "Лофт",
+  "furnitureStyleMilliy": "Национальный",
+  "estimateFloorStandIn": "Товар для пола не выбран — цена взята по средней в магазинах (примерно).",
+  "scanChoiceTitle": "Что сканируем?",
+  "scanChoiceOneRoom": "Одну комнату",
+  "scanChoiceFlat": "Несколько комнат (квартира)",
+  "scanChoiceFlatHint": "Сканируйте комнаты подряд — они встанут на свои места в плане",
+  "scanNextRoom": "Следующая комната",
+  "scanFinish": "Готово",
+  "scanRoomN": "Комната {n}",
+  "flatReviewTitle": "Отсканированные комнаты",
+  "flatReviewRoomName": "Название комнаты",
+  "flatReviewContinue": "Открыть в студии",
+  "flatReviewPartial": "Сканирование прервалось — сохранено комнат: {n}",
+  "flatReviewDropped": "Не удалось распознать комнат: {n}, они не добавлены",
+  "flatReviewSavedSome": "Сохранено комнат: {saved} из {total} — остальные отсканируйте заново",
+  "loginWithApple": "Войти через Apple",
+  "loginAppleFailed": "Не удалось войти через Apple. Попробуйте ещё раз.",
+  "reportAction": "Пожаловаться",
+  "reportTitle": "Жалоба",
+  "reportHint": "Что не так? Модераторы рассмотрят жалобу.",
+  "reportReasonSpam": "Спам или реклама",
+  "reportReasonInappropriate": "Неприемлемый контент",
+  "reportReasonFraud": "Мошенничество",
+  "reportReasonOther": "Другое",
+  "reportDetails": "Комментарий (необязательно)",
+  "reportSend": "Отправить",
+  "reportSent": "Спасибо! Жалоба отправлена.",
+  "blockUstaAction": "Заблокировать",
+  "blockUstaTitle": "Заблокировать мастера?",
+  "blockUstaBody": "Он больше не будет виден вам на карте и в списке.",
+  "blockUstaConfirm": "Заблокировать",
+  "blockUstaDone": "Мастер заблокирован",
+  "shopFurnitureSection": "Мебель",
+  "shopFurnitureNoPrice": "Цена по договорённости",
+  "storePageOpen": "Магазин «{name}»",
+  "@storePageOpen": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "storeLoadFailed": "Не удалось открыть магазин",
+  "storeCall": "Позвонить",
+  "storeTelegram": "Telegram",
+  "storeNoProducts": "В этом магазине пока нет товаров",
+  "storeReport": "Пожаловаться на магазин",
+  "furnitureSize": "Размер",
+  "furnitureSizeValue": "{size} см",
+  "@furnitureSizeValue": {
+    "placeholders": {
+      "size": {
+        "type": "String"
+      }
+    }
+  },
+  "furniturePlaceInRoom": "Поставить в мою комнату",
+  "furniturePickRoom": "В какую комнату поставить?",
+  "furnitureNoRooms": "Сначала создайте или отсканируйте комнату",
+  "furnitureNoModel": "У этого товара нет 3D-модели, его нельзя поставить в комнату",
+  "furnitureLoadFailed": "Не удалось открыть товар",
+  "profileMenuMebel": "Производство мебели",
+  "profileMenuMebelHint": "Для цехов: детали шкафа, кромка и цена",
+  "mebelExportFailed": "Не удалось открыть файл",
+  "scanHintStart": "Медленно обойдите комнату, сканируя её",
+  "scanCoachMoveCloser": "Поднесите телефон ближе к стене",
+  "scanCoachMoveAway": "Отодвиньте телефон немного от стены",
+  "scanCoachSlowDown": "Вы двигаетесь слишком быстро — помедленнее",
+  "scanCoachTurnOnLight": "В комнате темно — включите свет",
+  "scanCoachLowTexture": "Поверхность слишком однородная — направьте камеру в другую сторону",
+  "scanCoachGood": "Отлично — продолжайте обходить комнату в том же темпе",
+  "scanCoachKeepGoing": "Продолжайте сканирование"
 }

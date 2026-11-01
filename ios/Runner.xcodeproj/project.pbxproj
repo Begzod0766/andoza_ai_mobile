@@ -7,24 +7,32 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		003A07135FA970EDDA13179A /* ShareExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 5ACFF558DDCF314650E21B71 /* ShareExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		0E2484326684513FDFDE24FD /* RoomMeasurer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7A0ED7D36E7CA45458487B0D /* RoomMeasurer.swift */; };
 		1498D2341E8E89220040F4C2 /* GeneratedPluginRegistrant.m in Sources */ = {isa = PBXBuildFile; fileRef = 1498D2331E8E89220040F4C2 /* GeneratedPluginRegistrant.m */; };
 		20CCE2E17F2554800687ABB9 /* RoomMeasurerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DFCBD382C50E0F36A6D66347 /* RoomMeasurerTests.swift */; };
 		331C808B294A63AB00263BE5 /* RunnerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 331C807B294A618700263BE5 /* RunnerTests.swift */; };
 		3B3967161E833CAA004F5970 /* AppFrameworkInfo.plist in Resources */ = {isa = PBXBuildFile; fileRef = 3B3967151E833CAA004F5970 /* AppFrameworkInfo.plist */; };
+		3C5C6557A5F23A1D0C06113F /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 317943F902B657F0DB3C1D83 /* PrivacyInfo.xcprivacy */; };
+		4B58EC42FC7CE751E94FABFF /* ShareViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9207F12D68A24C704A911B35 /* ShareViewController.swift */; };
 		54091664C6045F83FFF2D545 /* Pods_RunnerTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F1388EFADC7404D481D7BD3E /* Pods_RunnerTests.framework */; };
+		5AF3702046F44877314F7AB9 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 0FFC27748538616323A984ED /* GoogleService-Info.plist */; };
 		74858FAF1ED2DC5600515810 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 74858FAE1ED2DC5600515810 /* AppDelegate.swift */; };
 		7884E8682EC3CC0700C636F2 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7884E8672EC3CC0400C636F2 /* SceneDelegate.swift */; };
 		78A318202AECB46A00862997 /* FlutterGeneratedPluginSwiftPackage in Frameworks */ = {isa = PBXBuildFile; productRef = 78A3181F2AECB46A00862997 /* FlutterGeneratedPluginSwiftPackage */; };
 		812D388DD644D7C33122F0A0 /* LidarMethodChannel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20F32AD942BE54BEB28ED8EB /* LidarMethodChannel.swift */; };
+		8B23F7FF5749B9C17DC23A5C /* ShareChannel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B00224FD6C5A0C1363DE445 /* ShareChannel.swift */; };
 		8DE8056573A83E083F147432 /* DepthScanViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BD55CC0C7CF134ACE631E49 /* DepthScanViewController.swift */; };
 		97C146FC1CF9000F007C117D /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 97C146FA1CF9000F007C117D /* Main.storyboard */; };
 		97C146FE1CF9000F007C117D /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 97C146FD1CF9000F007C117D /* Assets.xcassets */; };
 		97C147011CF9000F007C117D /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 97C146FF1CF9000F007C117D /* LaunchScreen.storyboard */; };
 		A1000000000000000000B0DE /* RoomScanPlugin.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000000000000000000C0DE /* RoomScanPlugin.swift */; };
 		A2000000000000000000B0DE /* RoomScanViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000000000000000000C0DE /* RoomScanViewController.swift */; };
+		A2000000000000000000B0DF /* MultiRoomScanViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000000000000000000C0DF /* MultiRoomScanViewController.swift */; };
 		A3000000000000000000B0DE /* ObjectScanViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A3000000000000000000C0DE /* ObjectScanViewController.swift */; };
+		C50C904BB18A88711DC360B4 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 49A5E2075CF014CCA35036E9 /* InfoPlist.strings */; };
 		ECEDD6224CB6E4CDBDB35301 /* Pods_Runner.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3A84F5A862E48592A02384EB /* Pods_Runner.framework */; };
+		FB21FEBF783ED75E22D0A1F7 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 11504CB6C736B6489D180D63 /* Foundation.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -34,6 +42,13 @@
 			proxyType = 1;
 			remoteGlobalIDString = 97C146ED1CF9000F007C117D;
 			remoteInfo = Runner;
+		};
+		94E8A5B6953210208454BBC7 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 97C146E61CF9000F007C117D /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = D581D3C7DD28CD7E834950D1;
+			remoteInfo = ShareExtension;
 		};
 /* End PBXContainerItemProxy section */
 
@@ -48,17 +63,37 @@
 			name = "Embed Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		A16A7D48C682048C05CA77A0 /* Embed Foundation Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				003A07135FA970EDDA13179A /* ShareExtension.appex in Embed Foundation Extensions */,
+			);
+			name = "Embed Foundation Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		05833654E478C85C3C61E499 /* Info.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		0B00224FD6C5A0C1363DE445 /* ShareChannel.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = ShareChannel.swift; sourceTree = "<group>"; };
+		0FFC27748538616323A984ED /* GoogleService-Info.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; name = "GoogleService-Info.plist"; path = "Runner/GoogleService-Info.plist"; sourceTree = "<group>"; };
+		11504CB6C736B6489D180D63 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS26.0.sdk/System/Library/Frameworks/Foundation.framework; sourceTree = DEVELOPER_DIR; };
 		1498D2321E8E86230040F4C2 /* GeneratedPluginRegistrant.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = GeneratedPluginRegistrant.h; sourceTree = "<group>"; };
 		1498D2331E8E89220040F4C2 /* GeneratedPluginRegistrant.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GeneratedPluginRegistrant.m; sourceTree = "<group>"; };
 		20F32AD942BE54BEB28ED8EB /* LidarMethodChannel.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = LidarMethodChannel.swift; sourceTree = "<group>"; };
+		317943F902B657F0DB3C1D83 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; includeInIndex = 1; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
+		325058477526C0C1D82D2D12 /* ru */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.strings; name = ru; path = ru.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		331C807B294A618700263BE5 /* RunnerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RunnerTests.swift; sourceTree = "<group>"; };
 		331C8081294A63A400263BE5 /* RunnerTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = RunnerTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		3A84F5A862E48592A02384EB /* Pods_Runner.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Runner.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		3B3967151E833CAA004F5970 /* AppFrameworkInfo.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = AppFrameworkInfo.plist; path = Flutter/AppFrameworkInfo.plist; sourceTree = "<group>"; };
 		4296918B11715CD08D34D6CD /* Pods-Runner.profile.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Runner.profile.xcconfig"; path = "Target Support Files/Pods-Runner/Pods-Runner.profile.xcconfig"; sourceTree = "<group>"; };
+		52D6D2F5A45642182BEFD187 /* ShareExtension.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = ShareExtension.xcconfig; sourceTree = "<group>"; };
+		585F77471D46BFB7C97FBFBD /* Runner.entitlements */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.entitlements; path = Runner.entitlements; sourceTree = "<group>"; };
+		5ACFF558DDCF314650E21B71 /* ShareExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = ShareExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		6F6F1B068C685A98276493C7 /* Pods-Runner.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Runner.debug.xcconfig"; path = "Target Support Files/Pods-Runner/Pods-Runner.debug.xcconfig"; sourceTree = "<group>"; };
 		74858FAD1ED2DC5600515810 /* Runner-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Runner-Bridging-Header.h"; sourceTree = "<group>"; };
 		74858FAE1ED2DC5600515810 /* AppDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -68,6 +103,7 @@
 		7AFA3C8E1D35360C0083082E /* Release.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; name = Release.xcconfig; path = Flutter/Release.xcconfig; sourceTree = "<group>"; };
 		854194467DB7A65BF564E374 /* Pods-RunnerTests.profile.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-RunnerTests.profile.xcconfig"; path = "Target Support Files/Pods-RunnerTests/Pods-RunnerTests.profile.xcconfig"; sourceTree = "<group>"; };
 		8BD55CC0C7CF134ACE631E49 /* DepthScanViewController.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = DepthScanViewController.swift; sourceTree = "<group>"; };
+		9207F12D68A24C704A911B35 /* ShareViewController.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = ShareViewController.swift; sourceTree = "<group>"; };
 		9740EEB21CF90195004384FC /* Debug.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; name = Debug.xcconfig; path = Flutter/Debug.xcconfig; sourceTree = "<group>"; };
 		9740EEB31CF90195004384FC /* Generated.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; name = Generated.xcconfig; path = Flutter/Generated.xcconfig; sourceTree = "<group>"; };
 		97C146EE1CF9000F007C117D /* Runner.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Runner.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -78,9 +114,12 @@
 		98E715413DCAF6AF01977745 /* Pods-RunnerTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-RunnerTests.debug.xcconfig"; path = "Target Support Files/Pods-RunnerTests/Pods-RunnerTests.debug.xcconfig"; sourceTree = "<group>"; };
 		A1000000000000000000C0DE /* RoomScanPlugin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoomScan/RoomScanPlugin.swift; sourceTree = "<group>"; };
 		A2000000000000000000C0DE /* RoomScanViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoomScan/RoomScanViewController.swift; sourceTree = "<group>"; };
+		A2000000000000000000C0DF /* MultiRoomScanViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoomScan/MultiRoomScanViewController.swift; sourceTree = "<group>"; };
 		A3000000000000000000C0DE /* ObjectScanViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoomScan/ObjectScanViewController.swift; sourceTree = "<group>"; };
+		C1692B46FC40C947283A4299 /* uz */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.strings; name = uz; path = uz.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		CCC80626940CB6C56B3BC10F /* Pods-Runner.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Runner.release.xcconfig"; path = "Target Support Files/Pods-Runner/Pods-Runner.release.xcconfig"; sourceTree = "<group>"; };
 		D7E78F6A210583F751795846 /* Pods-RunnerTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-RunnerTests.release.xcconfig"; path = "Target Support Files/Pods-RunnerTests/Pods-RunnerTests.release.xcconfig"; sourceTree = "<group>"; };
+		DBBFD47C4D2AFBA9FD1EABBD /* en */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		DFCBD382C50E0F36A6D66347 /* RoomMeasurerTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = RoomMeasurerTests.swift; sourceTree = "<group>"; };
 		F1388EFADC7404D481D7BD3E /* Pods_RunnerTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_RunnerTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -100,6 +139,14 @@
 			files = (
 				78A318202AECB46A00862997 /* FlutterGeneratedPluginSwiftPackage in Frameworks */,
 				ECEDD6224CB6E4CDBDB35301 /* Pods_Runner.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		BC20BD8EAB7B5A11599F2F3C /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				FB21FEBF783ED75E22D0A1F7 /* Foundation.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -133,6 +180,7 @@
 			children = (
 				3A84F5A862E48592A02384EB /* Pods_Runner.framework */,
 				F1388EFADC7404D481D7BD3E /* Pods_RunnerTests.framework */,
+				C8C66E9763F6F07F5744E8D5 /* iOS */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -158,6 +206,8 @@
 				331C8082294A63A400263BE5 /* RunnerTests */,
 				831CDC5E62036DE46CC6BCA9 /* Pods */,
 				965AEE7C05B5AA4409612F21 /* Frameworks */,
+				0FFC27748538616323A984ED /* GoogleService-Info.plist */,
+				F1CB076747FEBF528B27D90D /* ShareExtension */,
 			);
 			sourceTree = "<group>";
 		};
@@ -166,6 +216,7 @@
 			children = (
 				97C146EE1CF9000F007C117D /* Runner.app */,
 				331C8081294A63A400263BE5 /* RunnerTests.xctest */,
+				5ACFF558DDCF314650E21B71 /* ShareExtension.appex */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -183,13 +234,37 @@
 				7884E8672EC3CC0400C636F2 /* SceneDelegate.swift */,
 				A1000000000000000000C0DE /* RoomScanPlugin.swift */,
 				A2000000000000000000C0DE /* RoomScanViewController.swift */,
+				A2000000000000000000C0DF /* MultiRoomScanViewController.swift */,
 				A3000000000000000000C0DE /* ObjectScanViewController.swift */,
 				74858FAD1ED2DC5600515810 /* Runner-Bridging-Header.h */,
 				20F32AD942BE54BEB28ED8EB /* LidarMethodChannel.swift */,
 				7A0ED7D36E7CA45458487B0D /* RoomMeasurer.swift */,
 				8BD55CC0C7CF134ACE631E49 /* DepthScanViewController.swift */,
+				0B00224FD6C5A0C1363DE445 /* ShareChannel.swift */,
+				49A5E2075CF014CCA35036E9 /* InfoPlist.strings */,
+				317943F902B657F0DB3C1D83 /* PrivacyInfo.xcprivacy */,
+				585F77471D46BFB7C97FBFBD /* Runner.entitlements */,
 			);
 			path = Runner;
+			sourceTree = "<group>";
+		};
+		C8C66E9763F6F07F5744E8D5 /* iOS */ = {
+			isa = PBXGroup;
+			children = (
+				11504CB6C736B6489D180D63 /* Foundation.framework */,
+			);
+			name = iOS;
+			sourceTree = "<group>";
+		};
+		F1CB076747FEBF528B27D90D /* ShareExtension */ = {
+			isa = PBXGroup;
+			children = (
+				9207F12D68A24C704A911B35 /* ShareViewController.swift */,
+				05833654E478C85C3C61E499 /* Info.plist */,
+				52D6D2F5A45642182BEFD187 /* ShareExtension.xcconfig */,
+			);
+			name = ShareExtension;
+			path = ShareExtension;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -224,12 +299,14 @@
 				97C146EB1CF9000F007C117D /* Frameworks */,
 				97C146EC1CF9000F007C117D /* Resources */,
 				9705A1C41CF9048500538489 /* Embed Frameworks */,
+				A16A7D48C682048C05CA77A0 /* Embed Foundation Extensions */,
 				3B06AD1E1E4923F5004D2608 /* Thin Binary */,
 				E0C843ABB2010D2EF9178F41 /* [CP] Embed Pods Frameworks */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				647497FA4FC83FE1F23BE8AA /* PBXTargetDependency */,
 			);
 			name = Runner;
 			packageProductDependencies = (
@@ -238,6 +315,23 @@
 			productName = Runner;
 			productReference = 97C146EE1CF9000F007C117D /* Runner.app */;
 			productType = "com.apple.product-type.application";
+		};
+		D581D3C7DD28CD7E834950D1 /* ShareExtension */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 2E915A0FFEAB7A20C698E01B /* Build configuration list for PBXNativeTarget "ShareExtension" */;
+			buildPhases = (
+				A421FCD4E65CA07FE05E9B75 /* Sources */,
+				BC20BD8EAB7B5A11599F2F3C /* Frameworks */,
+				7104A07D6337BE2FD8A1A763 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = ShareExtension;
+			productName = ShareExtension;
+			productReference = 5ACFF558DDCF314650E21B71 /* ShareExtension.appex */;
+			productType = "com.apple.product-type.app-extension";
 		};
 /* End PBXNativeTarget section */
 
@@ -266,6 +360,8 @@
 			knownRegions = (
 				en,
 				Base,
+				ru,
+				uz,
 			);
 			mainGroup = 97C146E51CF9000F007C117D;
 			packageReferences = (
@@ -277,12 +373,20 @@
 			targets = (
 				97C146ED1CF9000F007C117D /* Runner */,
 				331C8080294A63A400263BE5 /* RunnerTests */,
+				D581D3C7DD28CD7E834950D1 /* ShareExtension */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
 		331C807F294A63A400263BE5 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		7104A07D6337BE2FD8A1A763 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -297,6 +401,9 @@
 				3B3967161E833CAA004F5970 /* AppFrameworkInfo.plist in Resources */,
 				97C146FE1CF9000F007C117D /* Assets.xcassets in Resources */,
 				97C146FC1CF9000F007C117D /* Main.storyboard in Resources */,
+				5AF3702046F44877314F7AB9 /* GoogleService-Info.plist in Resources */,
+				C50C904BB18A88711DC360B4 /* InfoPlist.strings in Resources */,
+				3C5C6557A5F23A1D0C06113F /* PrivacyInfo.xcprivacy in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -419,7 +526,17 @@
 				8DE8056573A83E083F147432 /* DepthScanViewController.swift in Sources */,
 				A1000000000000000000B0DE /* RoomScanPlugin.swift in Sources */,
 				A2000000000000000000B0DE /* RoomScanViewController.swift in Sources */,
+				A2000000000000000000B0DF /* MultiRoomScanViewController.swift in Sources */,
 				A3000000000000000000B0DE /* ObjectScanViewController.swift in Sources */,
+				8B23F7FF5749B9C17DC23A5C /* ShareChannel.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		A421FCD4E65CA07FE05E9B75 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				4B58EC42FC7CE751E94FABFF /* ShareViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -431,9 +548,25 @@
 			target = 97C146ED1CF9000F007C117D /* Runner */;
 			targetProxy = 331C8085294A63A400263BE5 /* PBXContainerItemProxy */;
 		};
+		647497FA4FC83FE1F23BE8AA /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = ShareExtension;
+			target = D581D3C7DD28CD7E834950D1 /* ShareExtension */;
+			targetProxy = 94E8A5B6953210208454BBC7 /* PBXContainerItemProxy */;
+		};
 /* End PBXTargetDependency section */
 
 /* Begin PBXVariantGroup section */
+		49A5E2075CF014CCA35036E9 /* InfoPlist.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				DBBFD47C4D2AFBA9FD1EABBD /* en */,
+				325058477526C0C1D82D2D12 /* ru */,
+				C1692B46FC40C947283A4299 /* uz */,
+			);
+			name = InfoPlist.strings;
+			sourceTree = "<group>";
+		};
 		97C146FA1CF9000F007C117D /* Main.storyboard */ = {
 			isa = PBXVariantGroup;
 			children = (
@@ -453,6 +586,57 @@
 /* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
+		07827EAAB581C1CF23F403AF /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 52D6D2F5A45642182BEFD187 /* ShareExtension.xcconfig */;
+			buildSettings = {
+				APPLICATION_EXTENSION_API_ONLY = YES;
+				CLANG_ENABLE_OBJC_WEAK = NO;
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = 24GC58FD74;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = ShareExtension/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = uz.andozaai.app.ShareExtension;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Debug;
+		};
+		0C36A4A797825FB1F2DB55E2 /* Profile */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 52D6D2F5A45642182BEFD187 /* ShareExtension.xcconfig */;
+			buildSettings = {
+				APPLICATION_EXTENSION_API_ONLY = YES;
+				CLANG_ENABLE_OBJC_WEAK = NO;
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = 24GC58FD74;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = ShareExtension/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = uz.andozaai.app.ShareExtension;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 1;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Profile;
+		};
 		249021D3217E4FDB00AE95B9 /* Profile */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -519,10 +703,11 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.tamiruy.tamirUyMobileFlutter;
+				PRODUCT_BUNDLE_IDENTIFIER = uz.andozaai.app;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_OBJC_BRIDGING_HEADER = "Runner/Runner-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 1;
 				VERSIONING_SYSTEM = "apple-generic";
 			};
 			name = Profile;
@@ -536,7 +721,7 @@
 				CURRENT_PROJECT_VERSION = 1;
 				GENERATE_INFOPLIST_FILE = YES;
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.tamiruy.tamirUyMobileFlutter.RunnerTests;
+				PRODUCT_BUNDLE_IDENTIFIER = uz.andozaai.app.RunnerTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
@@ -554,7 +739,7 @@
 				CURRENT_PROJECT_VERSION = 1;
 				GENERATE_INFOPLIST_FILE = YES;
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.tamiruy.tamirUyMobileFlutter.RunnerTests;
+				PRODUCT_BUNDLE_IDENTIFIER = uz.andozaai.app.RunnerTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Runner.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Runner";
@@ -570,12 +755,38 @@
 				CURRENT_PROJECT_VERSION = 1;
 				GENERATE_INFOPLIST_FILE = YES;
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.tamiruy.tamirUyMobileFlutter.RunnerTests;
+				PRODUCT_BUNDLE_IDENTIFIER = uz.andozaai.app.RunnerTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Runner.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Runner";
 			};
 			name = Profile;
+		};
+		90C48C2D6397102EE682704C /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 52D6D2F5A45642182BEFD187 /* ShareExtension.xcconfig */;
+			buildSettings = {
+				APPLICATION_EXTENSION_API_ONLY = YES;
+				CLANG_ENABLE_OBJC_WEAK = NO;
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = 24GC58FD74;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = ShareExtension/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = uz.andozaai.app.ShareExtension;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 1;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
 		};
 		97C147031CF9000F007C117D /* Debug */ = {
 			isa = XCBuildConfiguration;
@@ -702,11 +913,12 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.tamiruy.tamirUyMobileFlutter;
+				PRODUCT_BUNDLE_IDENTIFIER = uz.andozaai.app;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_OBJC_BRIDGING_HEADER = "Runner/Runner-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 1;
 				VERSIONING_SYSTEM = "apple-generic";
 			};
 			name = Debug;
@@ -725,10 +937,11 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.tamiruy.tamirUyMobileFlutter;
+				PRODUCT_BUNDLE_IDENTIFIER = uz.andozaai.app;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_OBJC_BRIDGING_HEADER = "Runner/Runner-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 1;
 				VERSIONING_SYSTEM = "apple-generic";
 			};
 			name = Release;
@@ -736,6 +949,16 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		2E915A0FFEAB7A20C698E01B /* Build configuration list for PBXNativeTarget "ShareExtension" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				90C48C2D6397102EE682704C /* Release */,
+				07827EAAB581C1CF23F403AF /* Debug */,
+				0C36A4A797825FB1F2DB55E2 /* Profile */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 		331C8087294A63A400263BE5 /* Build configuration list for PBXNativeTarget "RunnerTests" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (

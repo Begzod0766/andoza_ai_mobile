@@ -27,7 +27,7 @@ class _FakePersistence extends RoomPersistenceNotifier {
 class _RecordingScanService implements RoomScanService {
   final calls = <String>[];
   @override
-  Future<Map<String, dynamic>> upload(String roomId, ScanResult scan) async {
+  Future<Map<String, dynamic>> upload(String roomId, ScanResult scan, {String? scanGroup}) async {
     calls.add('upload');
     return {};
   }

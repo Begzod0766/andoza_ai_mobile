@@ -1,3 +1,5 @@
+import 'package:flutter/services.dart';
+
 import '../../l10n/app_localizations.dart';
 import '../../models/business_profile.dart';
 
@@ -22,3 +24,11 @@ String statusLabel(AppLocalizations l10n, ModerationStatus s) => switch (s) {
       ModerationStatus.approved => l10n.businessStatusApproved,
       ModerationStatus.rejected => l10n.businessStatusRejected,
     };
+
+/// Digits only, at most 12 of them (under a trillion so'm). Without the cap a
+/// longer number did not fit an int, `int.tryParse` gave null and the price
+/// was saved as "not given" without a word.
+final priceInputFormatters = <TextInputFormatter>[
+  FilteringTextInputFormatter.digitsOnly,
+  LengthLimitingTextInputFormatter(12),
+];

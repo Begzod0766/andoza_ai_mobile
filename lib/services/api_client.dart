@@ -22,6 +22,7 @@ class ApiClient {
     this.onUnauthorized,
     this.onTokensRefreshed,
     this.onTokensCleared,
+    this.language,
     this.connectTimeout = const Duration(seconds: 10),
     this.receiveTimeout = const Duration(seconds: 30),
   }) {
@@ -54,6 +55,7 @@ class ApiClient {
     // second (attaches the bearer token before logging). Logging last.
     _dio.interceptors.add(_buildRefreshInterceptor());
     _dio.interceptors.add(_AuthInterceptor(() => _authToken, onUnauthorized));
+    if (language != null) _dio.interceptors.add(_LanguageInterceptor(language!));
     // Logging never runs in release, and only when explicitly enabled in debug —
     // it logs methods/paths/status only, never request/response bodies.
     if (kDebugMode && AppConfig.debugLogging) {
@@ -78,6 +80,10 @@ class ApiClient {
   /// Invoked when a refresh attempt fails, so the app can drop the now-dead
   /// persisted tokens.
   final Future<void> Function()? onTokensCleared;
+
+  /// The app's language code (uz/ru/en), sent as `Accept-Language` on every
+  /// request so the server answers (e.g. its error messages) in it.
+  final String Function()? language;
 
   String? _authToken;
   String? _refreshToken;
@@ -271,9 +277,9 @@ class ApiClient {
     }
   }
 
-  Future<void> delete(String path) async {
+  Future<void> delete(String path, {dynamic data}) async {
     try {
-      await _dio.delete<dynamic>(path);
+      await _dio.delete<dynamic>(path, data: data);
     } on DioException catch (e) {
       throw _handleDioError(e);
     }
@@ -476,6 +482,18 @@ class _AuthInterceptor extends Interceptor {
       _onUnauthorized?.call();
     }
     handler.next(err);
+  }
+}
+
+class _LanguageInterceptor extends Interceptor {
+  _LanguageInterceptor(this._language);
+
+  final String Function() _language;
+
+  @override
+  void onRequest(RequestOptions options, RequestInterceptorHandler handler) {
+    options.headers['Accept-Language'] = _language();
+    handler.next(options);
   }
 }
 
