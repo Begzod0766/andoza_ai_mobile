@@ -73,15 +73,21 @@ Future<void> _pump(WidgetTester tester, _FakeArScan fake) async {
 void main() {
   final l10n = lookupAppLocalizations(const Locale('uz'));
 
-  testWidgets('passes the scanner its step, no-floor and keep-measuring copy', (tester) async {
+  testWidgets('passes the scanner its flow copy', (tester) async {
     final fake = _FakeArScan(raw: _scan([[0, 0], [4, 0], [4, 3], [0, 3]]));
     await _pump(tester, fake);
     final s = fake.lastStrings!;
-    expect(s['arScanNoFloorHere'], l10n.arScanNoFloorHere);
-    expect(s['arScanKeepMeasuring'], l10n.arScanKeepMeasuring);
-    expect(s['arScanStepFloor'], l10n.arScanStepFloor);
-    expect(s['arScanStepCorners'], l10n.arScanStepCorners);
-    expect(s['arScanStepHeight'], l10n.arScanStepHeight);
+    for (final e in {
+      'arScanBaseHint': l10n.arScanBaseHint, 'arScanStart': l10n.arScanStart,
+      'arScanCloseRoom': l10n.arScanCloseRoom, 'arScanCreatePlan': l10n.arScanCreatePlan,
+      'arScanDoneHint': l10n.arScanDoneHint, 'arScanPerimeter': l10n.arScanPerimeter,
+      'arScanArea': l10n.arScanArea, 'arScanVolume': l10n.arScanVolume,
+      'arScanUnitCm': l10n.arScanUnitCm, 'arScanUnitM': l10n.arScanUnitM,
+      'arScanNoFloorHere': l10n.arScanNoFloorHere, 'arScanKeepMeasuring': l10n.arScanKeepMeasuring,
+    }.entries) {
+      expect(s[e.key], e.value, reason: e.key);
+    }
+    expect(s.containsKey('arScanStepFloor'), isFalse);
   });
 
   testWidgets('ok scan opens the review with an arcore plan', (tester) async {

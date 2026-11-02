@@ -155,8 +155,18 @@ nusxani olib tashlaydi (`andoza_ai` backend, `room_scan_dedupe`).
 3. Natija `PendingScanStore.saveFlat` ga saqlanadi va `/scanning/roomplan/review-flat` (`FlatScanReviewPage`) ochiladi: xonalar rejada, har biriga nom.
 4. `handoffScannedFlat` (`services/flat_scan_handoff.dart`) hamma xonani bitta kvartirada yaratadi va `layoutPos` ni yozadi; skanerlar bitta `scan_group` bilan yuklanadi (backend ularni bir-birining nusxasi deb o'chirmaydi); studiya butun kvartira bilan ochiladi (`/studio/{birinchi id}`, `focus` siz).
 
-**Android:** `andoza/roomscan` u yerda yo'q, shuning uchun foydalanuvchiga foto
-rejimi yoki xonani chizish taklif qilinadi.
+**Android (ARCore):** `andoza/roomscan` u yerda yo'q, uning o'rnida `andoza/arscan`
+kanali (`arscan/ArScanChannel.kt` → `ArScanActivity`) ishlaydi. Qadamlar: pol topiladi →
+devor bilan pol tutashgan joyga bazaviy nuqta → balandlik yuqoriga tortiladi (yoki
+2.5–3.0 m chiplaridan biri) → burchaklar qo'shiladi, har birida yarim shaffof 3D devor
+o'sadi → "Xonani yopish" yoki birinchi burchakka yaqinlashish → perimetr, maydon, hajm.
+Nishon cheksiz pol tekisligiga tushadi (`FloorRay`), shuning uchun devor yonida va
+mebel ortida ham ishlaydi. Mantiq ARCore'siz bo'laklarda va JVM testlari bilan:
+`ScanFlow` (qadamlar), `FloorPlanCapture` (burchaklar, balandlik, yakun), `FloorRay`,
+`WallGeometry` (proyeksiya va near-plane kesish); `ArOverlayView` faqat chizadi.
+Natija (`corners`, `height`, …) `features/ar_scan/arcore_plan.dart` da tozalanadi va
+odatdagi review sahifasiga boradi. ARCore yo'q qurilmada foto rejimi yoki xonani
+chizish taklif qilinadi.
 
 **Eski kod:** `com.tamir_uy/lidar` kanali (`LidarMethodChannel.swift`, Android
 ARCore `DepthScanActivity.kt`) va uning Dart qismi (`services/lidar_service.dart`,
@@ -164,7 +174,7 @@ ARCore `DepthScanActivity.kt`) va uning Dart qismi (`services/lidar_service.dart
 
 ## Tillar va tema
 
-- **Tillar:** o'zbek (standart), rus va ingliz, har birida 702 ta kalit.
+- **Tillar:** o'zbek (standart), rus va ingliz, har birida 870 ta kalit.
   - Tanlov `SharedPreferences` dagi `app_locale` kalitida saqlanadi.
   - Til sozlamalar ekranida o'zgartiriladi.
   - Batafsil: [../LOCALIZATION.md](../LOCALIZATION.md).

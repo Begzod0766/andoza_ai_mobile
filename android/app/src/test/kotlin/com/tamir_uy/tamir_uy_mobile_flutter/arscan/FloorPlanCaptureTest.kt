@@ -150,4 +150,39 @@ class FloorPlanCaptureTest {
         assertEquals(2, m["trackingLossCount"])
         assertEquals(95, m["durationSec"])
     }
+
+    @Test fun `close appends a copy of the first corner`() {
+        val c = FloorPlanCapture(); square(c)
+        assertTrue(c.close())
+        assertTrue(c.isClosed)
+        assertEquals(5, c.corners.size)
+        assertEquals(c.corners[0], c.corners[4])
+        assertFalse(c.close())
+    }
+
+    @Test fun `close needs three corners`() {
+        val c = FloorPlanCapture()
+        c.addCorner(Vec3(0f, 0f, 0f)); c.addCorner(Vec3(4f, 0f, 0f))
+        assertFalse(c.close()); assertFalse(c.isClosed)
+    }
+
+    @Test fun `reopen after close drops the copy`() {
+        val c = FloorPlanCapture(); square(c); c.close()
+        assertTrue(c.reopen()); assertEquals(4, c.corners.size); assertFalse(c.isClosed)
+    }
+
+    @Test fun `summary of a 4 by 3 room at 2_5 m`() {
+        val c = FloorPlanCapture(); square(c); c.close()
+        val s = c.summary(2.5f)
+        assertEquals(14f, s.perimeterM, 1e-4f)
+        assertEquals(12f, s.areaM2, 1e-4f)
+        assertEquals(30f, s.volumeM3, 1e-4f)
+    }
+
+    @Test fun `rejects a corner within 5 cm of the last`() {
+        val c = FloorPlanCapture()
+        c.addCorner(Vec3(0f, 0f, 0f)); c.addCorner(Vec3(4f, 0f, 0f))
+        assertEquals(AddResult.REJECTED_DUPLICATE, c.addCorner(Vec3(4.03f, 0f, 0.02f)))
+        assertEquals(2, c.corners.size)
+    }
 }

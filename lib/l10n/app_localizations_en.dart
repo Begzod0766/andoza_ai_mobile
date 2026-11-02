@@ -546,7 +546,7 @@ class AppLocalizationsEn extends AppLocalizations {
       'Point the phone at the floor and move it slowly';
 
   @override
-  String get arScanCornersHint => 'Put the target on a floor corner and add it';
+  String get arScanCornersHint => 'Aim at the next corner and add it';
 
   @override
   String get arScanAddCorner => 'Add corner';
@@ -555,21 +555,15 @@ class AppLocalizationsEn extends AppLocalizations {
   String get arScanUndo => 'Undo';
 
   @override
-  String get arScanFinish => 'Done';
-
-  @override
   String get arScanSnapToFirst =>
       'Go back to the first corner to close the outline';
 
   @override
   String get arScanAimCeiling =>
-      'Aim at the ceiling line above the first corner';
+      'Tilt the phone up to pull the line to the ceiling';
 
   @override
   String get arScanConfirm => 'Confirm';
-
-  @override
-  String get arScanEnterManually => 'Enter manually';
 
   @override
   String get arScanExit => 'Exit';
@@ -590,19 +584,41 @@ class AppLocalizationsEn extends AppLocalizations {
   String get arScanCornersLost => 'Some corners were lost — mark them again';
 
   @override
-  String get arScanNoFloorHere => 'Scan the floor first';
+  String get arScanNoFloorHere =>
+      'The aim is off the floor — tilt the phone down';
 
   @override
   String get arScanKeepMeasuring => 'Keep measuring';
 
   @override
-  String get arScanStepFloor => '1/3 — floor';
+  String get arScanBaseHint => 'Aim at a corner where the wall meets the floor';
 
   @override
-  String get arScanStepCorners => '2/3 — corners';
+  String get arScanStart => 'Start';
 
   @override
-  String get arScanStepHeight => '3/3 — height';
+  String get arScanCloseRoom => 'Close the room';
+
+  @override
+  String get arScanCreatePlan => 'Create plan';
+
+  @override
+  String get arScanDoneHint => 'Room is ready. Use ↶ to fix a mistake';
+
+  @override
+  String get arScanPerimeter => 'Perimeter';
+
+  @override
+  String get arScanArea => 'Area';
+
+  @override
+  String get arScanVolume => 'Volume';
+
+  @override
+  String get arScanUnitCm => 'cm';
+
+  @override
+  String get arScanUnitM => 'm';
 
   @override
   String get arScanRescan => 'Measure again';
