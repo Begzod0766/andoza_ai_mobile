@@ -6,6 +6,7 @@ import '../../l10n/app_localizations.dart';
 import '../../models/shop_model.dart';
 import '../../providers/orders_provider.dart';
 import '../../utils/currency.dart';
+import '../../widgets/common/error_view.dart';
 import '../../widgets/empty_state_pattern.dart';
 import '../../widgets/periodic_refresh.dart';
 
@@ -27,9 +28,12 @@ class _E6OrdersScreenState extends ConsumerState<E6OrdersScreen> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     // valueOrNull keeps the previous list while a periodic refresh reloads.
-    final List<ShopOrder> orders =
-        ref.watch(serverOrdersProvider).valueOrNull ??
-        ref.watch(ordersProvider);
+    final server = ref.watch(serverOrdersProvider);
+    final local = ref.watch(ordersProvider);
+    final List<ShopOrder> orders = server.valueOrNull ?? local;
+    // Before the first answer: "no orders" would be a lie (the user may have
+    // some), so show progress — or the error — unless local ones exist.
+    final firstLoad = !server.hasValue && local.isEmpty;
     final visible = _filter == null
         ? orders
         : orders.where((o) => o.currentStep == _filter).toList();
@@ -50,10 +54,10 @@ class _E6OrdersScreenState extends ConsumerState<E6OrdersScreen> {
               horizontal: DesignTokens.screenPaddingHorizontal,
               vertical: DesignTokens.spacingSm,
             ),
-            child: SizedBox(
-              height: 40,
-              child: ListView(
-                scrollDirection: Axis.horizontal,
+            // Sized by its chips, so large system text doesn't clip them.
+            child: SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: Row(
                 children: [
                   _FilterChip(
                     label: l10n.shopFilterAll,
@@ -80,28 +84,49 @@ class _E6OrdersScreenState extends ConsumerState<E6OrdersScreen> {
             ),
           ),
           Expanded(
-            child: visible.isEmpty
-                ? Padding(
-                    padding: const EdgeInsets.all(
-                      DesignTokens.screenPaddingHorizontal,
-                    ),
-                    child: Center(
-                      child: EmptyStatePattern(
-                        icon: Icons.shopping_bag_outlined,
-                        title: l10n.profileOrdersEmptyTitle,
-                        message: l10n.profileOrdersEmptyMessage,
-                      ),
-                    ),
+            child: firstLoad && server.hasError
+                ? ErrorView(
+                    error: server.error,
+                    onRetry: () => ref.invalidate(serverOrdersProvider),
                   )
-                : ListView.separated(
-                    padding: const EdgeInsets.all(
-                      DesignTokens.screenPaddingHorizontal,
-                    ),
-                    itemCount: visible.length,
-                    separatorBuilder: (_, _) =>
-                        const SizedBox(height: DesignTokens.spacingSm),
-                    itemBuilder: (context, index) =>
-                        _OrderCard(order: visible[index]),
+                : firstLoad
+                ? const Center(child: CircularProgressIndicator())
+                : RefreshIndicator(
+                    onRefresh: () => ref.refresh(serverOrdersProvider.future),
+                    child: visible.isEmpty
+                        ? LayoutBuilder(
+                            builder: (context, box) => ListView(
+                              physics: const AlwaysScrollableScrollPhysics(),
+                              children: [
+                                ConstrainedBox(
+                                  constraints: BoxConstraints(minHeight: box.maxHeight),
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(
+                                      DesignTokens.screenPaddingHorizontal,
+                                    ),
+                                    child: Center(
+                                      child: EmptyStatePattern(
+                                        icon: Icons.shopping_bag_outlined,
+                                        title: l10n.profileOrdersEmptyTitle,
+                                        message: l10n.profileOrdersEmptyMessage,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          )
+                        : ListView.separated(
+                            physics: const AlwaysScrollableScrollPhysics(),
+                            padding: const EdgeInsets.all(
+                              DesignTokens.screenPaddingHorizontal,
+                            ),
+                            itemCount: visible.length,
+                            separatorBuilder: (_, _) =>
+                                const SizedBox(height: DesignTokens.spacingSm),
+                            itemBuilder: (context, index) =>
+                                _OrderCard(order: visible[index]),
+                          ),
                   ),
           ),
         ],
