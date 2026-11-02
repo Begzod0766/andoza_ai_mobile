@@ -163,7 +163,8 @@ String _mapStatus(int? statusCode) {
 }
 
 /// Like [mapErrorToMessage], but when the server explained a 400/403/409 itself
-/// (FastAPI `{"detail": "..."}`, in Uzbek) that sentence is shown instead of
+/// (FastAPI `{"detail": "..."}`, already in the app's language — the backend
+/// translates it by the `Accept-Language` the app sends) that sentence is shown instead of
 /// the generic status text — "which line was refused" beats "invalid data".
 ///
 /// A 422 comes in two shapes: a plain sentence (a value the database refused,

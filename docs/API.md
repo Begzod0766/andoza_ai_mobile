@@ -21,7 +21,7 @@ Studio "Frame load interrupted" bilan ochilmaydi (handoff §9.1).
   - Ikkala tokenni yangilab, so'rovni bir marta qaytaradi.
   - Bir vaqtda kelgan bir nechta 401 bitta yangilashga birlashadi.
   - Yangilash muvaffaqiyatsiz bo'lsa, tokenlar o'chiriladi va foydalanuvchi login sahifasiga qaytariladi.
-- **Xatolar:** `ApiException` ga o'raladi. Foydalanuvchiga ko'rinadigan matnni `utils/error_mapper.dart` beradi, ilova tilida (`error*` ARB kalitlari; tilni `MyApp` `setErrorMessagesLocale` bilan beradi). Serverning `detail` matni (`mapErrorWithServerDetail`) hozircha o'zbekcha keladi.
+- **Xatolar:** `ApiException` ga o'raladi. Foydalanuvchiga ko'rinadigan matnni `utils/error_mapper.dart` beradi, ilova tilida (`error*` ARB kalitlari; tilni `MyApp` `setErrorMessagesLocale` bilan beradi). Serverning `detail` matni (`mapErrorWithServerDetail`) ham ilova tilida keladi: ilova har so'rovga `Accept-Language` qo'yadi, backend uni `app/i18n/messages.py` jadvali bo'yicha tarjima qiladi.
 - **Til:** har bir so'rov `Accept-Language: uz|ru|en` (ilova tili) bilan ketadi, shuning uchun server xato matnlarini shu tilda qaytaradi. Tanlangan til akkauntga `PATCH /auth/me {language}` bilan yoziladi.
 - **Log:** faqat debug rejimida, faqat metod, yo'l va status. So'rov va javob tanasi log qilinmaydi.
 - **Tokenlar:** `flutter_secure_storage` da (`services/secure_storage.dart`), kalitlar `auth_token`, `refresh_token`, `user_id`.
