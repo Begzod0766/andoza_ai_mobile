@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:path_provider/path_provider.dart';
+import '../../utils/error_mapper.dart';
 import '../../config/design_tokens.dart';
 import '../../features/ar_scan/ar_scan_service.dart';
 import '../../l10n/app_localizations.dart';
@@ -94,7 +95,7 @@ class _E9PreferencesSettingsScreenState
     } catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(l10n.settingsCacheClearFailedMessage(e.toString()))),
+        SnackBar(content: Text(l10n.settingsCacheClearFailedMessage(mapErrorToMessage(e)))),
       );
     } finally {
       if (mounted) setState(() => _clearingCache = false);

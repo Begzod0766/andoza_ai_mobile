@@ -11,6 +11,7 @@ import 'services/push_router.dart';
 import 'services/push_service.dart';
 import 'services/session_telemetry.dart';
 import 'services/share_intent.dart';
+import 'utils/error_mapper.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -30,6 +31,8 @@ class MyApp extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final router = ref.watch(routerProvider);
     final locale = ref.watch(localeProvider);
+    // Error texts are built outside the widget tree; keep them in step.
+    setErrorMessagesLocale(locale);
     ref.watch(sessionTelemetryProvider);
     ref.watch(pushRegistrationProvider);
     ref.watch(accountLanguageSyncProvider);

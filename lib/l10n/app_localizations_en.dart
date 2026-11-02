@@ -2811,4 +2811,35 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get scanCoachKeepGoing => 'Keep scanning';
+
+  @override
+  String get errorNoInternet =>
+      'No internet connection. Check your connection.';
+
+  @override
+  String get errorTimeout => 'The server didn\'t respond. Try again.';
+
+  @override
+  String get errorValidation =>
+      'Some of the details are invalid. Check them and try again.';
+
+  @override
+  String get errorSession => 'Your session has ended. Please sign in again.';
+
+  @override
+  String get errorForbidden => 'You aren\'t allowed to do this.';
+
+  @override
+  String get errorNotFound => 'Not found.';
+
+  @override
+  String get errorConflict =>
+      'The data has changed in the meantime. Please try again.';
+
+  @override
+  String get errorServer =>
+      'Something went wrong on the server. Try again a bit later.';
+
+  @override
+  String get errorGeneric => 'Something went wrong. Try again.';
 }

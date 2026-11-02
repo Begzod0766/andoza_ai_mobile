@@ -132,7 +132,7 @@ class _RoomScanReviewPageState extends ConsumerState<RoomScanReviewPage> {
       }
     } catch (e) {
       _logger.e('roomscan continue failed', error: e);
-      messenger.showSnackBar(SnackBar(content: Text(l10n.scanReviewError('$e'))));
+      messenger.showSnackBar(SnackBar(content: Text(mapErrorToMessage(e))));
       if (mounted) setState(() => _busy = false);
     }
   }

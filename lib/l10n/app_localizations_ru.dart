@@ -2811,4 +2811,33 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get scanCoachKeepGoing => 'Продолжайте сканирование';
+
+  @override
+  String get errorNoInternet =>
+      'Нет подключения к интернету. Проверьте соединение.';
+
+  @override
+  String get errorTimeout => 'Сервер не ответил. Попробуйте ещё раз.';
+
+  @override
+  String get errorValidation =>
+      'Введены неверные данные. Проверьте и введите заново.';
+
+  @override
+  String get errorSession => 'Сессия истекла. Войдите снова.';
+
+  @override
+  String get errorForbidden => 'У вас нет прав на это действие.';
+
+  @override
+  String get errorNotFound => 'Данные не найдены.';
+
+  @override
+  String get errorConflict => 'Конфликт данных. Попробуйте ещё раз.';
+
+  @override
+  String get errorServer => 'Ошибка на сервере. Попробуйте чуть позже.';
+
+  @override
+  String get errorGeneric => 'Произошла ошибка. Попробуйте ещё раз.';
 }
