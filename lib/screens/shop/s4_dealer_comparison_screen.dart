@@ -92,11 +92,10 @@ class _S4DealerComparisonScreenState
             ),
           ),
           const SizedBox(height: DesignTokens.spacingMd),
-          SizedBox(
-            height: 40,
-            child: ListView(
+          // Sized by its chips (no fixed 40 px), so large text doesn't clip them.
+          SingleChildScrollView(
               scrollDirection: Axis.horizontal,
-              children: [
+              child: Row(children: [
                 _FilterChip(
                   label: l10n.shopFilterAll,
                   selected: _filter == _DealerFilter.all,
@@ -277,7 +276,13 @@ class _DealerCard extends StatelessWidget {
             ],
           ),
           const SizedBox(height: DesignTokens.spacingSm),
-          Row(
+          // Price and button share a line while they fit; at large text the
+          // button drops below instead of overflowing.
+          Wrap(
+            alignment: WrapAlignment.spaceBetween,
+            crossAxisAlignment: WrapCrossAlignment.center,
+            spacing: DesignTokens.spacingSm,
+            runSpacing: DesignTokens.spacingSm,
             children: [
               Text(
                 '${formatSom(dealer.pricePerUnit)} / $unit',
@@ -285,10 +290,10 @@ class _DealerCard extends StatelessWidget {
                   color: DesignTokens.primaryBlue,
                 ),
               ),
-              const Spacer(),
               ElevatedButton(
                 onPressed: onSelect,
                 style: ElevatedButton.styleFrom(
+                  minimumSize: const Size(0, 48),
                   padding: const EdgeInsets.symmetric(
                     horizontal: DesignTokens.spacingLg,
                   ),

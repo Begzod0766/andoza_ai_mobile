@@ -124,14 +124,13 @@ class _E10SearchResultsScreenState
               ),
             ),
           ),
-          SizedBox(
-            height: 40,
-            child: ListView(
+          // Sized by its chips (no fixed 40 px), so large text doesn't clip them.
+          SingleChildScrollView(
               scrollDirection: Axis.horizontal,
               padding: const EdgeInsets.symmetric(
                 horizontal: DesignTokens.screenPaddingHorizontal,
               ),
-              children: [
+              child: Row(children: [
                 _FilterChip(
                   label: l10n.shopFilterAll,
                   selected: _filter == _ResultFilter.all,
