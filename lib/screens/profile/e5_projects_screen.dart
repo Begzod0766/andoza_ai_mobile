@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import '../projects/project_menu.dart';
 import '../../config/design_tokens.dart';
 import '../../l10n/app_localizations.dart';
 import '../../models/design_selection_model.dart';
@@ -255,6 +256,7 @@ class _ProjectCard extends StatelessWidget {
                     ),
                   ),
                 ),
+                ProjectMenuButton(project: project),
               ],
             ),
             Text(

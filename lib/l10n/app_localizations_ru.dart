@@ -2840,4 +2840,43 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get errorGeneric => 'Произошла ошибка. Попробуйте ещё раз.';
+
+  @override
+  String get projectMenuTooltip => 'Действия с проектом';
+
+  @override
+  String get projectRename => 'Переименовать';
+
+  @override
+  String get projectRooms => 'Комнаты';
+
+  @override
+  String get projectDelete => 'Удалить проект';
+
+  @override
+  String get projectRenameTitle => 'Название проекта';
+
+  @override
+  String get roomRenameTitle => 'Название комнаты';
+
+  @override
+  String get projectDeleteTitle => 'Удалить проект?';
+
+  @override
+  String projectDeleteBody(String name, int rooms) {
+    return 'Проект «$name» и его комнаты ($rooms) будут удалены навсегда. Это нельзя отменить.';
+  }
+
+  @override
+  String get roomDeleteTitle => 'Удалить комнату?';
+
+  @override
+  String roomDeleteBody(String name) {
+    return 'Комната «$name» и её дизайн будут удалены навсегда. Это нельзя отменить.';
+  }
+
+  @override
+  String roomMenuTooltip(String name) {
+    return 'Действия: «$name»';
+  }
 }

@@ -35,7 +35,7 @@ Hammasi `/api/v1` ga nisbatan. Har bir mavzu uchun bitta repository fayli (`lib/
 | Mavzu | So'rovlar | Fayl |
 |---|---|---|
 | Kirish | `POST /auth/login`, `/auth/register`, `/auth/otp/request`, `/auth/otp/verify`, `/auth/google` (`id_token`), `/auth/apple` (`identity_token`, `name` faqat birinchi kirishda; faqat iOS), `/auth/refresh`, `/auth/logout`, `/auth/delete-account`; `GET /auth/me`, `PATCH /auth/me` (`language`) | `auth_repository.dart`, `services/api_client.dart` |
-| Kvartira va xonalar | `GET/POST /apartments`; `GET/PATCH/DELETE /apartments/{id}`; `GET/POST /apartments/{id}/rooms`; `GET/PATCH/DELETE /rooms/{id}` | `apartment_repository.dart` |
+| Kvartira va xonalar | `GET/POST /apartments`; `GET/PATCH/DELETE /apartments/{id}`; `GET/POST /apartments/{id}/rooms`; `GET/PATCH/DELETE /rooms/{id}` (loyiha/xona nomini o'zgartirish va o'chirish: kartochkadagi "⋮", `screens/projects/project_menu.dart`) | `apartment_repository.dart` |
 | Xona holati | `GET/POST/PATCH /rooms/{id}/state`; `GET /rooms/{id}/delta` | `room_state_repository.dart` |
 | Bezak va elektr | `GET/PUT /rooms/{id}/decoration`; `GET/PUT /rooms/{id}/electrical` | `decoration_repository.dart`, `electrical_repository.dart` |
 | Smeta | `POST /rooms/{id}/estimate/preview`, `POST /rooms/{id}/estimate`; `GET /rooms/{id}/estimates`, `GET /estimates/{id}`; `GET /rooms/{id}/estimate/pdf` | `estimate_repository.dart` |

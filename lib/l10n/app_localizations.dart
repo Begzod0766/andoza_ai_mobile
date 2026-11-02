@@ -5223,6 +5223,72 @@ abstract class AppLocalizations {
   /// In uz, this message translates to:
   /// **'Xatolik yuz berdi. Qayta urinib ko\'ring.'**
   String get errorGeneric;
+
+  /// Project card: tooltip of the ⋮ menu button
+  ///
+  /// In uz, this message translates to:
+  /// **'Loyiha amallari'**
+  String get projectMenuTooltip;
+
+  /// Project/room menu: rename
+  ///
+  /// In uz, this message translates to:
+  /// **'Nomini o\'zgartirish'**
+  String get projectRename;
+
+  /// Project menu: opens the list of the project's rooms
+  ///
+  /// In uz, this message translates to:
+  /// **'Xonalar'**
+  String get projectRooms;
+
+  /// Project menu: delete the project
+  ///
+  /// In uz, this message translates to:
+  /// **'Loyihani o\'chirish'**
+  String get projectDelete;
+
+  /// Rename dialog title for a project
+  ///
+  /// In uz, this message translates to:
+  /// **'Loyiha nomi'**
+  String get projectRenameTitle;
+
+  /// Rename dialog title for a room
+  ///
+  /// In uz, this message translates to:
+  /// **'Xona nomi'**
+  String get roomRenameTitle;
+
+  /// Confirm dialog title before deleting a project
+  ///
+  /// In uz, this message translates to:
+  /// **'Loyihani o\'chirasizmi?'**
+  String get projectDeleteTitle;
+
+  /// Confirm dialog body before deleting a project
+  ///
+  /// In uz, this message translates to:
+  /// **'«{name}» va undagi {rooms} ta xona butunlay o\'chiriladi. Buni qaytarib bo\'lmaydi.'**
+  String projectDeleteBody(String name, int rooms);
+
+  /// Confirm dialog title before deleting a room
+  ///
+  /// In uz, this message translates to:
+  /// **'Xonani o\'chirasizmi?'**
+  String get roomDeleteTitle;
+
+  /// Confirm dialog body before deleting a room
+  ///
+  /// In uz, this message translates to:
+  /// **'«{name}» xonasi va uning dizayni butunlay o\'chiriladi. Buni qaytarib bo\'lmaydi.'**
+  String roomDeleteBody(String name);
+
+  /// Rooms sheet: tooltip of a room's ⋮ menu
+  ///
+  /// In uz, this message translates to:
+  /// **'«{name}» amallari'**
+  String roomMenuTooltip(String name);
 }
 
 class _AppLocalizationsDelegate

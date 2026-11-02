@@ -2788,5 +2788,16 @@
   "errorNotFound": "Данные не найдены.",
   "errorConflict": "Конфликт данных. Попробуйте ещё раз.",
   "errorServer": "Ошибка на сервере. Попробуйте чуть позже.",
-  "errorGeneric": "Произошла ошибка. Попробуйте ещё раз."
+  "errorGeneric": "Произошла ошибка. Попробуйте ещё раз.",
+  "projectMenuTooltip": "Действия с проектом",
+  "projectRename": "Переименовать",
+  "projectRooms": "Комнаты",
+  "projectDelete": "Удалить проект",
+  "projectRenameTitle": "Название проекта",
+  "roomRenameTitle": "Название комнаты",
+  "projectDeleteTitle": "Удалить проект?",
+  "projectDeleteBody": "Проект «{name}» и его комнаты ({rooms}) будут удалены навсегда. Это нельзя отменить.",
+  "roomDeleteTitle": "Удалить комнату?",
+  "roomDeleteBody": "Комната «{name}» и её дизайн будут удалены навсегда. Это нельзя отменить.",
+  "roomMenuTooltip": "Действия: «{name}»"
 }

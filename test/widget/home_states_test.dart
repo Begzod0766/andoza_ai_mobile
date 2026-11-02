@@ -6,6 +6,7 @@ import 'package:flutter_test/flutter_test.dart';
 // tests use (alongside HomeEmptyBody from the same file).
 import 'package:tamir_uy_mobile_flutter/screens/home/home_empty_screen.dart';
 import 'package:tamir_uy_mobile_flutter/screens/home/home_with_projects_screen.dart';
+import 'package:tamir_uy_mobile_flutter/screens/projects/project_menu.dart';
 import 'package:tamir_uy_mobile_flutter/utils/error_mapper.dart';
 import 'package:tamir_uy_mobile_flutter/widgets/common/error_view.dart';
 import 'package:tamir_uy_mobile_flutter/widgets/common/skeleton_loader.dart';
@@ -105,5 +106,11 @@ void main() {
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 50));
     expect(find.byType(RefreshIndicator), findsOneWidget);
+  });
+
+  testWidgets('each project card has the ⋮ menu', (tester) async {
+    await _pumpWithProjects(tester, AsyncData([_project('Mening loyiham')]));
+    await tester.pumpAndSettle();
+    expect(find.byType(ProjectMenuButton), findsOneWidget);
   });
 }
