@@ -6,25 +6,19 @@ import android.app.AlertDialog
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Color
-import android.graphics.drawable.GradientDrawable
 import android.opengl.GLES20
 import android.opengl.GLSurfaceView
 import android.os.Bundle
 import android.os.SystemClock
 import android.util.Log
-import android.view.Gravity
-import android.view.View
-import android.widget.Button
+import android.view.HapticFeedbackConstants
 import android.widget.FrameLayout
-import android.widget.LinearLayout
-import android.widget.TextView
 import com.google.ar.core.Anchor
 import com.google.ar.core.ArCoreApk
 import com.google.ar.core.Config
-import com.google.ar.core.HitResult
 import com.google.ar.core.Plane
+import com.google.ar.core.Pose
 import com.google.ar.core.Session
-import com.google.ar.core.TrackingFailureReason
 import com.google.ar.core.TrackingState
 import com.google.ar.core.exceptions.CameraNotAvailableException
 import com.google.ar.core.exceptions.UnavailableApkTooOldException
@@ -34,16 +28,20 @@ import com.google.ar.core.exceptions.UnavailableUserDeclinedInstallationExceptio
 import com.tamir_uy.tamir_uy_mobile_flutter.BackgroundRenderer
 import org.json.JSONArray
 import org.json.JSONObject
+import java.util.Locale
 import javax.microedition.khronos.egl.EGLConfig
 import javax.microedition.khronos.opengles.GL10
+import kotlin.math.hypot
 
 /**
- * Full-screen ARCore floor-plan scanner: find the floor → tap the corners
- * (snapping onto the first closes the outline) → aim at the ceiling line for
- * the height. Returns [FloorPlanCapture.toResult] as JSON in [EXTRA_RESULT].
+ * Full-screen ARCore room scanner: find the floor → base point where a wall
+ * meets the floor → pull the height up → add corners while 3D walls grow →
+ * done. Steps and copy come from [ScanFlow]; walls are projected by
+ * [WallGeometry] and drawn by [ArOverlayView]. Returns
+ * [FloorPlanCapture.toResult] as JSON in [EXTRA_RESULT].
  *
- * Threading: ARCore and [capture] live on the GL thread; button taps are
- * queued onto it with [GLSurfaceView.queueEvent]; UI updates go back with
+ * Threading: ARCore, [flow] and [anchors] live on the GL thread; button taps
+ * are queued onto it with [GLSurfaceView.queueEvent]; UI updates go back with
  * [runOnUiThread].
  */
 class ArScanActivity : Activity(), GLSurfaceView.Renderer {
@@ -55,64 +53,60 @@ class ArScanActivity : Activity(), GLSurfaceView.Renderer {
         const val EXTRA_ERROR_MESSAGE = "errorMessage"
         private const val CAMERA_REQUEST = 4202
         private const val FLOOR_HINT_AFTER_MS = 20_000L
-        private const val NOTICE_MS = 2_500L
-        private val PRESET_HEIGHTS = floatArrayOf(2.5f, 2.7f, 2.8f, 3.0f, 3.2f)
+        private val PRESET_HEIGHTS = floatArrayOf(2.5f, 2.7f, 2.8f, 3.0f)
         private const val TAG = "ArScan"
     }
-
-    private enum class Step { FIND_FLOOR, CORNERS, HEIGHT }
 
     // Fallbacks only; Flutter passes the copy in the user's language.
     private val fallback = mapOf(
         "arScanFindFloor" to "Telefonni polga qaratib sekin aylantiring",
-        "arScanAddCorner" to "Burchak qo'shish",
-        "arScanUndo" to "Bekor qilish",
-        "arScanFinish" to "Tayyor",
-        "arScanAimCeiling" to "Birinchi burchak ustidagi shift chizig'iga qarating",
+        "arScanFloorHint" to "Yorug'roq joyda, gilam yoki naqshli polga qarating",
+        "arScanBaseHint" to "Nishonni devor va pol tutashgan burchakka qo'ying",
+        "arScanStart" to "Boshlash",
+        "arScanAimCeiling" to "Telefonni yuqoriga burib, chiziqni shiftgacha torting",
         "arScanConfirm" to "Tasdiqlash",
-        "arScanEnterManually" to "Qo'lda kiritish",
+        "arScanCornersHint" to "Nishonni keyingi burchakka qo'yib, burchak qo'shing",
+        "arScanSnapToFirst" to "Birinchi burchakka yaqinlashing — kontur yopiladi",
+        "arScanAddCorner" to "Burchak qo'shish",
+        "arScanCloseRoom" to "Xonani yopish",
+        "arScanDoneHint" to "Xona tayyor. Xato bo'lsa, ↶ bilan qayting",
+        "arScanCreatePlan" to "Rejani yaratish",
+        "arScanUndo" to "Bekor qilish",
         "arScanExit" to "Chiqish",
         "arScanExitConfirm" to "O'lchovni to'xtatasizmi? Belgilangan burchaklar yo'qoladi.",
-        "arScanTrackingLost" to "Yorug'lik kam yoki telefon tez harakatlandi",
-        "arScanFloorHint" to "Yorug'roq joyda, gilam yoki naqshli polga qarating",
-        "arScanSnapToFirst" to "Birinchi burchakka yaqinlashing — kontur yopiladi",
-        "arScanCornersHint" to "Nishonni pol burchagiga keltirib, burchak qo'shing",
-        "arScanCornersLost" to "Ba'zi burchaklar yo'qoldi — ularni qayta belgilang",
-        "arScanNoFloorHere" to "Avval polni skaner qiling",
         "arScanKeepMeasuring" to "O'lchashni davom ettirish",
-        "arScanStepFloor" to "1/3 — pol",
-        "arScanStepCorners" to "2/3 — burchaklar",
-        "arScanStepHeight" to "3/3 — balandlik",
+        "arScanTrackingLost" to "Yorug'lik kam yoki telefon tez harakatlandi",
+        "arScanCornersLost" to "Ba'zi burchaklar yo'qoldi — ularni qayta belgilang",
+        "arScanNoFloorHere" to "Nishon polga tushmayapti — telefonni pastroq qarating",
+        "arScanPerimeter" to "Perimetr",
+        "arScanArea" to "Maydon",
+        "arScanVolume" to "Hajm",
+        "arScanUnitCm" to "sm",
+        "arScanUnitM" to "m",
     )
     private lateinit var strings: Map<String, String>
     private fun s(key: String) = strings[key] ?: fallback[key] ?: key
 
     private lateinit var surface: GLSurfaceView
     private lateinit var overlay: ArOverlayView
-    private lateinit var hint: TextView
-    private lateinit var stepLabel: TextView
-    private lateinit var leftButton: Button
-    private lateinit var mainButton: Button
-    private lateinit var rightButton: Button
+    private lateinit var chrome: ArScanChrome
 
     private var session: Session? = null
     private var installRequested = false
     private val background = BackgroundRenderer()
 
-    // GL-thread state.
-    private val capture = FloorPlanCapture()
+    // GL-thread state. One anchor per corner in flow.capture, in order.
+    private val flow = ScanFlow()
     private val anchors = mutableListOf<Anchor>()
-    private var lastFloorHit: HitResult? = null
+    private var reticle: Vec3? = null
+    // The lowest tracked upward plane until the base point fixes the floor.
+    private var floorCandidateY: Float? = null
     @Volatile private var liveHeight: Float? = null
     @Volatile private var tracking = false
     private var wasTracking = false
-    @Volatile private var step = Step.FIND_FLOOR
     // Set when anchors stopped tracking and corners were dropped; stays up
-    // until the user adds or undoes a corner (a one-frame hint is never seen).
+    // until the user's next action (a one-frame hint is never seen).
     @Volatile private var cornersLost = false
-    // "Add corner" tapped with no floor under the reticle: a short notice
-    // ("Avval polni skaner qiling") until this time (elapsedRealtime).
-    @Volatile private var noFloorUntil = 0L
     private var viewportW = 0
     private var viewportH = 0
     private var viewportChanged = false
@@ -134,104 +128,22 @@ class ArScanActivity : Activity(), GLSurfaceView.Renderer {
             renderMode = GLSurfaceView.RENDERMODE_CONTINUOUSLY
         }
         overlay = ArOverlayView(this)
+        chrome = ArScanChrome(this, ::s, PRESET_HEIGHTS).apply {
+            onExit = ::confirmExit
+            onUndo = ::onUndo
+            onMain = ::onMain
+            onCloseRoom = ::onCloseRoom
+            onChip = ::onChip
+        }
         root.addView(surface, FrameLayout.LayoutParams(-1, -1))
         root.addView(overlay, FrameLayout.LayoutParams(-1, -1))
-        root.addView(buildChrome(), FrameLayout.LayoutParams(-1, -1))
+        root.addView(chrome.root, FrameLayout.LayoutParams(-1, -1))
         setContentView(root)
-        render()
+        chrome.bind(flow.ui(tracking = false, reticle = null, liveHeight = null), s("arScanFindFloor"), null)
 
         if (checkSelfPermission(Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
             requestPermissions(arrayOf(Manifest.permission.CAMERA), CAMERA_REQUEST)
         }
-    }
-
-    // ── chrome ────────────────────────────────────────────────────────────
-    private fun dp(v: Int) = (v * resources.displayMetrics.density).toInt()
-
-    private fun pill(fill: Int) = GradientDrawable().apply { cornerRadius = dp(28).toFloat(); setColor(fill) }
-
-    private fun button(primary: Boolean) = Button(this).apply {
-        isAllCaps = false
-        textSize = 15f
-        setTextColor(Color.WHITE)
-        background = pill(if (primary) Color.rgb(40, 80, 208) else Color.argb(150, 0, 0, 0))
-        setPadding(dp(18), 0, dp(18), 0)
-        minHeight = dp(52)
-    }
-
-    private fun buildChrome(): View {
-        val chrome = FrameLayout(this)
-        val top = LinearLayout(this).apply {
-            orientation = LinearLayout.VERTICAL
-            setPadding(dp(16), dp(48), dp(16), dp(8))
-        }
-        val exit = TextView(this).apply {
-            text = "✕  ${s("arScanExit")}"
-            setTextColor(Color.WHITE)
-            textSize = 15f
-            setPadding(dp(14), dp(8), dp(14), dp(8))
-            background = pill(Color.argb(150, 0, 0, 0))
-            setOnClickListener { confirmExit() }
-        }
-        stepLabel = TextView(this).apply { setTextColor(Color.WHITE); textSize = 13f; setPadding(0, dp(12), 0, 0) }
-        hint = TextView(this).apply {
-            setTextColor(Color.WHITE); textSize = 16f
-            setPadding(dp(14), dp(10), dp(14), dp(10))
-            background = pill(Color.argb(150, 0, 0, 0))
-        }
-        top.addView(exit, LinearLayout.LayoutParams(-2, -2))
-        top.addView(stepLabel)
-        top.addView(hint, LinearLayout.LayoutParams(-1, -2).apply { topMargin = dp(8) })
-        chrome.addView(top, FrameLayout.LayoutParams(-1, -2, Gravity.TOP))
-
-        val bottom = LinearLayout(this).apply {
-            orientation = LinearLayout.HORIZONTAL
-            gravity = Gravity.CENTER
-            setPadding(dp(16), dp(8), dp(16), dp(36))
-        }
-        leftButton = button(false).apply { setOnClickListener { onLeft() } }
-        mainButton = button(true).apply { setOnClickListener { onMain() } }
-        rightButton = button(false).apply { setOnClickListener { onRight() } }
-        val lp = { w: Float -> LinearLayout.LayoutParams(0, -2, w).apply { marginStart = dp(4); marginEnd = dp(4) } }
-        bottom.addView(leftButton, lp(1f))
-        bottom.addView(mainButton, lp(1.4f))
-        bottom.addView(rightButton, lp(1f))
-        chrome.addView(bottom, FrameLayout.LayoutParams(-1, -2, Gravity.BOTTOM))
-        return chrome
-    }
-
-    /** UI from the current state (UI thread). */
-    private fun render(
-        trackingHint: String? = null,
-        snapping: Boolean = false,
-        n: Int = 0,
-        height: Float? = null,
-        notice: String? = null, // informational: shown, but doesn't block adding corners
-    ) {
-        stepLabel.text = when (step) {
-            Step.FIND_FLOOR -> s("arScanStepFloor")
-            Step.CORNERS -> s("arScanStepCorners")
-            Step.HEIGHT -> s("arScanStepHeight")
-        }
-        hint.text = trackingHint ?: notice ?: when (step) {
-            Step.FIND_FLOOR ->
-                if (SystemClock.elapsedRealtime() - startedAt > FLOOR_HINT_AFTER_MS) s("arScanFloorHint") else s("arScanFindFloor")
-            Step.CORNERS -> if (snapping) s("arScanSnapToFirst") else s("arScanCornersHint")
-            Step.HEIGHT -> height?.let { "${s("arScanAimCeiling")} · ${ArOverlayView.metres(it)}" } ?: s("arScanAimCeiling")
-        }
-        when (step) {
-            Step.FIND_FLOOR, Step.CORNERS -> {
-                leftButton.text = s("arScanUndo"); leftButton.isEnabled = n > 0
-                mainButton.text = s("arScanAddCorner"); mainButton.isEnabled = step == Step.CORNERS && trackingHint == null
-                rightButton.text = s("arScanFinish"); rightButton.isEnabled = n >= 3
-            }
-            Step.HEIGHT -> {
-                leftButton.text = s("arScanUndo"); leftButton.isEnabled = true
-                mainButton.text = s("arScanConfirm"); mainButton.isEnabled = height != null
-                rightButton.text = s("arScanEnterManually"); rightButton.isEnabled = true
-            }
-        }
-        listOf(leftButton, mainButton, rightButton).forEach { it.alpha = if (it.isEnabled) 1f else 0.45f }
     }
 
     // ── actions (UI thread → GL thread) ────────────────────────────────────
@@ -244,54 +156,57 @@ class ArScanActivity : Activity(), GLSurfaceView.Renderer {
         }
     }
 
+    private fun haptic(constant: Int) = runOnUiThread { overlay.performHapticFeedback(constant) }
+
+    /** GL thread: a world anchor on the floor under the reticle. */
+    private fun anchorAtReticle(): Anchor? {
+        val p = reticle ?: return null
+        if (!tracking) return null
+        return session?.createAnchor(Pose.makeTranslation(p.x, p.y, p.z))
+    }
+
+    private fun Anchor.vec() = Vec3(pose.tx(), pose.ty(), pose.tz())
+
     private fun onMain() = onGl {
-        when (step) {
-            Step.FIND_FLOOR, Step.CORNERS -> addCorner()
-            Step.HEIGHT -> liveHeight?.let { finishWith(it, measured = true) }
-        }
-    }
-
-    private fun onLeft() = onGl {
         cornersLost = false
-        if (step == Step.HEIGHT) {
-            // Reopen in one tap: a snap-closed outline drops its closing tap
-            // (and that anchor), so "add corner" works straight away.
-            if (capture.reopen()) anchors.removeLastOrNull()?.detach()
-            step = Step.CORNERS
-        } else if (capture.undo()) {
-            anchors.removeLastOrNull()?.detach()
+        when (flow.step) {
+            ScanStep.FIND_FLOOR -> Unit
+            ScanStep.BASE -> {
+                val anchor = anchorAtReticle() ?: return@onGl
+                if (flow.placeBase(anchor.vec())) {
+                    anchors.add(anchor); haptic(HapticFeedbackConstants.VIRTUAL_KEY)
+                } else {
+                    anchor.detach()
+                }
+            }
+            ScanStep.HEIGHT -> liveHeight?.let { flow.confirmHeight(it, measured = true) }
+            ScanStep.WALLS -> {
+                val anchor = anchorAtReticle() ?: return@onGl
+                when (flow.addCorner(anchor.vec())) {
+                    AddResult.ADDED -> { anchors.add(anchor); haptic(HapticFeedbackConstants.VIRTUAL_KEY) }
+                    AddResult.CLOSED -> { anchors.add(anchor); haptic(HapticFeedbackConstants.LONG_PRESS) }
+                    AddResult.REJECTED_CLOSED, AddResult.REJECTED_DUPLICATE -> anchor.detach()
+                }
+            }
+            ScanStep.DONE -> flow.height?.let { finishWith(it, flow.heightMeasured) }
         }
     }
 
-    private fun onRight() {
-        if (step == Step.HEIGHT) {
-            val labels = PRESET_HEIGHTS.map { ArOverlayView.metres(it) }.toTypedArray()
-            AlertDialog.Builder(this)
-                .setTitle(s("arScanEnterManually"))
-                .setItems(labels) { _, i -> onGl { finishWith(PRESET_HEIGHTS[i], measured = false) } }
-                .show()
-        } else {
-            onGl { if (capture.corners.size >= 3) step = Step.HEIGHT }
-        }
-    }
-
-    /** GL thread. */
-    private fun addCorner() {
-        if (!capture.canAddCorner(tracking = tracking)) return
-        val hit = lastFloorHit
-        if (hit == null) {
-            noFloorUntil = SystemClock.elapsedRealtime() + NOTICE_MS
-            return
-        }
-        val anchor = hit.createAnchor()
-        val t = anchor.pose
+    private fun onCloseRoom() = onGl {
         cornersLost = false
-        noFloorUntil = 0L
-        when (capture.addCorner(Vec3(t.tx(), t.ty(), t.tz()))) {
-            AddResult.REJECTED_CLOSED, AddResult.REJECTED_DUPLICATE -> anchor.detach()
-            AddResult.CLOSED -> { anchors.add(anchor); step = Step.HEIGHT }
-            AddResult.ADDED -> { anchors.add(anchor); step = Step.CORNERS }
+        val first = anchors.firstOrNull() ?: return@onGl
+        if (flow.closeRoom()) {
+            // close() appended a copy of the first corner; keep one anchor per corner.
+            session?.createAnchor(first.pose)?.let(anchors::add)
+            haptic(HapticFeedbackConstants.LONG_PRESS)
         }
+    }
+
+    private fun onChip(h: Float) = onGl { flow.confirmHeight(h, measured = false) }
+
+    private fun onUndo() = onGl {
+        cornersLost = false
+        repeat(flow.undo()) { anchors.removeLastOrNull()?.detach() }
     }
 
     private fun confirmExit() {
@@ -310,7 +225,7 @@ class ArScanActivity : Activity(), GLSurfaceView.Renderer {
     private fun finishWith(height: Float, measured: Boolean) {
         if (finished) return
         val seconds = ((SystemClock.elapsedRealtime() - startedAt) / 1000).toInt()
-        val result = capture.toResult(height, measured, seconds)
+        val result = flow.capture.toResult(height, measured, seconds)
         val json = JSONObject().apply {
             put("corners", JSONArray().apply {
                 @Suppress("UNCHECKED_CAST")
@@ -419,6 +334,9 @@ class ArScanActivity : Activity(), GLSurfaceView.Renderer {
         viewportW = width; viewportH = height; viewportChanged = true
     }
 
+    private fun isUpwardFloor(p: Plane) =
+        p.type == Plane.Type.HORIZONTAL_UPWARD_FACING && p.trackingState == TrackingState.TRACKING && p.subsumedBy == null
+
     override fun onDrawFrame(gl: GL10?) {
         GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT or GLES20.GL_DEPTH_BUFFER_BIT)
         val s = session ?: return
@@ -435,78 +353,122 @@ class ArScanActivity : Activity(), GLSurfaceView.Renderer {
             val camera = frame.camera
 
             tracking = camera.trackingState == TrackingState.TRACKING
-            if (wasTracking && !tracking) capture.trackingLossCount++
+            if (wasTracking && !tracking) flow.capture.trackingLossCount++
             wasTracking = tracking
 
             // Anchors drift as ARCore refines its map — keep corners in step;
             // stopped anchors are dropped together with their corners.
-            val lost = capture.updatePositions(anchors.map {
-                if (it.trackingState == TrackingState.STOPPED) null else Vec3(it.pose.tx(), it.pose.ty(), it.pose.tz())
+            val lost = flow.capture.updatePositions(anchors.map {
+                if (it.trackingState == TrackingState.STOPPED) null else it.vec()
             })
             if (lost > 0) {
                 val keep = anchors.size - lost
                 anchors.subList(keep, anchors.size).forEach { it.detach() }
                 while (anchors.size > keep) anchors.removeAt(anchors.size - 1)
+                flow.cornersLost()
                 cornersLost = true
-                if (step == Step.HEIGHT) step = Step.CORNERS
             }
 
-            // Floor under the reticle.
-            lastFloorHit = if (!tracking) null else frame.hitTest(viewportW / 2f, viewportH / 2f).firstOrNull { hit ->
-                val t = hit.trackable
-                t is Plane && t.type == Plane.Type.HORIZONTAL_UPWARD_FACING && t.isPoseInPolygon(hit.hitPose) &&
-                    (capture.floorY == null || kotlin.math.abs(hit.hitPose.ty() - capture.floorY!!) < 0.25f)
+            // The floor: the lowest upward plane (a table top is higher) until the base point fixes it.
+            if (tracking && flow.capture.floorY == null) {
+                s.getAllTrackables(Plane::class.java).filter(::isUpwardFloor)
+                    .minOfOrNull { it.centerPose.ty() }
+                    ?.let { floorCandidateY = it; flow.floorFound() }
             }
-            if (step == Step.FIND_FLOOR && lastFloorHit != null) step = Step.CORNERS
-            val reticle = lastFloorHit?.hitPose?.let { Vec3(it.tx(), it.ty(), it.tz()) }
+            val floorY = flow.capture.floorY ?: floorCandidateY
 
-            // Ceiling height along the first corner's vertical axis.
-            liveHeight = if (step == Step.HEIGHT && tracking) {
+            // The aim: a real floor hit at the centre, else the camera ray on the floor plane.
+            reticle = if (!tracking || floorY == null) null else {
+                val planeHit = frame.hitTest(viewportW / 2f, viewportH / 2f).firstOrNull { hit ->
+                    val t = hit.trackable
+                    t is Plane && t.type == Plane.Type.HORIZONTAL_UPWARD_FACING
+                }?.hitPose?.let { Vec3(it.tx(), it.ty(), it.tz()) }
                 val p = camera.pose
                 val z = p.zAxis // camera looks down -Z
-                capture.heightFromRay(Vec3(p.tx(), p.ty(), p.tz()), Vec3(-z[0], -z[1], -z[2]))
+                val rayHit = FloorRay.hit(Vec3(p.tx(), p.ty(), p.tz()), Vec3(-z[0], -z[1], -z[2]), floorY)
+                FloorRay.pick(planeHit, rayHit, floorY)
+            }
+
+            // Ceiling height along the base point's vertical axis.
+            liveHeight = if (flow.step == ScanStep.HEIGHT && tracking) {
+                val p = camera.pose
+                val z = p.zAxis
+                flow.capture.heightFromRay(Vec3(p.tx(), p.ty(), p.tz()), Vec3(-z[0], -z[1], -z[2]))
             } else null
 
             val view = FloatArray(16).also { camera.getViewMatrix(it, 0) }
             val proj = FloatArray(16).also { camera.getProjectionMatrix(it, 0, 0.05f, 100f) }
-            val pr = ScreenProjector(view, proj, viewportW, viewportH)
-            val corners = capture.corners
-            val projected = corners.map { pr.project(it) }
-            val labels = (0 until corners.size - 1).mapNotNull { i ->
-                val a = projected[i]; val b = projected[i + 1]
-                if (a == null || b == null) null else {
-                    val len = kotlin.math.hypot(corners[i + 1].x - corners[i].x, corners[i + 1].z - corners[i].z)
-                    Triple((a.first + b.first) / 2, (a.second + b.second) / 2, ArOverlayView.metres(len))
-                }
+            val state = overlayState(WallGeometry(view, proj, viewportW, viewportH))
+            val ui = flow.ui(tracking, reticle, liveHeight)
+            val hintKey = when {
+                flow.step == ScanStep.FIND_FLOOR && tracking &&
+                    SystemClock.elapsedRealtime() - startedAt > FLOOR_HINT_AFTER_MS -> "arScanFloorHint"
+                cornersLost && tracking -> "arScanCornersLost"
+                else -> ui.hintKey
             }
-            val axis = if (step == Step.HEIGHT && corners.isNotEmpty()) {
-                val base = corners[0]
-                val a = pr.project(base); val b = pr.project(Vec3(base.x, base.y + (liveHeight ?: 2.7f), base.z))
-                if (a != null && b != null) Pair(a, b) else null
-            } else null
-            val snapping = reticle != null && capture.wouldSnap(reticle)
-            val trackingHint = if (tracking) null else when (camera.trackingFailureReason) {
-                TrackingFailureReason.NONE -> null
-                else -> s("arScanTrackingLost")
-            }
-            val state = OverlayState(
-                corners = projected, labels = labels, reticleOnFloor = reticle != null,
-                snapping = snapping, closed = capture.isClosed, heightAxis = axis,
-                heightLabel = liveHeight?.let { ArOverlayView.metres(it) },
-            )
-            val n = corners.size
-            val height = liveHeight
-            val notice = when {
-                cornersLost -> s("arScanCornersLost")
-                SystemClock.elapsedRealtime() < noFloorUntil -> s("arScanNoFloorHere")
-                else -> null
-            }
+            val summary = flow.height?.takeIf { flow.step == ScanStep.DONE }?.let(::summaryText)
             runOnUiThread {
                 overlay.state = state
-                render(trackingHint, snapping, n, height, notice)
+                chrome.bind(ui, s(hintKey), summary)
             }
         } catch (e: Exception) {
             Log.w(TAG, "frame failed", e)
         }
+    }
+
+    /** GL thread: walls, the live wall, the height line and the reticle on screen. */
+    private fun overlayState(geo: WallGeometry): OverlayState {
+        val cm = s("arScanUnitCm")
+        val corners = flow.capture.corners
+        val h = flow.height
+        val step = flow.step
+        val walls = ArrayList<WallShape>()
+        val labels = ArrayList<Pair<Px, String>>()
+        if (h != null) {
+            for (i in 0 until corners.size - 1) {
+                val a = corners[i]; val b = corners[i + 1]
+                val w = geo.wall(a, b, h) ?: continue
+                walls.add(w)
+                w.labelAt?.let { labels.add(it to ArOverlayView.cm(hypot(b.x - a.x, b.z - a.z), cm)) }
+            }
+        }
+        val aim = reticle
+        val liveWall = if (step == ScanStep.WALLS && h != null && aim != null) {
+            corners.lastOrNull()?.let { last ->
+                geo.wall(last, aim, h)?.also { w ->
+                    w.labelAt?.let { labels.add(it to ArOverlayView.cm(hypot(aim.x - last.x, aim.z - last.z), cm)) }
+                }
+            }
+        } else null
+
+        val base = corners.firstOrNull()
+        val shownHeight = if (step == ScanStep.HEIGHT) liveHeight else h
+        val heightAxis = if (step == ScanStep.HEIGHT && base != null && shownHeight != null) {
+            geo.segment(base, Vec3(base.x, base.y + shownHeight, base.z))
+        } else null
+        val heightLabel = if (base != null && shownHeight != null) {
+            geo.point(Vec3(base.x, base.y + shownHeight, base.z))?.let { it to "H = ${ArOverlayView.cm(shownHeight, cm)}" }
+        } else null
+
+        val showReticle = step == ScanStep.BASE || step == ScanStep.WALLS
+        return OverlayState(
+            walls = walls,
+            liveWall = liveWall,
+            heightAxis = heightAxis,
+            heightLabel = heightLabel,
+            reticle = if (showReticle && aim != null) geo.floorEllipse(aim) else null,
+            reticleSnapping = step == ScanStep.WALLS && aim != null && flow.capture.wouldSnap(aim),
+            labels = labels,
+            onboarding = step == ScanStep.FIND_FLOOR,
+        )
+    }
+
+    private fun summaryText(height: Float): String {
+        val m = s("arScanUnitM")
+        val r = flow.capture.summary(height)
+        return String.format(
+            Locale.US, "%s %.1f %s · %s %.1f %s² · %s %.1f %s³",
+            s("arScanPerimeter"), r.perimeterM, m, s("arScanArea"), r.areaM2, m, s("arScanVolume"), r.volumeM3, m,
+        )
     }
 }
