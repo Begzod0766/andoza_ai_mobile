@@ -6,8 +6,14 @@ import kotlin.math.hypot
 /** A world-space point in metres (ARCore pose translation). */
 data class Vec3(val x: Float, val y: Float, val z: Float)
 
-/** [REJECTED_CLOSED]: the outline is already closed — reopen it first. */
-enum class AddResult { ADDED, CLOSED, REJECTED_CLOSED }
+/**
+ * [REJECTED_CLOSED]: the outline is already closed — reopen it first.
+ * [REJECTED_DUPLICATE]: within [FloorPlanCapture.DUPLICATE_M] of the last corner (a double tap).
+ */
+enum class AddResult { ADDED, CLOSED, REJECTED_CLOSED, REJECTED_DUPLICATE }
+
+/** What the finished room measures: floor perimeter, floor area and volume. */
+data class RoomSummary(val perimeterM: Float, val areaM2: Float, val volumeM3: Float)
 
 /**
  * The floor outline being captured, kept free of ARCore types so it can be
@@ -44,6 +50,7 @@ class FloorPlanCapture(val snapDistanceM: Float = 0.20f) {
 
     fun addCorner(p: Vec3): AddResult {
         if (isClosed) return AddResult.REJECTED_CLOSED
+        points.lastOrNull()?.let { if (hypot(p.x - it.x, p.z - it.z) < DUPLICATE_M) return AddResult.REJECTED_DUPLICATE }
         val y = floorY ?: p.y.also { floorY = it }
         val snap = wouldSnap(p)
         points = points + Vec3(p.x, y, p.z)
@@ -60,6 +67,34 @@ class FloorPlanCapture(val snapDistanceM: Float = 0.20f) {
         isClosed = false
         if (points.isEmpty()) floorY = null
         return true
+    }
+
+    /**
+     * Close the outline without snapping ("Xonani yopish"): appends a copy of
+     * the first corner, so the last point is the closing one exactly as after
+     * a snap. False (nothing changes) with fewer than 3 corners or when closed.
+     */
+    fun close(): Boolean {
+        val current = points
+        if (isClosed || current.size < 3) return false
+        points = current + current[0]
+        isClosed = true
+        return true
+    }
+
+    /** Perimeter, floor area (shoelace) and volume of the outline as a closed polygon. */
+    fun summary(height: Float): RoomSummary {
+        val pts = points.let { if (isClosed) it.dropLast(1) else it }
+        var perimeter = 0f
+        var twiceArea = 0f
+        for (i in pts.indices) {
+            val a = pts[i]
+            val b = pts[(i + 1) % pts.size]
+            perimeter += hypot(b.x - a.x, b.z - a.z)
+            twiceArea += a.x * b.z - b.x * a.z
+        }
+        val area = abs(twiceArea) / 2f
+        return RoomSummary(perimeter, area, area * height)
     }
 
     /**
@@ -128,5 +163,6 @@ class FloorPlanCapture(val snapDistanceM: Float = 0.20f) {
     companion object {
         const val MIN_HEIGHT_M = 1.8f
         const val MAX_HEIGHT_M = 4.5f
+        const val DUPLICATE_M = 0.05f
     }
 }

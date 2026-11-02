@@ -288,7 +288,7 @@ class ArScanActivity : Activity(), GLSurfaceView.Renderer {
         cornersLost = false
         noFloorUntil = 0L
         when (capture.addCorner(Vec3(t.tx(), t.ty(), t.tz()))) {
-            AddResult.REJECTED_CLOSED -> anchor.detach()
+            AddResult.REJECTED_CLOSED, AddResult.REJECTED_DUPLICATE -> anchor.detach()
             AddResult.CLOSED -> { anchors.add(anchor); step = Step.HEIGHT }
             AddResult.ADDED -> { anchors.add(anchor); step = Step.CORNERS }
         }
