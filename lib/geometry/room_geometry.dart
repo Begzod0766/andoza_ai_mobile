@@ -131,13 +131,18 @@ List<Vec2> rdpSimplify(List<Vec2> pts,
 /// Merge polygon vertices that sit closer than [minDist] (incl. the wrap-around
 /// closing vertex).
 List<Vec2> mergeCloseVertices(List<Vec2> poly,
+        [double minDist = GeometryConfig.mergeDistM]) =>
+    [for (final i in mergeCloseVertexIndices(poly, minDist)) poly[i]];
+
+/// The indices of [poly] that [mergeCloseVertices] keeps, in order.
+List<int> mergeCloseVertexIndices(List<Vec2> poly,
     [double minDist = GeometryConfig.mergeDistM]) {
-  if (poly.length < 3) return List.of(poly);
-  final out = <Vec2>[];
-  for (final p in poly) {
-    if (out.isEmpty || out.last.distanceTo(p) >= minDist) out.add(p);
+  if (poly.length < 3) return [for (var i = 0; i < poly.length; i++) i];
+  final out = <int>[];
+  for (var i = 0; i < poly.length; i++) {
+    if (out.isEmpty || poly[out.last].distanceTo(poly[i]) >= minDist) out.add(i);
   }
-  while (out.length > 3 && out.first.distanceTo(out.last) < minDist) {
+  while (out.length > 3 && poly[out.first].distanceTo(poly[out.last]) < minDist) {
     out.removeLast();
   }
   return out;
@@ -201,18 +206,21 @@ List<Vec2> regularize(List<Vec2> poly) {
 /// Remove vertices whose turn angle is below [tolDeg] (they lie on a straight
 /// wall). Keeps at least 3 corners.
 List<Vec2> removeCollinearVertices(List<Vec2> poly,
+        [double tolDeg = GeometryConfig.collinearToleranceDeg]) =>
+    [for (final i in collinearKeepIndices(poly, tolDeg)) poly[i]];
+
+/// The indices of [poly] that [removeCollinearVertices] keeps, in order.
+List<int> collinearKeepIndices(List<Vec2> poly,
     [double tolDeg = GeometryConfig.collinearToleranceDeg]) {
   final n = poly.length;
-  if (n < 4) return List.of(poly);
+  final all = [for (var i = 0; i < n; i++) i];
+  if (n < 4) return all;
   final tol = _rad(tolDeg);
-  final keep = <Vec2>[];
+  final keep = <int>[];
   for (var i = 0; i < n; i++) {
-    final prev = poly[(i - 1 + n) % n];
-    final cur = poly[i];
-    final next = poly[(i + 1) % n];
-    if (_turnAngle(prev, cur, next) > tol) keep.add(cur);
+    if (_turnAngle(poly[(i - 1 + n) % n], poly[i], poly[(i + 1) % n]) > tol) keep.add(i);
   }
-  return keep.length >= 3 ? keep : List.of(poly);
+  return keep.length >= 3 ? keep : all;
 }
 
 /// Turn angle at [b] on the path a→b→c (radians; 0 = straight).

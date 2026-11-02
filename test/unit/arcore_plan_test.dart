@@ -5,13 +5,16 @@ import 'package:tamir_uy_mobile_flutter/features/ar_scan/arcore_plan.dart';
 import 'package:tamir_uy_mobile_flutter/geometry/room_geometry.dart';
 import 'package:tamir_uy_mobile_flutter/models/room_plan.dart';
 
-ArScanRaw _raw(List<List<double>> pts, {bool closed = false, double height = 2.7}) => ArScanRaw(
+ArScanRaw _raw(List<List<double>> pts,
+        {bool closed = false, double height = 2.7, List<ArRawOpening> openings = const []}) =>
+    ArScanRaw(
       corners: [for (final p in pts) Vec2(p[0], p[1])],
       height: height,
       heightMeasured: true,
       closed: closed,
       trackingLossCount: 0,
       durationSec: 60,
+      openings: openings,
     );
 
 RoomPlan _ok(ArPlanResult r) {
@@ -167,5 +170,127 @@ void main() {
     final minY = plan.corners.map((c) => c.y).reduce(math.min);
     expect(minX, closeTo(0, 1e-9));
     expect(minY, closeTo(0, 1e-9));
+  });
+
+  group('doors and windows', () {
+    const rect = [[0.0, 0.0], [4.0, 0.0], [4.0, 3.0], [0.0, 3.0]];
+
+    RoomOpening only(RoomPlan p, int wall) => p.walls[wall].openings.single;
+
+    /// Wall whose corners are [a] → [b] in the final plan.
+    int wallBetween(RoomPlan p, Vec2 a, Vec2 b) => p.walls.indexWhere((w) =>
+        p.corners[w.a].distanceTo(a) < 0.02 && p.corners[w.b].distanceTo(b) < 0.02);
+
+    test('a result without openings parses to none', () {
+      final raw = ArScanRaw.fromMap({
+        'corners': rect,
+        'height': 2.7,
+        'heightMeasured': true,
+        'closed': false,
+      });
+      expect(raw.openings, isEmpty);
+      expect(_ok(buildArcorePlan(raw)).walls.every((w) => w.openings.isEmpty), isTrue);
+    });
+
+    test('fromMap reads openings', () {
+      final raw = ArScanRaw.fromMap({
+        'corners': rect,
+        'height': 2.7,
+        'openings': [
+          {'type': 'window', 'edge': 2, 't0': 0.25, 't1': 0.5},
+        ],
+      });
+      final o = raw.openings.single;
+      expect([o.type, o.edge, o.t0, o.t1], ['window', 2, 0.25, 0.5]);
+    });
+
+    test('a door lands on its rectangle wall', () {
+      final p = _ok(buildArcorePlan(_raw(rect, openings: const [ArRawOpening('door', 0, 0.25, 0.5)])));
+      final o = only(p, 0);
+      expect(o.type, 'door');
+      expect(o.width, closeTo(1.0, 0.005));
+      expect(o.height, 2.0);
+      expect(o.sillHeight, 0.0);
+      expect(o.position, closeTo(0.375, 0.005));
+    });
+
+    test('a window gets the window defaults', () {
+      final o = only(_ok(buildArcorePlan(_raw(rect, openings: const [ArRawOpening('window', 1, 0.2, 0.6)]))), 1);
+      expect(o.type, 'window');
+      expect(o.height, 1.5);
+      expect(o.sillHeight, 0.9);
+    });
+
+    test('an opening on the closing wall of a closed outline', () {
+      final p = _ok(buildArcorePlan(_raw([...rect, [0.05, 0.03]],
+          closed: true, openings: const [ArRawOpening('door', 3, 0.4, 0.6)])));
+      // Corner order survives (the plan may come out turned): edge 3 is wall 3.
+      expect(p.walls[3].lengthM, closeTo(3.0, 0.02));
+      expect(only(p, 3).position, closeTo(0.5, 0.01));
+      expect(only(p, 3).width, closeTo(0.6, 0.02));
+      expect([0, 1, 2].every((i) => p.walls[i].openings.isEmpty), isTrue);
+    });
+
+    test('an opening on the last wall of an open outline', () {
+      final p = _ok(buildArcorePlan(_raw(rect, openings: const [ArRawOpening('window', 3, 0.4, 0.6)])));
+      final w = wallBetween(p, const Vec2(0, 3), const Vec2(0, 0));
+      expect(only(p, w).position, closeTo(0.5, 0.01));
+    });
+
+    test('an opening on a wall that was merged from two raw walls', () {
+      // An extra corner half-way along the 4 m wall: raw edges 0 (0→2 m) and 1 (2→4 m).
+      final p = _ok(buildArcorePlan(_raw(
+        [[0, 0], [2, 0], [4, 0], [4, 3], [0, 3]],
+        openings: const [ArRawOpening('door', 1, 0.5, 1.0)], // 3.0 → 4.0 m
+      )));
+      // The 4 m back wall is the longest, so the plan comes out turned 180°.
+      expect(p.walls, hasLength(4));
+      final w = p.walls.singleWhere((w) => w.openings.isNotEmpty);
+      expect(w.lengthM, closeTo(4.0, 0.01));
+      expect(w.openings.single.width, closeTo(1.0, 0.01));
+      expect(w.openings.single.position, closeTo(3.5 / 4, 0.01));
+    });
+
+    test('an opening on a merged wall when the first raw corner was dropped', () {
+      // Corner 0 sits mid-wall and is removed as collinear; edge 4 (0,3)→(0,1.5) and
+      // edge 0 (0,1.5)→(0,0) make one wall.
+      final p = _ok(buildArcorePlan(_raw(
+        [[0, 1.5], [0, 0], [4, 0], [4, 3], [0, 3]],
+        openings: const [ArRawOpening('door', 4, 0.0, 0.5)], // (0,3) → (0,2.25)
+      )));
+      expect(p.walls, hasLength(4));
+      final len = 3.0;
+      for (final w in p.walls) {
+        if (w.openings.isEmpty) continue;
+        expect(w.lengthM, closeTo(len, 0.01));
+        expect(w.openings.single.width, closeTo(0.75, 0.01));
+        // From the wall's start (0,3): centre at 0.375 m.
+        expect(p.corners[w.a].distanceTo(const Vec2(0, 3)), lessThan(0.02));
+        expect(w.openings.single.position, closeTo(0.375 / len, 0.01));
+        return;
+      }
+      fail('no wall has the door');
+    });
+
+    test('an opening flush against a corner stays on the wall', () {
+      final p = _ok(buildArcorePlan(_raw(rect, openings: const [
+        ArRawOpening('door', 0, 0.0, 0.25),
+        ArRawOpening('window', 0, 0.75, 1.0),
+      ])));
+      final len = p.walls[0].lengthM;
+      for (final o in p.walls[0].openings) {
+        expect(o.position - o.width / 2 / len, greaterThanOrEqualTo(-1e-9));
+        expect(o.position + o.width / 2 / len, lessThanOrEqualTo(1 + 1e-9));
+      }
+    });
+
+    test('a low measured ceiling shrinks the defaults', () {
+      final p = _ok(buildArcorePlan(_raw(rect, height: 2.05, openings: const [
+        ArRawOpening('door', 0, 0.1, 0.3),
+        ArRawOpening('window', 1, 0.2, 0.6),
+      ])));
+      expect(only(p, 0).height, closeTo(1.95, 0.001));
+      expect(only(p, 1).height, closeTo(1.05, 0.001));
+    });
   });
 }
