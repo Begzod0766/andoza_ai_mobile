@@ -28,3 +28,12 @@ bool isPhoneBlank(String value) {
   final rest = value.replaceAll(_separators, '').replaceFirst('+', '');
   return rest.isEmpty || rest == '998';
 }
+
+/// An Uzbek number grouped for reading — "+998 90 123 45 67"; any other value
+/// unchanged.
+String displayPhone(String value) {
+  final n = normalizeUzPhone(value);
+  if (n == null) return value;
+  final d = n.substring(4);
+  return '+998 ${d.substring(0, 2)} ${d.substring(2, 5)} ${d.substring(5, 7)} ${d.substring(7)}';
+}
