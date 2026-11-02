@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../widgets/common/phone_field.dart';
 import '../../config/design_tokens.dart';
 import '../../l10n/app_localizations.dart';
 import '../../models/business_profile.dart';
@@ -26,7 +27,7 @@ class BusinessApplyScreen extends ConsumerStatefulWidget {
 class _BusinessApplyScreenState extends ConsumerState<BusinessApplyScreen> {
   final _name = TextEditingController();
   final _district = TextEditingController();
-  final _phone = TextEditingController(text: '+998');
+  final _phone = TextEditingController();
   final _telegram = TextEditingController();
   final _priceMin = TextEditingController();
   final _priceMax = TextEditingController();
@@ -152,7 +153,7 @@ class _BusinessApplyScreenState extends ConsumerState<BusinessApplyScreen> {
             const SizedBox(height: DesignTokens.spacingMd),
             _field(_district, l10n.businessFieldDistrict),
             const SizedBox(height: DesignTokens.spacingMd),
-            _field(_phone, l10n.businessFieldPhone, keyboard: TextInputType.phone),
+            _field(_phone, l10n.businessFieldPhone, phone: true),
             const SizedBox(height: DesignTokens.spacingMd),
             _field(_telegram, l10n.businessFieldTelegram),
             if (_isUsta) ...[
@@ -217,12 +218,15 @@ class _BusinessApplyScreenState extends ConsumerState<BusinessApplyScreen> {
     String label, {
     TextInputType? keyboard,
     bool digits = false,
+    bool phone = false,
   }) =>
       TextField(
         controller: c,
         enabled: !_busy,
-        keyboardType: keyboard ?? (digits ? TextInputType.number : null),
-        inputFormatters: digits ? priceInputFormatters : null,
+        keyboardType: phone ? TextInputType.phone : keyboard ?? (digits ? TextInputType.number : null),
+        autofillHints: phone ? const [AutofillHints.telephoneNumber] : null,
+        // Same "+998 90 123 45 67" grouping as every other phone field.
+        inputFormatters: phone ? [UzPhoneInputFormatter()] : digits ? priceInputFormatters : null,
         decoration: _decoration(label),
         // A message about the last submit no longer holds once a field changes.
         onChanged: (_) {

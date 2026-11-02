@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../widgets/common/phone_field.dart';
 import '../../config/design_tokens.dart';
 import '../../l10n/app_localizations.dart';
 import '../../models/business_profile.dart';
@@ -56,7 +57,7 @@ class _EditUstaScreenState extends ConsumerState<EditUstaScreen> {
     _loaded = true;
     _name.text = u.name;
     _district.text = u.district ?? '';
-    _phone.text = u.phone ?? '';
+    _phone.text = displayPhone(u.phone ?? '');
     _telegram.text = u.telegram ?? '';
     _priceMin.text = u.priceMin?.toString() ?? '';
     _priceMax.text = u.priceMax?.toString() ?? '';
@@ -145,11 +146,7 @@ class _EditUstaScreenState extends ConsumerState<EditUstaScreen> {
                 const SizedBox(height: DesignTokens.spacingSm),
                 TextField(controller: _district, decoration: InputDecoration(labelText: l10n.businessFieldDistrict)),
                 const SizedBox(height: DesignTokens.spacingSm),
-                TextField(
-                  controller: _phone,
-                  keyboardType: TextInputType.phone,
-                  decoration: InputDecoration(labelText: l10n.businessFieldPhone),
-                ),
+                PhoneField(controller: _phone, label: l10n.businessFieldPhone, hint: null),
                 const SizedBox(height: DesignTokens.spacingSm),
                 TextField(controller: _telegram, decoration: InputDecoration(labelText: l10n.businessFieldTelegram)),
                 const SizedBox(height: DesignTokens.spacingSm),

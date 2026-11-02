@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../widgets/common/phone_field.dart';
 import '../../config/design_tokens.dart';
 import '../../l10n/app_localizations.dart';
 import '../../providers/auth_provider.dart';
@@ -40,7 +41,7 @@ class _U5BookingConfirmationScreenState
     // when it has one (OTP accounts do, username accounts don't).
     final auth = ref.read(authStateProvider);
     final phone = auth is AuthAuthenticated ? auth.user.phone : null;
-    if (phone != null) _phoneController.text = phone;
+    if (phone != null) _phoneController.text = displayPhone(phone);
   }
 
   static final _uuid = RegExp(
@@ -164,20 +165,14 @@ class _U5BookingConfirmationScreenState
                     ),
                   ),
                   const SizedBox(height: DesignTokens.spacingLg),
-                  TextField(
+                  PhoneField(
                     controller: _phoneController,
-                    keyboardType: TextInputType.phone,
+                    label: l10n.mastersPhoneLabel,
+                    errorText: _phoneInvalid ? l10n.phoneErrorInvalid : null,
+                    border: const OutlineInputBorder(),
                     onChanged: (_) {
                       if (_phoneInvalid) setState(() => _phoneInvalid = false);
                     },
-                    decoration: InputDecoration(
-                      labelText: l10n.mastersPhoneLabel,
-                      hintText: '+998 90 123 45 67',
-                      errorText: _phoneInvalid ? l10n.phoneErrorInvalid : null,
-                    // The example number does not fit one line on a phone.
-                    errorMaxLines: 2,
-                      border: const OutlineInputBorder(),
-                    ),
                   ),
                   const SizedBox(height: DesignTokens.spacingSm),
                   TextField(

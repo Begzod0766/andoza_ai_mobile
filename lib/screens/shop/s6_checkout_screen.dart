@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import '../../widgets/common/phone_field.dart';
 import '../../config/design_tokens.dart';
 import '../../l10n/app_localizations.dart';
 import '../../models/api/api.dart';
@@ -71,7 +72,7 @@ class _S6CheckoutScreenState extends ConsumerState<S6CheckoutScreen> {
     // own phone when it has one (OTP accounts do, username accounts don't).
     final auth = ref.read(authStateProvider);
     final phone = auth is AuthAuthenticated ? auth.user.phone : null;
-    if (phone != null) _phoneController.text = phone;
+    if (phone != null) _phoneController.text = displayPhone(phone);
   }
   bool _isPlacing = false;
 
@@ -244,18 +245,14 @@ class _S6CheckoutScreenState extends ConsumerState<S6CheckoutScreen> {
                   decoration: InputDecoration(hintText: l10n.shopAddressHint),
                 ),
                 const SizedBox(height: DesignTokens.spacingSm),
-                TextField(
+                PhoneField(
                   key: _phoneKey,
                   controller: _phoneController,
-                  keyboardType: TextInputType.phone,
+                  hint: l10n.shopPhoneHint,
+                  errorText: _phoneInvalid ? l10n.phoneErrorInvalid : null,
                   onChanged: (_) {
                     if (_phoneInvalid) setState(() => _phoneInvalid = false);
                   },
-                  decoration: InputDecoration(
-                    hintText: l10n.shopPhoneHint,
-                    errorText: _phoneInvalid ? l10n.phoneErrorInvalid : null,
-                    errorMaxLines: 2,
-                  ),
                 ),
                 const SizedBox(height: DesignTokens.spacingLg),
                 Text(l10n.shopPaymentMethod, style: DesignTokens.subtitle2),
