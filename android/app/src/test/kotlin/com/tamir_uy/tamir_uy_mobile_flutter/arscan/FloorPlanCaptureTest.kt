@@ -149,6 +149,17 @@ class FloorPlanCaptureTest {
         assertEquals(false, m["closed"])
         assertEquals(2, m["trackingLossCount"])
         assertEquals(95, m["durationSec"])
+        assertEquals(emptyList<Any>(), m["openings"])
+    }
+
+    @Test fun `serializes openings into the channel payload`() {
+        val c = FloorPlanCapture()
+        square(c)
+        val m = c.toResult(2.7f, true, 1, listOf(CapturedOpening(OpeningType.WINDOW, 2, 0.25f, 0.5f)))
+        assertEquals(
+            listOf(mapOf("type" to "window", "edge" to 2, "t0" to 0.25, "t1" to 0.5)),
+            m["openings"],
+        )
     }
 
     // ── auto corners ───────────────────────────────────────────────────────

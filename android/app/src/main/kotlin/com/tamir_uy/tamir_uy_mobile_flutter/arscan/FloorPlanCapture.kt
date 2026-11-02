@@ -171,13 +171,21 @@ class FloorPlanCapture(val snapDistanceM: Float = 0.20f) {
         return abs((p.x - w.ax) * (w.bz - w.az) - (p.z - w.az) * (w.bx - w.ax)) / len
     }
 
-    fun toResult(height: Float, heightMeasured: Boolean, durationSec: Int): Map<String, Any> = mapOf(
+    fun toResult(
+        height: Float,
+        heightMeasured: Boolean,
+        durationSec: Int,
+        openings: List<CapturedOpening> = emptyList(),
+    ): Map<String, Any> = mapOf(
         "corners" to points.map { listOf(it.x.toDouble(), it.z.toDouble()) },
         "height" to height.toDouble(),
         "heightMeasured" to heightMeasured,
         "closed" to isClosed,
         "trackingLossCount" to trackingLossCount,
         "durationSec" to durationSec,
+        "openings" to openings.map {
+            mapOf("type" to it.type.wire, "edge" to it.edge, "t0" to it.t0.toDouble(), "t1" to it.t1.toDouble())
+        },
     )
 
     companion object {
