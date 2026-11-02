@@ -711,7 +711,7 @@
   "@arScanFindFloor": {
     "description": "Android ARCore floor-plan scanner"
   },
-  "arScanCornersHint": "Nishonni pol burchagiga keltirib, burchak qo'shing",
+  "arScanCornersHint": "Nishonni keyingi burchakka qo'yib, burchak qo'shing",
   "@arScanCornersHint": {
     "description": "Android ARCore floor-plan scanner"
   },
@@ -723,24 +723,16 @@
   "@arScanUndo": {
     "description": "Android ARCore floor-plan scanner"
   },
-  "arScanFinish": "Tayyor",
-  "@arScanFinish": {
-    "description": "Android ARCore floor-plan scanner"
-  },
   "arScanSnapToFirst": "Birinchi burchakka yaqinlashing — kontur yopiladi",
   "@arScanSnapToFirst": {
     "description": "Android ARCore floor-plan scanner"
   },
-  "arScanAimCeiling": "Birinchi burchak ustidagi shift chizig'iga qarating",
+  "arScanAimCeiling": "Telefonni yuqoriga burib, chiziqni shiftgacha torting",
   "@arScanAimCeiling": {
     "description": "Android ARCore floor-plan scanner"
   },
   "arScanConfirm": "Tasdiqlash",
   "@arScanConfirm": {
-    "description": "Android ARCore floor-plan scanner"
-  },
-  "arScanEnterManually": "Qo'lda kiritish",
-  "@arScanEnterManually": {
     "description": "Android ARCore floor-plan scanner"
   },
   "arScanExit": "Chiqish",
@@ -763,7 +755,7 @@
   "@arScanCornersLost": {
     "description": "Android ARCore floor-plan scanner"
   },
-  "arScanNoFloorHere": "Avval polni skaner qiling",
+  "arScanNoFloorHere": "Nishon polga tushmayapti — telefonni pastroq qarating",
   "@arScanNoFloorHere": {
     "description": "Android ARCore floor-plan scanner: 'Add corner' tapped with no floor under the reticle"
   },
@@ -771,17 +763,45 @@
   "@arScanKeepMeasuring": {
     "description": "Android ARCore floor-plan scanner: cancel button of the exit confirmation"
   },
-  "arScanStepFloor": "1/3 — pol",
-  "@arScanStepFloor": {
-    "description": "Android ARCore floor-plan scanner: step indicator, finding the floor"
+  "arScanBaseHint": "Nishonni devor va pol tutashgan burchakka qo'ying",
+  "@arScanBaseHint": {
+    "description": "Android ARCore floor-plan scanner: base point: aim where the wall meets the floor"
   },
-  "arScanStepCorners": "2/3 — burchaklar",
-  "@arScanStepCorners": {
-    "description": "Android ARCore floor-plan scanner: step indicator, marking corners"
+  "arScanStart": "Boshlash",
+  "@arScanStart": {
+    "description": "Android ARCore floor-plan scanner: button that places the base point"
   },
-  "arScanStepHeight": "3/3 — balandlik",
-  "@arScanStepHeight": {
-    "description": "Android ARCore floor-plan scanner: step indicator, measuring the height"
+  "arScanCloseRoom": "Xonani yopish",
+  "@arScanCloseRoom": {
+    "description": "Android ARCore floor-plan scanner: button joining the last corner to the first"
+  },
+  "arScanCreatePlan": "Rejani yaratish",
+  "@arScanCreatePlan": {
+    "description": "Android ARCore floor-plan scanner: final button: finish and open the review"
+  },
+  "arScanDoneHint": "Xona tayyor. Xato bo'lsa, ↶ bilan qayting",
+  "@arScanDoneHint": {
+    "description": "Android ARCore floor-plan scanner: hint once the room is closed; ↶ is the undo icon"
+  },
+  "arScanPerimeter": "Perimetr",
+  "@arScanPerimeter": {
+    "description": "Android ARCore floor-plan scanner: summary label: floor perimeter"
+  },
+  "arScanArea": "Maydon",
+  "@arScanArea": {
+    "description": "Android ARCore floor-plan scanner: summary label: floor area"
+  },
+  "arScanVolume": "Hajm",
+  "@arScanVolume": {
+    "description": "Android ARCore floor-plan scanner: summary label: room volume"
+  },
+  "arScanUnitCm": "sm",
+  "@arScanUnitCm": {
+    "description": "Android ARCore floor-plan scanner: unit after wall lengths and height (centimetres)"
+  },
+  "arScanUnitM": "m",
+  "@arScanUnitM": {
+    "description": "Android ARCore floor-plan scanner: unit after summary values (metres; m² and m³ add the superscript)"
   },
   "arScanRescan": "Qayta o'lchash",
   "@arScanRescan": {

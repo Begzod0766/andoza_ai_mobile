@@ -539,7 +539,7 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get arScanCornersHint =>
-      'Наведите прицел на угол пола и добавьте угол';
+      'Наведите прицел на следующий угол и добавьте его';
 
   @override
   String get arScanAddCorner => 'Добавить угол';
@@ -548,19 +548,14 @@ class AppLocalizationsRu extends AppLocalizations {
   String get arScanUndo => 'Отменить';
 
   @override
-  String get arScanFinish => 'Готово';
-
-  @override
   String get arScanSnapToFirst => 'Подойдите к первому углу — контур замкнётся';
 
   @override
-  String get arScanAimCeiling => 'Наведите на линию потолка над первым углом';
+  String get arScanAimCeiling =>
+      'Наклоните телефон вверх и дотяните линию до потолка';
 
   @override
   String get arScanConfirm => 'Подтвердить';
-
-  @override
-  String get arScanEnterManually => 'Ввести вручную';
 
   @override
   String get arScanExit => 'Выйти';
@@ -582,19 +577,42 @@ class AppLocalizationsRu extends AppLocalizations {
       'Некоторые углы потерялись — отметьте их снова';
 
   @override
-  String get arScanNoFloorHere => 'Сначала отсканируйте пол';
+  String get arScanNoFloorHere => 'Прицел не на полу — наклоните телефон ниже';
 
   @override
   String get arScanKeepMeasuring => 'Продолжить измерение';
 
   @override
-  String get arScanStepFloor => '1/3 — пол';
+  String get arScanBaseHint =>
+      'Наведите прицел на угол, где стена встречается с полом';
 
   @override
-  String get arScanStepCorners => '2/3 — углы';
+  String get arScanStart => 'Начать';
 
   @override
-  String get arScanStepHeight => '3/3 — высота';
+  String get arScanCloseRoom => 'Замкнуть комнату';
+
+  @override
+  String get arScanCreatePlan => 'Создать план';
+
+  @override
+  String get arScanDoneHint =>
+      'Комната готова. Если есть ошибка, вернитесь кнопкой ↶';
+
+  @override
+  String get arScanPerimeter => 'Периметр';
+
+  @override
+  String get arScanArea => 'Площадь';
+
+  @override
+  String get arScanVolume => 'Объём';
+
+  @override
+  String get arScanUnitCm => 'см';
+
+  @override
+  String get arScanUnitM => 'м';
 
   @override
   String get arScanRescan => 'Измерить заново';

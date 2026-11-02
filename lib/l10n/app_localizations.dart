@@ -1069,7 +1069,7 @@ abstract class AppLocalizations {
   /// Android ARCore floor-plan scanner
   ///
   /// In uz, this message translates to:
-  /// **'Nishonni pol burchagiga keltirib, burchak qo\'shing'**
+  /// **'Nishonni keyingi burchakka qo\'yib, burchak qo\'shing'**
   String get arScanCornersHint;
 
   /// Android ARCore floor-plan scanner
@@ -1087,19 +1087,13 @@ abstract class AppLocalizations {
   /// Android ARCore floor-plan scanner
   ///
   /// In uz, this message translates to:
-  /// **'Tayyor'**
-  String get arScanFinish;
-
-  /// Android ARCore floor-plan scanner
-  ///
-  /// In uz, this message translates to:
   /// **'Birinchi burchakka yaqinlashing — kontur yopiladi'**
   String get arScanSnapToFirst;
 
   /// Android ARCore floor-plan scanner
   ///
   /// In uz, this message translates to:
-  /// **'Birinchi burchak ustidagi shift chizig\'iga qarating'**
+  /// **'Telefonni yuqoriga burib, chiziqni shiftgacha torting'**
   String get arScanAimCeiling;
 
   /// Android ARCore floor-plan scanner
@@ -1107,12 +1101,6 @@ abstract class AppLocalizations {
   /// In uz, this message translates to:
   /// **'Tasdiqlash'**
   String get arScanConfirm;
-
-  /// Android ARCore floor-plan scanner
-  ///
-  /// In uz, this message translates to:
-  /// **'Qo\'lda kiritish'**
-  String get arScanEnterManually;
 
   /// Android ARCore floor-plan scanner
   ///
@@ -1147,7 +1135,7 @@ abstract class AppLocalizations {
   /// Android ARCore floor-plan scanner: 'Add corner' tapped with no floor under the reticle
   ///
   /// In uz, this message translates to:
-  /// **'Avval polni skaner qiling'**
+  /// **'Nishon polga tushmayapti — telefonni pastroq qarating'**
   String get arScanNoFloorHere;
 
   /// Android ARCore floor-plan scanner: cancel button of the exit confirmation
@@ -1156,23 +1144,65 @@ abstract class AppLocalizations {
   /// **'O\'lchashni davom ettirish'**
   String get arScanKeepMeasuring;
 
-  /// Android ARCore floor-plan scanner: step indicator, finding the floor
+  /// Android ARCore floor-plan scanner: base point: aim where the wall meets the floor
   ///
   /// In uz, this message translates to:
-  /// **'1/3 — pol'**
-  String get arScanStepFloor;
+  /// **'Nishonni devor va pol tutashgan burchakka qo\'ying'**
+  String get arScanBaseHint;
 
-  /// Android ARCore floor-plan scanner: step indicator, marking corners
+  /// Android ARCore floor-plan scanner: button that places the base point
   ///
   /// In uz, this message translates to:
-  /// **'2/3 — burchaklar'**
-  String get arScanStepCorners;
+  /// **'Boshlash'**
+  String get arScanStart;
 
-  /// Android ARCore floor-plan scanner: step indicator, measuring the height
+  /// Android ARCore floor-plan scanner: button joining the last corner to the first
   ///
   /// In uz, this message translates to:
-  /// **'3/3 — balandlik'**
-  String get arScanStepHeight;
+  /// **'Xonani yopish'**
+  String get arScanCloseRoom;
+
+  /// Android ARCore floor-plan scanner: final button: finish and open the review
+  ///
+  /// In uz, this message translates to:
+  /// **'Rejani yaratish'**
+  String get arScanCreatePlan;
+
+  /// Android ARCore floor-plan scanner: hint once the room is closed; ↶ is the undo icon
+  ///
+  /// In uz, this message translates to:
+  /// **'Xona tayyor. Xato bo\'lsa, ↶ bilan qayting'**
+  String get arScanDoneHint;
+
+  /// Android ARCore floor-plan scanner: summary label: floor perimeter
+  ///
+  /// In uz, this message translates to:
+  /// **'Perimetr'**
+  String get arScanPerimeter;
+
+  /// Android ARCore floor-plan scanner: summary label: floor area
+  ///
+  /// In uz, this message translates to:
+  /// **'Maydon'**
+  String get arScanArea;
+
+  /// Android ARCore floor-plan scanner: summary label: room volume
+  ///
+  /// In uz, this message translates to:
+  /// **'Hajm'**
+  String get arScanVolume;
+
+  /// Android ARCore floor-plan scanner: unit after wall lengths and height (centimetres)
+  ///
+  /// In uz, this message translates to:
+  /// **'sm'**
+  String get arScanUnitCm;
+
+  /// Android ARCore floor-plan scanner: unit after summary values (metres; m² and m³ add the superscript)
+  ///
+  /// In uz, this message translates to:
+  /// **'m'**
+  String get arScanUnitM;
 
   /// Android ARCore floor-plan scanner
   ///

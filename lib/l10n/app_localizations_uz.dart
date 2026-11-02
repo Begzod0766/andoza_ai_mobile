@@ -536,7 +536,7 @@ class AppLocalizationsUz extends AppLocalizations {
 
   @override
   String get arScanCornersHint =>
-      'Nishonni pol burchagiga keltirib, burchak qo\'shing';
+      'Nishonni keyingi burchakka qo\'yib, burchak qo\'shing';
 
   @override
   String get arScanAddCorner => 'Burchak qo\'shish';
@@ -545,21 +545,15 @@ class AppLocalizationsUz extends AppLocalizations {
   String get arScanUndo => 'Bekor qilish';
 
   @override
-  String get arScanFinish => 'Tayyor';
-
-  @override
   String get arScanSnapToFirst =>
       'Birinchi burchakka yaqinlashing — kontur yopiladi';
 
   @override
   String get arScanAimCeiling =>
-      'Birinchi burchak ustidagi shift chizig\'iga qarating';
+      'Telefonni yuqoriga burib, chiziqni shiftgacha torting';
 
   @override
   String get arScanConfirm => 'Tasdiqlash';
-
-  @override
-  String get arScanEnterManually => 'Qo\'lda kiritish';
 
   @override
   String get arScanExit => 'Chiqish';
@@ -581,19 +575,42 @@ class AppLocalizationsUz extends AppLocalizations {
       'Ba\'zi burchaklar yo\'qoldi — ularni qayta belgilang';
 
   @override
-  String get arScanNoFloorHere => 'Avval polni skaner qiling';
+  String get arScanNoFloorHere =>
+      'Nishon polga tushmayapti — telefonni pastroq qarating';
 
   @override
   String get arScanKeepMeasuring => 'O\'lchashni davom ettirish';
 
   @override
-  String get arScanStepFloor => '1/3 — pol';
+  String get arScanBaseHint =>
+      'Nishonni devor va pol tutashgan burchakka qo\'ying';
 
   @override
-  String get arScanStepCorners => '2/3 — burchaklar';
+  String get arScanStart => 'Boshlash';
 
   @override
-  String get arScanStepHeight => '3/3 — balandlik';
+  String get arScanCloseRoom => 'Xonani yopish';
+
+  @override
+  String get arScanCreatePlan => 'Rejani yaratish';
+
+  @override
+  String get arScanDoneHint => 'Xona tayyor. Xato bo\'lsa, ↶ bilan qayting';
+
+  @override
+  String get arScanPerimeter => 'Perimetr';
+
+  @override
+  String get arScanArea => 'Maydon';
+
+  @override
+  String get arScanVolume => 'Hajm';
+
+  @override
+  String get arScanUnitCm => 'sm';
+
+  @override
+  String get arScanUnitM => 'm';
 
   @override
   String get arScanRescan => 'Qayta o\'lchash';
