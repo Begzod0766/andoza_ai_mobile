@@ -154,6 +154,8 @@ class HomeEmptyBody extends StatelessWidget {
     final l10n = AppLocalizations.of(context)!;
     return SafeArea(
       child: SingleChildScrollView(
+        // Always scrollable so the home's pull-to-refresh works when it fits.
+        physics: const AlwaysScrollableScrollPhysics(),
         padding: const EdgeInsets.symmetric(
           horizontal: DesignTokens.screenPaddingHorizontal,
           vertical: DesignTokens.spacingLg,
