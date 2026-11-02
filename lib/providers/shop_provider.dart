@@ -193,6 +193,11 @@ List<Product> _mapToProducts(
 ) {
   final areas = _computeAreas(ref);
   final electrical = computeElectricalNeed(ref);
+  // No room anywhere yet: there is no project to need anything, so don't mark
+  // every product "Loyihada" from the default single-room baseline.
+  final hasRoom = ref.watch(activeRoomProvider) != null ||
+      ref.watch(activeRoomPlanProvider) != null ||
+      ref.watch(selectableRoomsProvider).isNotEmpty;
   final shpaklovkaNeeded = !stageExcluded(ref, RenovationStage.shpaklovka);
   final boyoqOboiNeeded = !stageExcluded(ref, RenovationStage.boyoqOboi);
   final polNeeded = !stageExcluded(ref, RenovationStage.pol);
@@ -215,7 +220,7 @@ List<Product> _mapToProducts(
       isOfficialDealer: isOfficial,
       imageUrl: catalogImageUrl(m.imageUrl),
       storeId: m.storeId,
-      projectQuantity: _projectQuantityFor(
+      projectQuantity: !hasRoom ? null : _projectQuantityFor(
         category,
         m.unit,
         areas,

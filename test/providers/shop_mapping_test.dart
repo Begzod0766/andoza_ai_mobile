@@ -13,11 +13,20 @@ import 'package:tamir_uy_mobile_flutter/providers/shop_provider.dart';
 Future<List<Product>> _catalog(
   List<Material> materials, {
   List<Store> stores = const [],
+  bool withRoom = true,
 }) async {
   final container = ProviderContainer(
     overrides: [
       materialsProvider(null).overrideWith((ref) async => materials),
       storesProvider.overrideWith((ref) async => stores),
+      // The user has a room somewhere (unless the test says otherwise).
+      selectableRoomsProvider.overrideWithValue([
+        if (withRoom)
+          SelectableRoom(
+            room: RoomOut(id: 'r1', apartmentId: 'a1', name: 'Xona', updatedAt: DateTime(2026)),
+            apartmentName: 'Uy',
+          ),
+      ]),
     ],
   );
   addTearDown(container.dispose);
@@ -153,5 +162,11 @@ void main() {
       expect(catalog.single.projectQuantity, isNull);
       expect(catalog.single.isInProject, isFalse);
     });
+  });
+
+  test('with no room anywhere, nothing is marked "in your project"', () async {
+    final catalog = await _catalog([_material(id: 'm1', category: 'gips')], withRoom: false);
+    expect(catalog.single.projectQuantity, isNull);
+    expect(catalog.single.isInProject, isFalse);
   });
 }
