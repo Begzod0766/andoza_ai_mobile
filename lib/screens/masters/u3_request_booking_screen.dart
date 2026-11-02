@@ -23,7 +23,10 @@ class U3RequestBookingScreen extends ConsumerWidget {
         elevation: 0,
         title: Text(l10n.navMasters, style: DesignTokens.heading3),
       ),
-      body: ListView.separated(
+      body: RefreshIndicator(
+        onRefresh: () => reloadMasters(ref),
+        child: ListView.separated(
+        physics: const AlwaysScrollableScrollPhysics(),
         padding: const EdgeInsets.all(DesignTokens.screenPaddingHorizontal),
         itemCount: masters.length,
         separatorBuilder: (_, _) =>
@@ -152,7 +155,7 @@ class U3RequestBookingScreen extends ConsumerWidget {
           ),
           );
         },
-      ),
+      )),
     );
   }
 }

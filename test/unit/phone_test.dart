@@ -45,4 +45,17 @@ void main() {
       expect(isPhoneBlank('abc'), isFalse);
     });
   });
+
+  group('displayPhone', () {
+    test('groups an Uzbek number the way people write it', () {
+      expect(displayPhone('+998900000001'), '+998 90 000 00 01');
+      expect(displayPhone('998901234567'), '+998 90 123 45 67');
+      expect(displayPhone('+998 90 123-45-67'), '+998 90 123 45 67');
+    });
+
+    test('leaves anything else as it was', () {
+      expect(displayPhone('+7 999 123 45 67'), '+7 999 123 45 67');
+      expect(displayPhone(''), '');
+    });
+  });
 }

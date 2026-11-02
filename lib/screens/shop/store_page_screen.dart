@@ -82,7 +82,13 @@ class _StoreBody extends ConsumerWidget {
     final empty =
         furniture.hasValue && furnitureItems.isEmpty && materials.isEmpty;
 
-    return ListView(
+    return RefreshIndicator(
+      onRefresh: () => Future.wait([
+        ref.refresh(storeFurnitureProvider(store.id).future),
+        ref.refresh(materialsProvider(null).future),
+      ]),
+      child: ListView(
+      physics: const AlwaysScrollableScrollPhysics(),
       padding: const EdgeInsets.all(DesignTokens.screenPaddingHorizontal),
       children: [
         _StoreHeader(store: store),
@@ -129,7 +135,7 @@ class _StoreBody extends ConsumerWidget {
             ),
           ),
       ],
-    );
+    ));
   }
 }
 

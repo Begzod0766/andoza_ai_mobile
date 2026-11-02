@@ -55,8 +55,7 @@ void main() {
       (tester) async {
     await _pumpShell(tester);
 
-    // Icon-only nav — each tab's name is carried as a Semantics label, not
-    // visible text (see app_shell.dart's _labelFor doc comment).
+    // Each tab has one Semantics name (the visible label is excluded).
     expect(find.bySemanticsLabel('Uy'), findsOneWidget);
     expect(find.bySemanticsLabel("Do'kon"), findsOneWidget);
     expect(find.bySemanticsLabel('Ustalar'), findsOneWidget);
@@ -96,5 +95,19 @@ void main() {
     await tester.tap(find.bySemanticsLabel('Uy'));
     await tester.pumpAndSettle();
     expect(find.text('HOME BODY'), findsOneWidget);
+  });
+
+  testWidgets('tabs show their names under the icons, even at large text', (tester) async {
+    await _pumpShell(tester);
+    for (final name in ['Uy', "Do'kon", 'Ustalar', 'Profil']) {
+      expect(find.text(name), findsOneWidget, reason: name);
+    }
+    // Semantics stay one name per tab (the visible text isn't read twice).
+    expect(find.bySemanticsLabel('Uy'), findsOneWidget);
+
+    tester.platformDispatcher.textScaleFactorTestValue = 2.0;
+    addTearDown(tester.platformDispatcher.clearTextScaleFactorTestValue);
+    await tester.pumpAndSettle();
+    expect(tester.takeException(), isNull);
   });
 }

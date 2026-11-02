@@ -1,4 +1,4 @@
-import 'package:riverpod/riverpod.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../features/moderation/blocked_ustalar.dart';
 import '../l10n/app_localizations.dart';
 import '../models/api/usta.dart';
@@ -147,6 +147,10 @@ final mastersLoadErrorProvider = Provider<Object?>((ref) {
 final mastersLoadingProvider = Provider<bool>((ref) {
   return ref.watch(ustalarProvider(_allUstalarFilter)).isLoading;
 });
+
+/// Re-fetches the masters list (pull to refresh).
+Future<void> reloadMasters(WidgetRef ref) =>
+    ref.refresh(ustalarProvider(_allUstalarFilter).future);
 
 /// The request behind [mockMastersProvider]; invalidate it to retry.
 final ProviderOrFamily mastersSource = ustalarProvider(_allUstalarFilter);

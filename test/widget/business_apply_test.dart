@@ -160,7 +160,8 @@ void main() {
 
     await tester.enterText(find.widgetWithText(TextField, "Do'kon nomi"), 'Mebel Plus');
     final phone = find.widgetWithText(TextField, 'Telefon (+998...)');
-    await tester.enterText(phone, 'abc');
+    // Letters can't be typed any more; a half-typed number is the wrong case.
+    await tester.enterText(phone, '9012');
     await tester.tap(find.text('Arizani yuborish'));
     await tester.pumpAndSettle();
     expect(find.textContaining("Telefon raqami noto'g'ri"), findsOneWidget);

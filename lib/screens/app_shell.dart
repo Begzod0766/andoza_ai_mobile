@@ -141,8 +141,8 @@ class _BottomNavWithFab extends StatelessWidget {
     ),
   ];
 
-  /// Resolves a tab's localized name from its route — the nav is icon-only
-  /// (no visible label), so this only feeds the Semantics accessible name.
+  /// Resolves a tab's localized name from its route — shown under the icon
+  /// and used as the tab's Semantics name.
   static String _labelFor(AppLocalizations l10n, String route) => switch (route) {
         '/shop/s1' => l10n.navShop,
         '/masters/u1' => l10n.navMasters,
@@ -168,7 +168,7 @@ class _BottomNavWithFab extends StatelessWidget {
       child: SafeArea(
         top: false,
         child: SizedBox(
-          height: 60,
+          height: 64,
           child: Row(
             children: [
               Expanded(child: _navItem(context, _tabs[0])),
@@ -189,27 +189,47 @@ class _BottomNavWithFab extends StatelessWidget {
     return Semantics(
       button: true,
       selected: isCurrent,
-      // Icon-only nav — no visible label (see _labelFor's doc comment) — so
-      // this is the tab's only accessible name for screen readers.
+      // The tab's one accessible name; the visible text below is excluded
+      // so screen readers don't read it twice.
       label: _labelFor(l10n, tab.route),
       child: InkWell(
         onTap: () => context.go(tab.route),
-        child: Center(
-          child: AnimatedContainer(
-            duration: const Duration(milliseconds: 150),
-            width: 56,
-            height: 40,
-            alignment: Alignment.center,
-            decoration: BoxDecoration(
-              color: isCurrent ? DesignTokens.primaryBlue : Colors.transparent,
-              borderRadius: BorderRadius.circular(DesignTokens.radiusMd),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            AnimatedContainer(
+              duration: const Duration(milliseconds: 150),
+              width: 52,
+              height: 32,
+              alignment: Alignment.center,
+              decoration: BoxDecoration(
+                color: isCurrent ? DesignTokens.primaryBlue : Colors.transparent,
+                borderRadius: BorderRadius.circular(DesignTokens.radiusMd),
+              ),
+              child: Icon(
+                isCurrent ? tab.activeIcon : tab.icon,
+                color: isCurrent ? DesignTokens.white : DesignTokens.textMuted,
+                size: 22,
+              ),
             ),
-            child: Icon(
-              isCurrent ? tab.activeIcon : tab.icon,
-              color: isCurrent ? DesignTokens.white : DesignTokens.textMuted,
-              size: 24,
+            const SizedBox(height: 2),
+            // First-time users shouldn't have to guess the tabs. Capped so a
+            // large system font can't push the label out of the 64 px bar.
+            ExcludeSemantics(
+              child: Text(
+                _labelFor(l10n, tab.route),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                textScaler: MediaQuery.textScalerOf(context).clamp(maxScaleFactor: 1.2),
+                style: DesignTokens.caption.copyWith(
+                  fontSize: 11,
+                  height: 1.2,
+                  color: isCurrent ? DesignTokens.primaryBlue : DesignTokens.textGray,
+                  fontWeight: isCurrent ? FontWeight.w600 : FontWeight.w400,
+                ),
+              ),
             ),
-          ),
+          ],
         ),
       ),
     );
