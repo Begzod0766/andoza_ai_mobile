@@ -16,6 +16,7 @@ import '../../features/room_scan/room_scan_service.dart';
 import '../../geometry/room_geometry.dart';
 import '../../models/room_plan.dart';
 import '../../services/room_plan_handoff.dart';
+import 'scan_openings_editor.dart';
 import '../../utils/error_mapper.dart';
 
 /// Nav payload for [RoomScanReviewPage] (passed via go_router `extra`).
@@ -48,7 +49,8 @@ class _RoomScanReviewPageState extends ConsumerState<RoomScanReviewPage> {
   late double _ceiling;
   bool _busy = false;
 
-  RoomPlan get _plan => widget.args.draft.plan;
+  // The scanned plan, with the user's door/window edits.
+  late RoomPlan _plan = widget.args.draft.plan;
 
   @override
   void initState() {
@@ -177,6 +179,10 @@ class _RoomScanReviewPageState extends ConsumerState<RoomScanReviewPage> {
                 ),
               ),
             ),
+            const SizedBox(height: DesignTokens.spacingLg),
+
+            // Doors and windows: fix what the scan got wrong or missed.
+            ScanOpeningsEditor(plan: _plan, onChanged: (p) => setState(() => _plan = p)),
             const SizedBox(height: DesignTokens.spacingLg),
 
             // Ceiling height override.

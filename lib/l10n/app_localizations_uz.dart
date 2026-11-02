@@ -2895,4 +2895,34 @@ class AppLocalizationsUz extends AppLocalizations {
   String roomMenuTooltip(String name) {
     return '«$name» amallari';
   }
+
+  @override
+  String get openingWidthCm => 'Eni (sm)';
+
+  @override
+  String get openingHeightCm => 'Bo\'yi (sm)';
+
+  @override
+  String get openingSillCm => 'Deraza tagi (sm)';
+
+  @override
+  String get openingSave => 'Saqlash';
+
+  @override
+  String get openingDelete => 'O\'chirish';
+
+  @override
+  String get openingOffsetCm => 'Chapdan (sm)';
+
+  @override
+  String get scanReviewOpeningsTitle => 'Eshik va derazalar';
+
+  @override
+  String get scanReviewOpeningAdd => '+ Qo\'shish';
+
+  @override
+  String get scanReviewPickWall => 'Qaysi devorga?';
+
+  @override
+  String get scanReviewOpeningsEmpty => 'Hali eshik yoki deraza yo\'q';
 }

@@ -2804,5 +2804,45 @@
   "projectDeleteBody": "Проект «{name}» и его комнаты ({rooms}) будут удалены навсегда. Это нельзя отменить.",
   "roomDeleteTitle": "Удалить комнату?",
   "roomDeleteBody": "Комната «{name}» и её дизайн будут удалены навсегда. Это нельзя отменить.",
-  "roomMenuTooltip": "Действия: «{name}»"
+  "roomMenuTooltip": "Действия: «{name}»",
+  "openingWidthCm": "Ширина (см)",
+  "@openingWidthCm": {
+    "description": "door/window sheet: width field, centimetres"
+  },
+  "openingHeightCm": "Высота (см)",
+  "@openingHeightCm": {
+    "description": "door/window sheet: height field, centimetres"
+  },
+  "openingSillCm": "Высота подоконника (см)",
+  "@openingSillCm": {
+    "description": "door/window sheet: window sill height above the floor, centimetres"
+  },
+  "openingSave": "Сохранить",
+  "@openingSave": {
+    "description": "door/window sheet: save an edited opening"
+  },
+  "openingDelete": "Удалить",
+  "@openingDelete": {
+    "description": "door/window sheet: remove the opening"
+  },
+  "openingOffsetCm": "Слева (см)",
+  "@openingOffsetCm": {
+    "description": "door/window sheet: distance from the wall start to the opening's left edge, centimetres"
+  },
+  "scanReviewOpeningsTitle": "Двери и окна",
+  "@scanReviewOpeningsTitle": {
+    "description": "Room-scan review: heading of the editable doors/windows list"
+  },
+  "scanReviewOpeningAdd": "+ Добавить",
+  "@scanReviewOpeningAdd": {
+    "description": "Room-scan review: adds a door or window by hand"
+  },
+  "scanReviewPickWall": "На какую стену?",
+  "@scanReviewPickWall": {
+    "description": "Room-scan review: title of the wall picker before adding an opening"
+  },
+  "scanReviewOpeningsEmpty": "Пока нет дверей и окон",
+  "@scanReviewOpeningsEmpty": {
+    "description": "Room-scan review: the doors/windows list is empty"
+  }
 }

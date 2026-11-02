@@ -5319,6 +5319,66 @@ abstract class AppLocalizations {
   /// In uz, this message translates to:
   /// **'«{name}» amallari'**
   String roomMenuTooltip(String name);
+
+  /// door/window sheet: width field, centimetres
+  ///
+  /// In uz, this message translates to:
+  /// **'Eni (sm)'**
+  String get openingWidthCm;
+
+  /// door/window sheet: height field, centimetres
+  ///
+  /// In uz, this message translates to:
+  /// **'Bo\'yi (sm)'**
+  String get openingHeightCm;
+
+  /// door/window sheet: window sill height above the floor, centimetres
+  ///
+  /// In uz, this message translates to:
+  /// **'Deraza tagi (sm)'**
+  String get openingSillCm;
+
+  /// door/window sheet: save an edited opening
+  ///
+  /// In uz, this message translates to:
+  /// **'Saqlash'**
+  String get openingSave;
+
+  /// door/window sheet: remove the opening
+  ///
+  /// In uz, this message translates to:
+  /// **'O\'chirish'**
+  String get openingDelete;
+
+  /// door/window sheet: distance from the wall start to the opening's left edge, centimetres
+  ///
+  /// In uz, this message translates to:
+  /// **'Chapdan (sm)'**
+  String get openingOffsetCm;
+
+  /// Room-scan review: heading of the editable doors/windows list
+  ///
+  /// In uz, this message translates to:
+  /// **'Eshik va derazalar'**
+  String get scanReviewOpeningsTitle;
+
+  /// Room-scan review: adds a door or window by hand
+  ///
+  /// In uz, this message translates to:
+  /// **'+ Qo\'shish'**
+  String get scanReviewOpeningAdd;
+
+  /// Room-scan review: title of the wall picker before adding an opening
+  ///
+  /// In uz, this message translates to:
+  /// **'Qaysi devorga?'**
+  String get scanReviewPickWall;
+
+  /// Room-scan review: the doors/windows list is empty
+  ///
+  /// In uz, this message translates to:
+  /// **'Hali eshik yoki deraza yo\'q'**
+  String get scanReviewOpeningsEmpty;
 }
 
 class _AppLocalizationsDelegate

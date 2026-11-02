@@ -2897,4 +2897,34 @@ class AppLocalizationsEn extends AppLocalizations {
   String roomMenuTooltip(String name) {
     return 'Actions for “$name”';
   }
+
+  @override
+  String get openingWidthCm => 'Width (cm)';
+
+  @override
+  String get openingHeightCm => 'Height (cm)';
+
+  @override
+  String get openingSillCm => 'Sill height (cm)';
+
+  @override
+  String get openingSave => 'Save';
+
+  @override
+  String get openingDelete => 'Delete';
+
+  @override
+  String get openingOffsetCm => 'From the left (cm)';
+
+  @override
+  String get scanReviewOpeningsTitle => 'Doors and windows';
+
+  @override
+  String get scanReviewOpeningAdd => '+ Add';
+
+  @override
+  String get scanReviewPickWall => 'Which wall?';
+
+  @override
+  String get scanReviewOpeningsEmpty => 'No doors or windows yet';
 }
