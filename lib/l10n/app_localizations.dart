@@ -2626,6 +2626,12 @@ abstract class AppLocalizations {
   /// **'Deraza tagi (sm)'**
   String get openingSillCm;
 
+  /// door/window sheet: distance from the wall start to the opening's left edge, centimetres
+  ///
+  /// In uz, this message translates to:
+  /// **'Chapdan (sm)'**
+  String get openingOffsetCm;
+
   /// door/window sheet: save an edited opening
   ///
   /// In uz, this message translates to:

@@ -99,4 +99,10 @@ class OpeningCaptureTest {
         assertNull(c.pending)
         assertTrue(c.openings.isEmpty())
     }
+
+    @Test fun `the whole outline is drawn while marking openings`() {
+        assertTrue(drawsClosingEdge(isClosed = false, markingOpenings = true))
+        assertTrue(drawsClosingEdge(isClosed = true, markingOpenings = false))
+        assertFalse(drawsClosingEdge(isClosed = false, markingOpenings = false))
+    }
 }

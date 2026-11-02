@@ -111,4 +111,44 @@ void main() {
     await tester.tap(find.text(l10n.openingAddToWall));
     expect(added, isEmpty);
   });
+
+  testWidgets('a door switched to a window gets the 90 cm sill, not 0', (tester) async {
+    final added = await _pump(tester,
+        initial: const DoorWindowInitial(
+            type: OpeningType.single, width: 0.9, height: 2, offset: 0.5, sill: 0),
+        showSill: true);
+    await tester.tap(find.text(l10n.openingTypeWindow));
+    await tester.pump();
+    expect(find.widgetWithText(TextField, '90'), findsWidgets);
+    await tester.ensureVisible(find.text(l10n.openingSave));
+    await tester.tap(find.text(l10n.openingSave));
+    expect(added.single.sill, closeTo(0.9, 1e-9));
+  });
+
+  testWidgets('with a wall length the position is a cm field and stays on the wall', (tester) async {
+    final added = <double>[];
+    await tester.pumpWidget(MaterialApp(
+      locale: const Locale('uz'),
+      localizationsDelegates: AppLocalizations.localizationsDelegates,
+      supportedLocales: AppLocalizations.supportedLocales,
+      home: Scaffold(
+        body: SingleChildScrollView(
+          child: DoorWindowModal(
+            initial: const DoorWindowInitial(
+                type: OpeningType.single, width: 1.0, height: 2, offset: 0.5),
+            maxOffset: 3.0,
+            onAdd: (type, width, height, offset, sill) => added.add(offset),
+          ),
+        ),
+      ),
+    ));
+    expect(find.byType(Slider), findsNothing);
+    expect(find.widgetWithText(TextField, '50'), findsOneWidget);
+    await tester.enterText(find.byKey(const Key('opening-offset')), '250');
+    await tester.pump();
+    await tester.ensureVisible(find.text(l10n.openingSave));
+    await tester.tap(find.text(l10n.openingSave));
+    // 3.0 m wall, 1.0 m door: the left edge can be at most 2.0 m.
+    expect(added.single, closeTo(2.0, 1e-9));
+  });
 }

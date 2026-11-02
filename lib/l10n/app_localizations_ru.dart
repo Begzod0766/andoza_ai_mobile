@@ -1411,6 +1411,9 @@ class AppLocalizationsRu extends AppLocalizations {
   String get openingSillCm => 'Высота подоконника (см)';
 
   @override
+  String get openingOffsetCm => 'Слева (см)';
+
+  @override
   String get openingSave => 'Сохранить';
 
   @override

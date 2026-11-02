@@ -1417,6 +1417,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get openingSillCm => 'Sill height (cm)';
 
   @override
+  String get openingOffsetCm => 'From the left (cm)';
+
+  @override
   String get openingSave => 'Save';
 
   @override

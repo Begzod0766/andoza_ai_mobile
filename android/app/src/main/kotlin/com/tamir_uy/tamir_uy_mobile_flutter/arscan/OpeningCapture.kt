@@ -2,6 +2,9 @@ package com.tamir_uy.tamir_uy_mobile_flutter.arscan
 
 import kotlin.math.hypot
 
+/** Draw the last→first wall too: always while marking openings, which snap to it. */
+fun drawsClosingEdge(isClosed: Boolean, markingOpenings: Boolean): Boolean = isClosed || markingOpenings
+
 enum class OpeningType(val wire: String) { DOOR("door"), WINDOW("window") }
 
 /** Where the target lands on the outline: edge [edge] (corner i → i+1) at fraction [t]; [x],[z] is that point. */

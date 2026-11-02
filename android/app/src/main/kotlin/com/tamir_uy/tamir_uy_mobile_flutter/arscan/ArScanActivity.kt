@@ -687,7 +687,7 @@ class ArScanActivity : Activity(), GLSurfaceView.Renderer {
             }
             val state = OverlayState(
                 corners = projected, labels = labels, reticleOnFloor = reticle != null,
-                snapping = snapping, closed = capture.isClosed, heightAxis = axis,
+                snapping = snapping, closed = drawsClosingEdge(capture.isClosed, step == Step.OPENINGS), heightAxis = axis,
                 heightLabel = liveHeight?.let { ArOverlayView.metres(it) },
                 walls = wallLines, candidates = candidateDots, dwell = dwellProgress, reticleAt = reticleAt,
                 openings = openingLines, pendingEdge = pendingAt, pendingLabel = pendingLabel,

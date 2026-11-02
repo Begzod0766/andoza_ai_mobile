@@ -1404,6 +1404,9 @@ class AppLocalizationsUz extends AppLocalizations {
   String get openingSillCm => 'Deraza tagi (sm)';
 
   @override
+  String get openingOffsetCm => 'Chapdan (sm)';
+
+  @override
   String get openingSave => 'Saqlash';
 
   @override

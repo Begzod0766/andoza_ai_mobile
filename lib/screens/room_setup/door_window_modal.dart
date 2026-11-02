@@ -1,4 +1,7 @@
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
+
 import '../../config/design_tokens.dart';
 import '../../l10n/app_localizations.dart';
 import '../../models/room_model.dart';
@@ -86,6 +89,7 @@ class _DoorWindowModalState extends State<DoorWindowModal> {
   final _width = TextEditingController();
   final _height = TextEditingController();
   final _sill = TextEditingController();
+  final _offsetCm = TextEditingController();
 
   @override
   void initState() {
@@ -97,10 +101,12 @@ class _DoorWindowModalState extends State<DoorWindowModal> {
       _offset = i.offset;
       _width.text = _cmText(i.width);
       _height.text = _cmText(i.height);
-      _sill.text = _cmText(i.sill);
+      // A door has no sill; if it becomes a window, start from the usual one.
+      _sill.text = i.type == OpeningType.dual ? _cmText(i.sill) : '90';
     } else {
       _sill.text = '90';
     }
+    _offsetCm.text = _cmText(_offset);
   }
 
   @override
@@ -108,6 +114,7 @@ class _DoorWindowModalState extends State<DoorWindowModal> {
     _width.dispose();
     _height.dispose();
     _sill.dispose();
+    _offsetCm.dispose();
     super.dispose();
   }
 
@@ -137,16 +144,24 @@ class _DoorWindowModalState extends State<DoorWindowModal> {
     final sill = _sillShown
         ? (double.tryParse(_sill.text.trim().replaceAll(',', '.')) ?? 0) / 100
         : 0.0;
-    widget.onAdd(_selectedType, size.$1, size.$2, _offset.clamp(0.0, _maxOffset), sill);
+    // With a known wall length the whole opening stays on the wall.
+    final wall = widget.maxOffset;
+    final offset = wall == null
+        ? _offset.clamp(0.0, _maxOffset)
+        : ((double.tryParse(_offsetCm.text.trim().replaceAll(',', '.')) ?? 0) /
+                  100)
+              .clamp(0.0, math.max(0.0, wall - size.$1))
+              .toDouble();
+    widget.onAdd(_selectedType, size.$1, size.$2, offset, sill);
   }
 
   Widget _cmField(Key key, TextEditingController c, String label) => TextField(
-        key: key,
-        controller: c,
-        keyboardType: const TextInputType.numberWithOptions(decimal: true),
-        decoration: InputDecoration(labelText: label, isDense: true),
-        onChanged: (_) => setState(() {}),
-      );
+    key: key,
+    controller: c,
+    keyboardType: const TextInputType.numberWithOptions(decimal: true),
+    decoration: InputDecoration(labelText: label, isDense: true),
+    onChanged: (_) => setState(() {}),
+  );
 
   @override
   Widget build(BuildContext context) {
@@ -219,9 +234,21 @@ class _DoorWindowModalState extends State<DoorWindowModal> {
             const SizedBox(height: DesignTokens.spacingMd),
             Row(
               children: [
-                Expanded(child: _cmField(const Key('opening-width'), _width, l10n.openingWidthCm)),
+                Expanded(
+                  child: _cmField(
+                    const Key('opening-width'),
+                    _width,
+                    l10n.openingWidthCm,
+                  ),
+                ),
                 const SizedBox(width: DesignTokens.spacingSm),
-                Expanded(child: _cmField(const Key('opening-height'), _height, l10n.openingHeightCm)),
+                Expanded(
+                  child: _cmField(
+                    const Key('opening-height'),
+                    _height,
+                    l10n.openingHeightCm,
+                  ),
+                ),
               ],
             ),
           ],
@@ -231,19 +258,32 @@ class _DoorWindowModalState extends State<DoorWindowModal> {
           ],
           const SizedBox(height: DesignTokens.spacingLg),
           Text(l10n.openingPositionLabel, style: DesignTokens.subtitle2),
-          Slider(
-            value: _offset.clamp(0.0, _maxOffset),
-            min: 0,
-            max: _maxOffset,
-            activeColor: DesignTokens.primaryBlue,
-            onChanged: (value) => setState(() => _offset = value),
-          ),
+          if (widget.maxOffset != null) ...[
+            const SizedBox(height: DesignTokens.spacingSm),
+            _cmField(
+              const Key('opening-offset'),
+              _offsetCm,
+              l10n.openingOffsetCm,
+            ),
+            const SizedBox(height: DesignTokens.spacingMd),
+          ] else
+            Slider(
+              value: _offset.clamp(0.0, _maxOffset),
+              min: 0,
+              max: _maxOffset,
+              activeColor: DesignTokens.primaryBlue,
+              onChanged: (value) => setState(() => _offset = value),
+            ),
           const SizedBox(height: DesignTokens.spacingSm),
           SizedBox(
             width: double.infinity,
             child: ElevatedButton(
               onPressed: _size == null ? null : _submit,
-              child: Text(widget.initial != null ? l10n.openingSave : l10n.openingAddToWall),
+              child: Text(
+                widget.initial != null
+                    ? l10n.openingSave
+                    : l10n.openingAddToWall,
+              ),
             ),
           ),
           if (widget.onDelete != null)
@@ -251,7 +291,9 @@ class _DoorWindowModalState extends State<DoorWindowModal> {
               width: double.infinity,
               child: TextButton(
                 onPressed: widget.onDelete,
-                style: TextButton.styleFrom(foregroundColor: DesignTokens.error),
+                style: TextButton.styleFrom(
+                  foregroundColor: DesignTokens.error,
+                ),
                 child: Text(l10n.openingDelete),
               ),
             ),

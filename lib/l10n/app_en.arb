@@ -1727,6 +1727,10 @@
   "@openingSillCm": {
     "description": "door/window sheet: window sill height above the floor, centimetres"
   },
+  "openingOffsetCm": "From the left (cm)",
+  "@openingOffsetCm": {
+    "description": "door/window sheet: distance from the wall start to the opening's left edge, centimetres"
+  },
   "openingSave": "Save",
   "@openingSave": {
     "description": "door/window sheet: save an edited opening"
