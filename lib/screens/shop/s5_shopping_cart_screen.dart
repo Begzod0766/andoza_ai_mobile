@@ -107,7 +107,7 @@ class S5ShoppingCartScreen extends ConsumerWidget {
                           height: DesignTokens.buttonHeightLarge,
                           child: ElevatedButton(
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: DesignTokens.accentOrange,
+                              backgroundColor: DesignTokens.accentOrangeStrong,
                             ),
                             onPressed: () => context.push('/shop/s6'),
                             child: Text(l10n.shopCheckout),

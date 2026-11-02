@@ -148,7 +148,7 @@ class _ProductTile extends ConsumerWidget {
                     if (product.status == ModerationStatus.rejected &&
                         (product.moderationNote ?? '').isNotEmpty)
                       Text(l10n.businessRejectedReason(product.moderationNote!),
-                          style: DesignTokens.caption.copyWith(color: DesignTokens.errorRed)),
+                          style: DesignTokens.caption.copyWith(color: DesignTokens.errorText)),
                   ],
                 ),
               ),

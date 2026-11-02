@@ -106,7 +106,7 @@ class _E7OnboardingWelcomeScreenState extends State<E7OnboardingWelcomeScreen> {
                 height: DesignTokens.buttonHeightLarge,
                 child: ElevatedButton(
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: DesignTokens.accentOrange,
+                    backgroundColor: DesignTokens.accentOrangeStrong,
                   ),
                   onPressed: _next,
                   child: Text(

@@ -243,7 +243,7 @@ class _E1EstimationIntroScreenState
                               formatSom(savings.round()),
                             ),
                             style: DesignTokens.body2.copyWith(
-                              color: DesignTokens.successGreen,
+                              color: DesignTokens.successText,
                               fontWeight: FontWeight.w600,
                             ),
                           ),
@@ -342,7 +342,7 @@ class _E1EstimationIntroScreenState
                     height: DesignTokens.buttonHeightLarge,
                     child: ElevatedButton(
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: DesignTokens.accentOrange,
+                        backgroundColor: DesignTokens.accentOrangeStrong,
                       ),
                       onPressed: () => context.push('/shop/s5'),
                       child: Text(l10n.estimateBuyFromShops),

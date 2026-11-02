@@ -288,7 +288,7 @@ class _CardShellState extends State<_CardShell> {
           if (status == ModerationStatus.rejected) ...[
             if (widget.note != null && widget.note!.isNotEmpty)
               Text(l10n.businessRejectedReason(widget.note!),
-                  style: DesignTokens.body2.copyWith(color: DesignTokens.errorRed)),
+                  style: DesignTokens.body2.copyWith(color: DesignTokens.errorText)),
             const SizedBox(height: DesignTokens.spacingSm),
             OutlinedButton(
               onPressed: _busy

@@ -171,7 +171,7 @@ class _BusinessApplyScreenState extends ConsumerState<BusinessApplyScreen> {
             ],
             if (_error != null) ...[
               const SizedBox(height: DesignTokens.spacingMd),
-              Text(_error!, style: DesignTokens.body2.copyWith(color: DesignTokens.errorRed)),
+              Text(_error!, style: DesignTokens.body2.copyWith(color: DesignTokens.errorText)),
             ],
             const SizedBox(height: DesignTokens.spacingLg),
             SizedBox(

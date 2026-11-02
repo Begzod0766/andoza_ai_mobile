@@ -392,7 +392,7 @@ class WallElevationPainter extends CustomPainter {
     textPainter.text = TextSpan(
       text: '${wall.length.toStringAsFixed(1)} m',
       style: const TextStyle(
-        color: DesignTokens.accentOrange,
+        color: DesignTokens.accentOrangeStrong,
         fontSize: 12,
         fontWeight: FontWeight.bold,
       ),

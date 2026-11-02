@@ -207,7 +207,7 @@ class _U5BookingConfirmationScreenState
                 height: DesignTokens.buttonHeightLarge,
                 child: ElevatedButton(
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: DesignTokens.accentOrange,
+                    backgroundColor: DesignTokens.accentOrangeStrong,
                   ),
                   onPressed: _sending ? null : () => _send(m),
                   child: Text(l10n.mastersSend),

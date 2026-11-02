@@ -95,7 +95,7 @@ class U4ReviewRatingScreen extends ConsumerWidget {
                       Text(
                         l10n.commonVerifiedBadge,
                         style: DesignTokens.caption.copyWith(
-                          color: DesignTokens.successGreen,
+                          color: DesignTokens.successText,
                         ),
                       ),
                   ],
@@ -230,7 +230,7 @@ class U4ReviewRatingScreen extends ConsumerWidget {
                 height: DesignTokens.buttonHeightLarge,
                 child: ElevatedButton(
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: DesignTokens.accentOrange,
+                    backgroundColor: DesignTokens.accentOrangeStrong,
                   ),
                   onPressed: () => context.push('/masters/u5', extra: m),
                   child: Text(l10n.mastersSendEstimate),

@@ -45,6 +45,13 @@ class DesignTokens {
   static const Color white = Color(0xFFFFFFFF);
   static const Color errorRed = Color(0xFFEF4444);
   static const Color successGreen = Color(0xFF16A34A);
+
+  // Text-safe variants (WCAG AA 4.5:1 on white). [accentOrange], [errorRed]
+  // and [successGreen] stay for icons, borders and fills; text and filled
+  // buttons with white labels use these.
+  static const Color accentOrangeStrong = Color(0xFFC2410C);
+  static const Color errorText = Color(0xFFB91C1C);
+  static const Color successText = Color(0xFF15803D);
   static const Color warningYellow = Color(0xFFFCD34D);
   static const Color borderGray = Color(0xFFE2E7F2);
   static const Color borderGrayAlt = Color(0xFFDCE4F7);
@@ -275,7 +282,7 @@ class AndozaTheme {
         secondary: DesignTokens.accentOrange,
         tertiary: DesignTokens.accentOrange,
         surface: DesignTokens.white,
-        error: DesignTokens.errorRed,
+        error: DesignTokens.errorText,
       ),
       appBarTheme: const AppBarTheme(
         backgroundColor: DesignTokens.backgroundLight,
@@ -372,7 +379,7 @@ class AndozaTheme {
         secondary: DesignTokens.accentOrange,
         tertiary: DesignTokens.accentOrange,
         surface: Color(0xFF1A2230),
-        error: DesignTokens.errorRed,
+        error: DesignTokens.errorText,
       ),
     );
   }

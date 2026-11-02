@@ -178,7 +178,7 @@ class _EditUstaScreenState extends ConsumerState<EditUstaScreen> {
                 if (_error != null)
                   Padding(
                     padding: const EdgeInsets.only(bottom: DesignTokens.spacingSm),
-                    child: Text(_error!, style: DesignTokens.body2.copyWith(color: DesignTokens.errorRed)),
+                    child: Text(_error!, style: DesignTokens.body2.copyWith(color: DesignTokens.errorText)),
                   ),
                 FilledButton(
                   onPressed: _saving ? null : _save,
