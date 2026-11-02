@@ -80,6 +80,16 @@ class _ArScanScreenState extends ConsumerState<ArScanScreen> with WidgetsBinding
         'arScanVolume': l10n.arScanVolume,
         'arScanUnitCm': l10n.arScanUnitCm,
         'arScanUnitM': l10n.arScanUnitM,
+        'arScanOpeningsHint': l10n.arScanOpeningsHint,
+        'arScanAddEdge': l10n.arScanAddEdge,
+        'arScanDoor': l10n.arScanDoor,
+        'arScanWindow': l10n.arScanWindow,
+        'arScanOpeningOtherWall': l10n.arScanOpeningOtherWall,
+        'arScanOpeningTooNarrow': l10n.arScanOpeningTooNarrow,
+        'arScanOpeningOverlap': l10n.arScanOpeningOverlap,
+        'arScanAimWallBase': l10n.arScanAimWallBase,
+        'arScanAddOpenings': l10n.arScanAddOpenings,
+        'arScanOpeningsDone': l10n.arScanOpeningsDone,
       };
 
   Future<void> _start() async {

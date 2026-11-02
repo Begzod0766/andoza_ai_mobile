@@ -185,4 +185,12 @@ class FloorPlanCaptureTest {
         assertEquals(AddResult.REJECTED_DUPLICATE, c.addCorner(Vec3(4.03f, 0f, 0.02f)))
         assertEquals(2, c.corners.size)
     }
+
+    @Test fun `the channel payload carries the openings`() {
+        val c = FloorPlanCapture()
+        c.addCorner(Vec3(0f, 0f, 0f)); c.addCorner(Vec3(4f, 0f, 0f)); c.addCorner(Vec3(4f, 0f, 3f))
+        val m = c.toResult(2.7f, true, 1, listOf(CapturedOpening(OpeningType.WINDOW, 2, 0.25f, 0.5f)))
+        assertEquals(listOf(mapOf("type" to "window", "edge" to 2, "t0" to 0.25, "t1" to 0.5)), m["openings"])
+        assertEquals(emptyList<Any>(), c.toResult(2.7f, true, 1)["openings"])
+    }
 }

@@ -23,6 +23,7 @@ class ArScanChrome(private val activity: Activity, private val s: (String) -> St
     var onMain: () -> Unit = {}
     var onCloseRoom: () -> Unit = {}
     var onChip: (Float) -> Unit = {}
+    var onOpeningType: (OpeningType) -> Unit = {}
 
     private val accent = Color.rgb(64, 56, 160)
     private fun dp(v: Int) = (v * activity.resources.displayMetrics.density).toInt()
@@ -67,6 +68,29 @@ class ArScanChrome(private val activity: Activity, private val s: (String) -> St
             }, LinearLayout.LayoutParams(-2, -2).apply { marginStart = dp(4); marginEnd = dp(4) })
         }
     }
+    // Eshik / Deraza: which kind the next two edges make (doors-and-windows step).
+    private var shownType = OpeningType.DOOR
+    private fun typePill(type: OpeningType, key: String) = TextView(activity).apply {
+        text = s(key); textSize = 15f
+        setPadding(dp(18), dp(8), dp(18), dp(8))
+        setOnClickListener { shownType = type; paintTypes(); onOpeningType(type) }
+    }
+    private val doorPill = typePill(OpeningType.DOOR, "arScanDoor")
+    private val windowPill = typePill(OpeningType.WINDOW, "arScanWindow")
+    private val types = LinearLayout(activity).apply {
+        orientation = LinearLayout.HORIZONTAL
+        gravity = Gravity.CENTER
+        addView(doorPill, LinearLayout.LayoutParams(-2, -2).apply { marginEnd = dp(8) })
+        addView(windowPill, LinearLayout.LayoutParams(-2, -2))
+    }
+    private fun paintTypes() {
+        for ((pill, type) in listOf(doorPill to OpeningType.DOOR, windowPill to OpeningType.WINDOW)) {
+            val on = shownType == type
+            pill.setTextColor(if (on) accent else Color.WHITE)
+            pill.background = rounded(if (on) Color.WHITE else Color.argb(150, 0, 0, 0), 18)
+        }
+    }
+
     private val main = Button(activity).apply {
         isAllCaps = false
         textSize = 17f
@@ -96,15 +120,21 @@ class ArScanChrome(private val activity: Activity, private val s: (String) -> St
             setPadding(dp(16), 0, dp(16), dp(40))
             addView(summary, LinearLayout.LayoutParams(-2, -2).apply { bottomMargin = dp(12) })
             addView(chips, LinearLayout.LayoutParams(-2, -2).apply { bottomMargin = dp(12) })
+            addView(types, LinearLayout.LayoutParams(-2, -2).apply { bottomMargin = dp(12) })
             addView(main, LinearLayout.LayoutParams(-2, -2))
         }
         addView(bottom, FrameLayout.LayoutParams(-1, -2, Gravity.BOTTOM))
+        paintTypes()
     }
 
-    fun bind(ui: FlowUi, hintText: String, summaryText: String?) {
+    fun bind(ui: FlowUi, hintText: String, summaryText: String?, openingType: OpeningType = OpeningType.DOOR) {
         hint.text = hintText
         undo.visibility = if (ui.undoVisible) View.VISIBLE else View.INVISIBLE
-        closeRoom.visibility = if (ui.closeVisible) View.VISIBLE else View.GONE
+        // The same pill: "Xonani yopish" while walling, else the doors/windows action.
+        closeRoom.visibility = if (ui.closeVisible || ui.secondaryKey != null) View.VISIBLE else View.GONE
+        closeRoom.text = s(ui.secondaryKey ?: "arScanCloseRoom")
+        types.visibility = if (ui.typeChipsVisible) View.VISIBLE else View.GONE
+        if (shownType != openingType) { shownType = openingType; paintTypes() }
         chips.visibility = if (ui.chipsVisible) View.VISIBLE else View.GONE
         summary.visibility = if (summaryText != null) View.VISIBLE else View.GONE
         summary.text = summaryText ?: ""

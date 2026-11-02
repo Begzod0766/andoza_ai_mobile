@@ -1,6 +1,6 @@
 package com.tamir_uy.tamir_uy_mobile_flutter.arscan
 
-enum class ScanStep { FIND_FLOOR, BASE, HEIGHT, WALLS, DONE }
+enum class ScanStep { FIND_FLOOR, BASE, HEIGHT, WALLS, DONE, OPENINGS }
 
 /** What the chrome shows this frame; keys are the copy keys passed in from Flutter. */
 data class FlowUi(
@@ -10,6 +10,10 @@ data class FlowUi(
     val undoVisible: Boolean,
     val closeVisible: Boolean,
     val chipsVisible: Boolean,
+    /** The pill under the hint when it isn't "Xonani yopish": opens/ends doors and windows. */
+    val secondaryKey: String? = null,
+    /** The Eshik / Deraza toggle (doors-and-windows step). */
+    val typeChipsVisible: Boolean = false,
 )
 
 /**
@@ -26,6 +30,37 @@ class ScanFlow(val capture: FloorPlanCapture = FloorPlanCapture()) {
         private set
     var heightMeasured = false
         private set
+
+    /** Doors and windows, marked after the room is closed (edge + fractions). */
+    val openings = OpeningCapture()
+    @Volatile var openingType = OpeningType.DOOR
+
+    /** The closed outline the openings' edge indices refer to. */
+    fun loop(): List<Vec3> = openings.loop(capture.corners, capture.isClosed)
+
+    /** Where the aim lands on a wall while marking openings; null off the walls. */
+    fun edgeAt(reticle: Vec3?): EdgeHit? =
+        if (step == ScanStep.OPENINGS && reticle != null) openings.snap(reticle, loop()) else null
+
+    fun startOpenings(): Boolean {
+        if (step != ScanStep.DONE) return false
+        step = ScanStep.OPENINGS
+        return true
+    }
+
+    /** Back to the finished room, keeping the openings (a half-marked one is dropped). */
+    fun finishOpenings(): Boolean {
+        if (step != ScanStep.OPENINGS) return false
+        if (openings.pending != null) openings.undo()
+        step = ScanStep.DONE
+        return true
+    }
+
+    /** One edge of a door/window under the aim; null when it isn't on a wall. */
+    fun addOpeningEdge(reticle: Vec3): OpeningAddResult? {
+        val hit = edgeAt(reticle) ?: return null
+        return openings.addEdge(hit, openingType, loop())
+    }
 
     /**
      * Taps are queued onto the GL thread: one made while the screen showed
@@ -79,15 +114,26 @@ class ScanFlow(val capture: FloorPlanCapture = FloorPlanCapture()) {
             capture.undo()
             1
         }
-        ScanStep.DONE -> {
+        // Openings hang on the closed outline: they go before it reopens.
+        ScanStep.DONE -> if (openings.openings.isNotEmpty()) {
+            openings.undo()
+            0
+        } else {
             capture.reopen()
             step = ScanStep.WALLS
             1
+        }
+        ScanStep.OPENINGS -> {
+            if (!openings.undo()) step = ScanStep.DONE
+            0
         }
     }
 
     /** After [FloorPlanCapture.updatePositions] dropped corners whose anchors stopped tracking. */
     fun cornersLost() {
+        // Their edge indices referred to the outline that just changed.
+        openings.clear()
+        if (step == ScanStep.OPENINGS) step = ScanStep.DONE
         if (capture.corners.isEmpty()) {
             height = null
             if (step != ScanStep.FIND_FLOOR) step = ScanStep.BASE
@@ -109,8 +155,16 @@ class ScanFlow(val capture: FloorPlanCapture = FloorPlanCapture()) {
                 if (reticle != null && capture.wouldSnap(reticle)) "arScanSnapToFirst" else "arScanCornersHint",
                 "arScanAddCorner", ok, true, tracking && capture.corners.size >= 3, false,
             )
-            ScanStep.DONE -> FlowUi("arScanDoneHint", "arScanCreatePlan", true, true, false, false)
+            ScanStep.DONE -> FlowUi("arScanDoneHint", "arScanCreatePlan", true, true, false, false, secondaryKey = "arScanAddOpenings")
+            ScanStep.OPENINGS -> {
+                val onWall = edgeAt(reticle) != null
+                FlowUi(
+                    if (onWall) "arScanOpeningsHint" else "arScanAimWallBase",
+                    "arScanAddEdge", tracking && onWall, true, false, false,
+                    secondaryKey = "arScanOpeningsDone", typeChipsVisible = true,
+                )
+            }
         }
-        return if (!tracking && step != ScanStep.DONE) ui.copy(hintKey = "arScanTrackingLost") else ui
+        return if (!tracking && step != ScanStep.DONE && step != ScanStep.OPENINGS) ui.copy(hintKey = "arScanTrackingLost") else ui
     }
 }

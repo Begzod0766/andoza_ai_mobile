@@ -151,13 +151,22 @@ class FloorPlanCapture(val snapDistanceM: Float = 0.20f) {
         return t.takeIf { it in MIN_HEIGHT_M..MAX_HEIGHT_M }
     }
 
-    fun toResult(height: Float, heightMeasured: Boolean, durationSec: Int): Map<String, Any> = mapOf(
+    fun toResult(
+        height: Float,
+        heightMeasured: Boolean,
+        durationSec: Int,
+        openings: List<CapturedOpening> = emptyList(),
+    ): Map<String, Any> = mapOf(
         "corners" to points.map { listOf(it.x.toDouble(), it.z.toDouble()) },
         "height" to height.toDouble(),
         "heightMeasured" to heightMeasured,
         "closed" to isClosed,
         "trackingLossCount" to trackingLossCount,
         "durationSec" to durationSec,
+        // Edge i is corner i → i+1 of the outline without its closing point.
+        "openings" to openings.map {
+            mapOf("type" to it.type.wire, "edge" to it.edge, "t0" to it.t0.toDouble(), "t1" to it.t1.toDouble())
+        },
     )
 
     companion object {

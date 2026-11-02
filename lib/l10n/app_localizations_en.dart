@@ -2927,4 +2927,35 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get scanReviewOpeningsEmpty => 'No doors or windows yet';
+
+  @override
+  String get arScanOpeningsHint =>
+      'Put the target under the left and right edge of a door or window and tap “Add edge”';
+
+  @override
+  String get arScanAddEdge => 'Add edge';
+
+  @override
+  String get arScanDoor => 'Door';
+
+  @override
+  String get arScanWindow => 'Window';
+
+  @override
+  String get arScanOpeningOtherWall => 'Both edges must be on the same wall';
+
+  @override
+  String get arScanOpeningTooNarrow => 'Too narrow — mark the edges again';
+
+  @override
+  String get arScanOpeningOverlap => 'There is already a door or window here';
+
+  @override
+  String get arScanAimWallBase => 'Move the target to the bottom of a wall';
+
+  @override
+  String get arScanAddOpenings => 'Add doors and windows';
+
+  @override
+  String get arScanOpeningsDone => 'Done';
 }

@@ -90,6 +90,23 @@ void main() {
     expect(s.containsKey('arScanStepFloor'), isFalse);
   });
 
+  testWidgets('passes the scanner its doors-and-windows copy', (tester) async {
+    final fake = _FakeArScan(raw: _scan([[0, 0], [4, 0], [4, 3], [0, 3]]));
+    await _pump(tester, fake);
+    final s = fake.lastStrings!;
+    for (final e in {
+      'arScanAddOpenings': l10n.arScanAddOpenings, 'arScanOpeningsDone': l10n.arScanOpeningsDone,
+      'arScanOpeningsHint': l10n.arScanOpeningsHint, 'arScanAddEdge': l10n.arScanAddEdge,
+      'arScanDoor': l10n.arScanDoor, 'arScanWindow': l10n.arScanWindow,
+      'arScanOpeningOtherWall': l10n.arScanOpeningOtherWall,
+      'arScanOpeningTooNarrow': l10n.arScanOpeningTooNarrow,
+      'arScanOpeningOverlap': l10n.arScanOpeningOverlap, 'arScanAimWallBase': l10n.arScanAimWallBase,
+    }.entries) {
+      expect(s[e.key], e.value, reason: e.key);
+      expect(e.value, isNotEmpty, reason: e.key);
+    }
+  });
+
   testWidgets('ok scan opens the review with an arcore plan', (tester) async {
     final fake = _FakeArScan(raw: _scan([[0, 0], [4, 0], [4, 3], [0, 3]]));
     await _pump(tester, fake);

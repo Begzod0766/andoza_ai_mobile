@@ -22,6 +22,8 @@ data class OverlayState(
     val reticleSnapping: Boolean = false,
     val labels: List<Pair<Px, String>> = emptyList(),
     val onboarding: Boolean = false,
+    /** Doors and windows on the walls: (outline, isWindow). */
+    val openings: List<Pair<List<Px>, Boolean>> = emptyList(),
 )
 
 /**
@@ -40,6 +42,8 @@ class ArOverlayView(context: Context) : View(context) {
     private val reticleSnapFill = Paint(Paint.ANTI_ALIAS_FLAG).apply { color = Color.WHITE; style = Paint.Style.FILL }
     private val reticleEdge = Paint(Paint.ANTI_ALIAS_FLAG).apply { color = Color.WHITE; strokeWidth = dp(2f); style = Paint.Style.STROKE }
     private val faintRing = Paint(Paint.ANTI_ALIAS_FLAG).apply { color = Color.argb(110, 255, 255, 255); strokeWidth = dp(2f); style = Paint.Style.STROKE }
+    private val doorFill = Paint(Paint.ANTI_ALIAS_FLAG).apply { color = Color.argb(120, 34, 197, 94); style = Paint.Style.FILL }
+    private val windowFill = Paint(Paint.ANTI_ALIAS_FLAG).apply { color = Color.argb(120, 59, 130, 246); style = Paint.Style.FILL }
     private val chipBg = Paint(Paint.ANTI_ALIAS_FLAG).apply { color = Color.WHITE }
     private val chipText = Paint(Paint.ANTI_ALIAS_FLAG).apply { color = Color.rgb(64, 56, 160); textSize = dp(13f); textAlign = Paint.Align.CENTER; isFakeBoldText = true }
     private val guide = Paint(Paint.ANTI_ALIAS_FLAG).apply { color = Color.WHITE; strokeWidth = dp(2.5f); style = Paint.Style.STROKE; strokeJoin = Paint.Join.ROUND }
@@ -51,6 +55,11 @@ class ArOverlayView(context: Context) : View(context) {
         val s = state
         for (w in s.walls) drawWall(canvas, w, wallFill)
         s.liveWall?.let { drawWall(canvas, it, liveFill) }
+        for ((outline, isWindow) in s.openings) {
+            val path = polygon(outline)
+            canvas.drawPath(path, if (isWindow) windowFill else doorFill)
+            canvas.drawPath(path, edge)
+        }
         s.heightAxis?.let { canvas.drawLine(it.a.first, it.a.second, it.b.first, it.b.second, edge) }
 
         val r = s.reticle

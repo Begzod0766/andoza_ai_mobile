@@ -2927,4 +2927,35 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get scanReviewOpeningsEmpty => 'Пока нет дверей и окон';
+
+  @override
+  String get arScanOpeningsHint =>
+      'Наведите прицел под левый и правый край двери или окна и нажмите «Добавить край»';
+
+  @override
+  String get arScanAddEdge => 'Добавить край';
+
+  @override
+  String get arScanDoor => 'Дверь';
+
+  @override
+  String get arScanWindow => 'Окно';
+
+  @override
+  String get arScanOpeningOtherWall => 'Оба края должны быть на одной стене';
+
+  @override
+  String get arScanOpeningTooNarrow => 'Слишком узко — отметьте края заново';
+
+  @override
+  String get arScanOpeningOverlap => 'Здесь уже есть дверь или окно';
+
+  @override
+  String get arScanAimWallBase => 'Наведите прицел на низ стены';
+
+  @override
+  String get arScanAddOpenings => 'Добавить двери и окна';
+
+  @override
+  String get arScanOpeningsDone => 'Готово';
 }

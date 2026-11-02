@@ -53,6 +53,12 @@ class ArScanActivity : Activity(), GLSurfaceView.Renderer {
         const val EXTRA_ERROR_MESSAGE = "errorMessage"
         private const val CAMERA_REQUEST = 4202
         private const val FLOOR_HINT_AFTER_MS = 20_000L
+        private const val NOTICE_MS = 2_500L
+        // Defaults the plan gives openings too (arcore_plan.dart), so the 3D preview matches.
+        private const val DOOR_HEIGHT_M = 2.0f
+        private const val WINDOW_HEIGHT_M = 1.5f
+        private const val WINDOW_SILL_M = 0.9f
+        private const val CEILING_GAP_M = 0.10f
         private val PRESET_HEIGHTS = floatArrayOf(2.5f, 2.7f, 2.8f, 3.0f)
         private const val TAG = "ArScan"
     }
@@ -83,6 +89,16 @@ class ArScanActivity : Activity(), GLSurfaceView.Renderer {
         "arScanVolume" to "Hajm",
         "arScanUnitCm" to "sm",
         "arScanUnitM" to "m",
+        "arScanAddOpenings" to "Eshik/deraza qo'shish",
+        "arScanOpeningsDone" to "Tayyor",
+        "arScanOpeningsHint" to "Eshik yoki derazaning chap va o'ng cheti tagiga nishonni qo'yib, «Chet qo'shish»ni bosing",
+        "arScanAddEdge" to "Chet qo'shish",
+        "arScanDoor" to "Eshik",
+        "arScanWindow" to "Deraza",
+        "arScanOpeningOtherWall" to "Ikkala chet bitta devorda bo'lsin",
+        "arScanOpeningTooNarrow" to "Juda tor — chetlarni qayta belgilang",
+        "arScanOpeningOverlap" to "Bu joyda allaqachon eshik yoki deraza bor",
+        "arScanAimWallBase" to "Nishonni devor tagiga olib boring",
     )
     private lateinit var strings: Map<String, String>
     private fun s(key: String) = strings[key] ?: fallback[key] ?: key
@@ -107,6 +123,9 @@ class ArScanActivity : Activity(), GLSurfaceView.Renderer {
     // Set when anchors stopped tracking and corners were dropped; stays up
     // until the user's next action (a one-frame hint is never seen).
     @Volatile private var cornersLost = false
+    // A refused door/window edge: its reason shows instead of the hint until then.
+    @Volatile private var openingNotice: String? = null
+    @Volatile private var openingNoticeUntil = 0L
     private var viewportW = 0
     private var viewportH = 0
     private var viewportChanged = false
@@ -136,6 +155,7 @@ class ArScanActivity : Activity(), GLSurfaceView.Renderer {
             onMain = ::onMain
             onCloseRoom = ::onCloseRoom
             onChip = ::onChip
+            onOpeningType = { type -> flow.openingType = type }
         }
         root.addView(surface, FrameLayout.LayoutParams(-1, -1))
         root.addView(overlay, FrameLayout.LayoutParams(-1, -1))
@@ -197,13 +217,35 @@ class ArScanActivity : Activity(), GLSurfaceView.Renderer {
                 }
             }
             ScanStep.DONE -> flow.height?.let { finishWith(it, flow.heightMeasured) }
+            ScanStep.OPENINGS -> {
+                val aim = reticle ?: return
+                val notice = when (flow.addOpeningEdge(aim)) {
+                    null -> return
+                    OpeningAddResult.PENDING -> { haptic(HapticFeedbackConstants.VIRTUAL_KEY); null }
+                    OpeningAddResult.ADDED -> { haptic(HapticFeedbackConstants.LONG_PRESS); null }
+                    OpeningAddResult.REJECTED_OTHER_WALL -> "arScanOpeningOtherWall"
+                    OpeningAddResult.REJECTED_TOO_NARROW -> "arScanOpeningTooNarrow"
+                    OpeningAddResult.REJECTED_OVERLAP -> "arScanOpeningOverlap"
+                }
+                if (notice != null) {
+                    openingNotice = notice
+                    openingNoticeUntil = SystemClock.elapsedRealtime() + NOTICE_MS
+                }
+            }
         }
     }
 
+    /** The pill under the hint: "Xonani yopish", or opening/ending doors and windows. */
     private fun onCloseRoom() {
         val tappedIn = shownStep
         onGl {
-            if (!flow.isCurrent(tappedIn) || !tracking) return@onGl
+            if (!flow.isCurrent(tappedIn)) return@onGl
+            when (flow.step) {
+                ScanStep.DONE -> { flow.startOpenings(); return@onGl }
+                ScanStep.OPENINGS -> { flow.finishOpenings(); return@onGl }
+                else -> Unit
+            }
+            if (!tracking) return@onGl
             cornersLost = false
             // Anchor first (it throws while not tracking): close() appends a copy
             // of the first corner, and every corner needs its anchor.
@@ -241,7 +283,7 @@ class ArScanActivity : Activity(), GLSurfaceView.Renderer {
     private fun finishWith(height: Float, measured: Boolean) {
         if (finished) return
         val seconds = ((SystemClock.elapsedRealtime() - startedAt) / 1000).toInt()
-        val result = flow.capture.toResult(height, measured, seconds)
+        val result = flow.capture.toResult(height, measured, seconds, flow.openings.openings)
         val json = JSONObject().apply {
             put("corners", JSONArray().apply {
                 @Suppress("UNCHECKED_CAST")
@@ -250,6 +292,10 @@ class ArScanActivity : Activity(), GLSurfaceView.Renderer {
             put("height", result["height"]); put("heightMeasured", result["heightMeasured"])
             put("closed", result["closed"]); put("trackingLossCount", result["trackingLossCount"])
             put("durationSec", result["durationSec"])
+            put("openings", JSONArray().apply {
+                @Suppress("UNCHECKED_CAST")
+                (result["openings"] as List<Map<String, Any>>).forEach { put(JSONObject(it)) }
+            })
         }.toString()
         Log.i(TAG, json)
         finished = true
@@ -420,6 +466,8 @@ class ArScanActivity : Activity(), GLSurfaceView.Renderer {
                 flow.step == ScanStep.FIND_FLOOR && tracking &&
                     SystemClock.elapsedRealtime() - startedAt > FLOOR_HINT_AFTER_MS -> "arScanFloorHint"
                 cornersLost && tracking -> "arScanCornersLost"
+                flow.step == ScanStep.OPENINGS && SystemClock.elapsedRealtime() < openingNoticeUntil ->
+                    openingNotice ?: ui.hintKey
                 else -> ui.hintKey
             }
             val summary = flow.height?.takeIf { flow.step == ScanStep.DONE }?.let(::summaryText)
@@ -427,7 +475,7 @@ class ArScanActivity : Activity(), GLSurfaceView.Renderer {
             runOnUiThread {
                 shownStep = step
                 overlay.state = state
-                chrome.bind(ui, s(hintKey), summary)
+                chrome.bind(ui, s(hintKey), summary, flow.openingType)
             }
         } catch (e: Exception) {
             Log.w(TAG, "frame failed", e)
@@ -468,14 +516,31 @@ class ArScanActivity : Activity(), GLSurfaceView.Renderer {
             geo.point(Vec3(base.x, base.y + shownHeight, base.z))?.let { it to "H = ${ArOverlayView.cm(shownHeight, cm)}" }
         } else null
 
-        val showReticle = step == ScanStep.BASE || step == ScanStep.WALLS
+        // Doors and windows on their walls, at the heights the plan will give them.
+        val openingShapes = ArrayList<Pair<List<Px>, Boolean>>()
+        val loop = flow.loop()
+        if (h != null && (step == ScanStep.DONE || step == ScanStep.OPENINGS) && loop.size >= 3) {
+            for (o in flow.openings.openings) {
+                val a = loop[o.edge]; val b = loop[(o.edge + 1) % loop.size]
+                val window = o.type == OpeningType.WINDOW
+                val bottom = if (window) WINDOW_SILL_M else 0f
+                val top = minOf(bottom + if (window) WINDOW_HEIGHT_M else DOOR_HEIGHT_M, h - CEILING_GAP_M)
+                geo.panel(a, b, o.t0, o.t1, bottom, top)?.let { openingShapes.add(it to window) }
+            }
+        }
+        // While marking openings the aim slides along the nearest wall's foot.
+        val edge = flow.edgeAt(aim)
+        val shownAim = edge?.let { Vec3(it.x, aim!!.y, it.z) } ?: aim
+
+        val showReticle = step == ScanStep.BASE || step == ScanStep.WALLS || step == ScanStep.OPENINGS
         return OverlayState(
             walls = walls,
             liveWall = liveWall,
             heightAxis = heightAxis,
             heightLabel = heightLabel,
-            reticle = if (showReticle && aim != null) geo.floorEllipse(aim) else null,
-            reticleSnapping = step == ScanStep.WALLS && aim != null && flow.capture.wouldSnap(aim),
+            reticle = if (showReticle && shownAim != null) geo.floorEllipse(shownAim) else null,
+            reticleSnapping = (step == ScanStep.WALLS && aim != null && flow.capture.wouldSnap(aim)) || edge != null,
+            openings = openingShapes,
             labels = labels,
             onboarding = step == ScanStep.FIND_FLOOR,
         )

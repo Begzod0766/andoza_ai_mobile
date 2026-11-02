@@ -5379,6 +5379,66 @@ abstract class AppLocalizations {
   /// In uz, this message translates to:
   /// **'Hali eshik yoki deraza yo\'q'**
   String get scanReviewOpeningsEmpty;
+
+  /// Android ARCore floor-plan scanner: hint on the doors-and-windows step
+  ///
+  /// In uz, this message translates to:
+  /// **'Eshik yoki derazaning chap va o\'ng cheti tagiga nishonni qo\'yib, «Chet qo\'shish»ni bosing'**
+  String get arScanOpeningsHint;
+
+  /// Android ARCore floor-plan scanner: main button on the doors-and-windows step: marks one edge of an opening
+  ///
+  /// In uz, this message translates to:
+  /// **'Chet qo\'shish'**
+  String get arScanAddEdge;
+
+  /// Android ARCore floor-plan scanner: opening type toggle: door
+  ///
+  /// In uz, this message translates to:
+  /// **'Eshik'**
+  String get arScanDoor;
+
+  /// Android ARCore floor-plan scanner: opening type toggle: window
+  ///
+  /// In uz, this message translates to:
+  /// **'Deraza'**
+  String get arScanWindow;
+
+  /// Android ARCore floor-plan scanner: notice: the two edges were on different walls
+  ///
+  /// In uz, this message translates to:
+  /// **'Ikkala chet bitta devorda bo\'lsin'**
+  String get arScanOpeningOtherWall;
+
+  /// Android ARCore floor-plan scanner: notice: the opening is narrower than 30 cm
+  ///
+  /// In uz, this message translates to:
+  /// **'Juda tor — chetlarni qayta belgilang'**
+  String get arScanOpeningTooNarrow;
+
+  /// Android ARCore floor-plan scanner: notice: the opening overlaps another one
+  ///
+  /// In uz, this message translates to:
+  /// **'Bu joyda allaqachon eshik yoki deraza bor'**
+  String get arScanOpeningOverlap;
+
+  /// Android ARCore floor-plan scanner: hint: the target is not near any wall of the outline
+  ///
+  /// In uz, this message translates to:
+  /// **'Nishonni devor tagiga olib boring'**
+  String get arScanAimWallBase;
+
+  /// Android ARCore scanner: pill in the finished room that starts marking doors and windows
+  ///
+  /// In uz, this message translates to:
+  /// **'Eshik/deraza qo\'shish'**
+  String get arScanAddOpenings;
+
+  /// Android ARCore scanner: pill that ends marking doors and windows
+  ///
+  /// In uz, this message translates to:
+  /// **'Tayyor'**
+  String get arScanOpeningsDone;
 }
 
 class _AppLocalizationsDelegate
