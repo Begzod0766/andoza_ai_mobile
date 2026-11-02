@@ -1607,6 +1607,18 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get scanReviewOpeningsTitle => 'Doors and windows';
+
+  @override
+  String get scanReviewOpeningAdd => '+ Add';
+
+  @override
+  String get scanReviewPickWall => 'Which wall?';
+
+  @override
+  String get scanReviewOpeningsEmpty => 'No doors or windows yet';
+
+  @override
   String scanReviewObjects(int count) {
     return 'Found objects ($count)';
   }

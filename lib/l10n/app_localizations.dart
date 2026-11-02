@@ -2962,6 +2962,30 @@ abstract class AppLocalizations {
   /// **'Devor {number}'**
   String scanReviewWall(int number);
 
+  /// Room-scan review: heading of the editable doors/windows list
+  ///
+  /// In uz, this message translates to:
+  /// **'Eshik va derazalar'**
+  String get scanReviewOpeningsTitle;
+
+  /// Room-scan review: adds a door or window by hand
+  ///
+  /// In uz, this message translates to:
+  /// **'+ Qo\'shish'**
+  String get scanReviewOpeningAdd;
+
+  /// Room-scan review: title of the wall picker before adding an opening
+  ///
+  /// In uz, this message translates to:
+  /// **'Qaysi devorga?'**
+  String get scanReviewPickWall;
+
+  /// Room-scan review: the doors/windows list is empty
+  ///
+  /// In uz, this message translates to:
+  /// **'Hali eshik yoki deraza yo\'q'**
+  String get scanReviewOpeningsEmpty;
+
   /// Room-scan review: detected-objects section header with count.
   ///
   /// In uz, this message translates to:

@@ -1983,6 +1983,22 @@
       }
     }
   },
+  "scanReviewOpeningsTitle": "Doors and windows",
+  "@scanReviewOpeningsTitle": {
+    "description": "Room-scan review: heading of the editable doors/windows list"
+  },
+  "scanReviewOpeningAdd": "+ Add",
+  "@scanReviewOpeningAdd": {
+    "description": "Room-scan review: adds a door or window by hand"
+  },
+  "scanReviewPickWall": "Which wall?",
+  "@scanReviewPickWall": {
+    "description": "Room-scan review: title of the wall picker before adding an opening"
+  },
+  "scanReviewOpeningsEmpty": "No doors or windows yet",
+  "@scanReviewOpeningsEmpty": {
+    "description": "Room-scan review: the doors/windows list is empty"
+  },
   "scanReviewObjects": "Found objects ({count})",
   "@scanReviewObjects": {
     "description": "Room-scan review: detected-objects section header with count.",

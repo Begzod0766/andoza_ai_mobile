@@ -1600,6 +1600,18 @@ class AppLocalizationsRu extends AppLocalizations {
   }
 
   @override
+  String get scanReviewOpeningsTitle => 'Двери и окна';
+
+  @override
+  String get scanReviewOpeningAdd => '+ Добавить';
+
+  @override
+  String get scanReviewPickWall => 'На какую стену?';
+
+  @override
+  String get scanReviewOpeningsEmpty => 'Пока нет дверей и окон';
+
+  @override
   String scanReviewObjects(int count) {
     return 'Найденные предметы ($count)';
   }

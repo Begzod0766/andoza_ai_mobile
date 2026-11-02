@@ -1983,6 +1983,22 @@
       }
     }
   },
+  "scanReviewOpeningsTitle": "Двери и окна",
+  "@scanReviewOpeningsTitle": {
+    "description": "Room-scan review: heading of the editable doors/windows list"
+  },
+  "scanReviewOpeningAdd": "+ Добавить",
+  "@scanReviewOpeningAdd": {
+    "description": "Room-scan review: adds a door or window by hand"
+  },
+  "scanReviewPickWall": "На какую стену?",
+  "@scanReviewPickWall": {
+    "description": "Room-scan review: title of the wall picker before adding an opening"
+  },
+  "scanReviewOpeningsEmpty": "Пока нет дверей и окон",
+  "@scanReviewOpeningsEmpty": {
+    "description": "Room-scan review: the doors/windows list is empty"
+  },
   "scanReviewObjects": "Найденные предметы ({count})",
   "@scanReviewObjects": {
     "description": "Room-scan review: detected-objects section header with count.",

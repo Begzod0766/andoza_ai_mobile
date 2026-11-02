@@ -1594,6 +1594,18 @@ class AppLocalizationsUz extends AppLocalizations {
   }
 
   @override
+  String get scanReviewOpeningsTitle => 'Eshik va derazalar';
+
+  @override
+  String get scanReviewOpeningAdd => '+ Qo\'shish';
+
+  @override
+  String get scanReviewPickWall => 'Qaysi devorga?';
+
+  @override
+  String get scanReviewOpeningsEmpty => 'Hali eshik yoki deraza yo\'q';
+
+  @override
   String scanReviewObjects(int count) {
     return 'Topilgan buyumlar ($count)';
   }
