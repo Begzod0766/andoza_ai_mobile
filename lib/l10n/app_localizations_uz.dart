@@ -587,13 +587,45 @@ class AppLocalizationsUz extends AppLocalizations {
   String get arScanKeepMeasuring => 'O\'lchashni davom ettirish';
 
   @override
-  String get arScanStepFloor => '1/3 — pol';
+  String get arScanStepFloor => '1/4 — pol';
 
   @override
-  String get arScanStepCorners => '2/3 — burchaklar';
+  String get arScanStepCorners => '2/4 — burchaklar';
 
   @override
-  String get arScanStepHeight => '3/3 — balandlik';
+  String get arScanStepHeight => '3/4 — balandlik';
+
+  @override
+  String get arScanStepOpenings => '4/4 — eshik va derazalar';
+
+  @override
+  String get arScanOpeningsHint =>
+      'Eshik yoki derazaning chap va o\'ng cheti tagiga nishonni qo\'yib, «Chet qo\'shish»ni bosing';
+
+  @override
+  String get arScanAddEdge => 'Chet qo\'shish';
+
+  @override
+  String get arScanDone => 'Tayyor';
+
+  @override
+  String get arScanDoor => 'Eshik';
+
+  @override
+  String get arScanWindow => 'Deraza';
+
+  @override
+  String get arScanOpeningOtherWall => 'Ikkala chet bitta devorda bo\'lsin';
+
+  @override
+  String get arScanOpeningTooNarrow => 'Juda tor — chetlarni qayta belgilang';
+
+  @override
+  String get arScanOpeningOverlap =>
+      'Bu joyda allaqachon eshik yoki deraza bor';
+
+  @override
+  String get arScanAimWallBase => 'Nishonni devor tagiga olib boring';
 
   @override
   String get arScanRescan => 'Qayta o\'lchash';

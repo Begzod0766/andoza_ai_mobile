@@ -41,6 +41,11 @@ data class OverlayState(
     val dwell: Float = 0f,
     /** Target drawn here when snapped to a wall corner; null = screen centre. */
     val reticleAt: Pair<Float, Float>? = null,
+    /** Doors/windows on the outline: (start, end, isWindow). */
+    val openings: List<Triple<Pair<Float, Float>, Pair<Float, Float>, Boolean>> = emptyList(),
+    /** The first edge of the opening being marked, and its live width. */
+    val pendingEdge: Pair<Float, Float>? = null,
+    val pendingLabel: String? = null,
 )
 
 /** Transparent view over the camera: outline, corner dots, lengths and the aim reticle. */
@@ -54,6 +59,9 @@ class ArOverlayView(context: Context) : View(context) {
     private val candidate = Paint(Paint.ANTI_ALIAS_FLAG).apply { color = Color.WHITE; style = Paint.Style.STROKE; strokeWidth = 2.5f * density }
     private val progress = Paint(Paint.ANTI_ALIAS_FLAG).apply { color = Color.rgb(59, 130, 246); style = Paint.Style.STROKE; strokeWidth = 4f * density; strokeCap = Paint.Cap.ROUND }
     private val axis = Paint(Paint.ANTI_ALIAS_FLAG).apply { color = Color.rgb(249, 115, 22); strokeWidth = 3f * density }
+
+    private val door = Paint(Paint.ANTI_ALIAS_FLAG).apply { color = Color.rgb(34, 197, 94); strokeWidth = 6f * density; strokeCap = Paint.Cap.ROUND }
+    private val window = Paint(Paint.ANTI_ALIAS_FLAG).apply { color = Color.rgb(59, 130, 246); strokeWidth = 6f * density; strokeCap = Paint.Cap.ROUND }
 
     var state = OverlayState()
         set(value) { field = value; postInvalidateOnAnimation() }
@@ -74,6 +82,8 @@ class ArOverlayView(context: Context) : View(context) {
         }
         for (p in pts) if (p != null) canvas.drawCircle(p.first, p.second, 7f * density, dot)
         for ((x, y, label) in s.labels) canvas.drawText(label, x, y, text)
+        for ((a, b, isWindow) in s.openings) canvas.drawLine(a.first, a.second, b.first, b.second, if (isWindow) window else door)
+
         s.heightAxis?.let { (a, b) -> canvas.drawLine(a.first, a.second, b.first, b.second, axis) }
         s.heightLabel?.let { canvas.drawText(it, width / 2f, height / 2f - 40f * density, text) }
 
@@ -84,6 +94,11 @@ class ArOverlayView(context: Context) : View(context) {
             s.snapping || s.reticleAt != null -> Color.rgb(40, 80, 208)
             s.reticleOnFloor -> Color.WHITE
             else -> Color.argb(110, 255, 255, 255)
+        }
+        s.pendingEdge?.let { p ->
+            canvas.drawLine(p.first, p.second, cx, cy, door)
+            canvas.drawCircle(p.first, p.second, 7f * density, dot)
+            s.pendingLabel?.let { canvas.drawText(it, (p.first + cx) / 2, (p.second + cy) / 2 - 12f * density, text) }
         }
         canvas.drawCircle(cx, cy, 18f * density, ring)
         canvas.drawCircle(cx, cy, 2.5f * density, ring)

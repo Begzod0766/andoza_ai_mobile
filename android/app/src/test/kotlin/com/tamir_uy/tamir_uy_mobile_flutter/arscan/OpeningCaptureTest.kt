@@ -90,4 +90,13 @@ class OpeningCaptureTest {
         assertTrue(c.openings.isEmpty())
         assertFalse(c.undo())
     }
+
+    @Test fun `clear drops everything`() {
+        c.addEdge(hit(0, 0.1f), OpeningType.DOOR, loop)
+        c.addEdge(hit(0, 0.4f), OpeningType.DOOR, loop)
+        c.addEdge(hit(1, 0.2f), OpeningType.WINDOW, loop)
+        c.clear()
+        assertNull(c.pending)
+        assertTrue(c.openings.isEmpty())
+    }
 }

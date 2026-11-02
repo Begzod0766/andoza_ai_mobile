@@ -597,13 +597,44 @@ class AppLocalizationsEn extends AppLocalizations {
   String get arScanKeepMeasuring => 'Keep measuring';
 
   @override
-  String get arScanStepFloor => '1/3 — floor';
+  String get arScanStepFloor => '1/4 — floor';
 
   @override
-  String get arScanStepCorners => '2/3 — corners';
+  String get arScanStepCorners => '2/4 — corners';
 
   @override
-  String get arScanStepHeight => '3/3 — height';
+  String get arScanStepHeight => '3/4 — height';
+
+  @override
+  String get arScanStepOpenings => '4/4 — doors and windows';
+
+  @override
+  String get arScanOpeningsHint =>
+      'Put the target under the left and right edge of a door or window and tap “Add edge”';
+
+  @override
+  String get arScanAddEdge => 'Add edge';
+
+  @override
+  String get arScanDone => 'Done';
+
+  @override
+  String get arScanDoor => 'Door';
+
+  @override
+  String get arScanWindow => 'Window';
+
+  @override
+  String get arScanOpeningOtherWall => 'Both edges must be on the same wall';
+
+  @override
+  String get arScanOpeningTooNarrow => 'Too narrow — mark the edges again';
+
+  @override
+  String get arScanOpeningOverlap => 'There is already a door or window here';
+
+  @override
+  String get arScanAimWallBase => 'Move the target to the bottom of a wall';
 
   @override
   String get arScanRescan => 'Measure again';

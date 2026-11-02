@@ -588,13 +588,44 @@ class AppLocalizationsRu extends AppLocalizations {
   String get arScanKeepMeasuring => 'Продолжить измерение';
 
   @override
-  String get arScanStepFloor => '1/3 — пол';
+  String get arScanStepFloor => '1/4 — пол';
 
   @override
-  String get arScanStepCorners => '2/3 — углы';
+  String get arScanStepCorners => '2/4 — углы';
 
   @override
-  String get arScanStepHeight => '3/3 — высота';
+  String get arScanStepHeight => '3/4 — высота';
+
+  @override
+  String get arScanStepOpenings => '4/4 — двери и окна';
+
+  @override
+  String get arScanOpeningsHint =>
+      'Наведите прицел под левый и правый край двери или окна и нажмите «Добавить край»';
+
+  @override
+  String get arScanAddEdge => 'Добавить край';
+
+  @override
+  String get arScanDone => 'Готово';
+
+  @override
+  String get arScanDoor => 'Дверь';
+
+  @override
+  String get arScanWindow => 'Окно';
+
+  @override
+  String get arScanOpeningOtherWall => 'Оба края должны быть на одной стене';
+
+  @override
+  String get arScanOpeningTooNarrow => 'Слишком узко — отметьте края заново';
+
+  @override
+  String get arScanOpeningOverlap => 'Здесь уже есть дверь или окно';
+
+  @override
+  String get arScanAimWallBase => 'Наведите прицел на низ стены';
 
   @override
   String get arScanRescan => 'Измерить заново';

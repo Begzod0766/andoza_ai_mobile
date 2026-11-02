@@ -65,7 +65,7 @@ class ArScanActivity : Activity(), GLSurfaceView.Renderer {
         private const val TAG = "ArScan"
     }
 
-    private enum class Step { FIND_FLOOR, CORNERS, HEIGHT }
+    private enum class Step { FIND_FLOOR, CORNERS, HEIGHT, OPENINGS }
 
     // Fallbacks only; Flutter passes the copy in the user's language.
     private val fallback = mapOf(
@@ -85,9 +85,19 @@ class ArScanActivity : Activity(), GLSurfaceView.Renderer {
         "arScanCornersLost" to "Ba'zi burchaklar yo'qoldi — ularni qayta belgilang",
         "arScanNoFloorHere" to "Avval polni skaner qiling",
         "arScanKeepMeasuring" to "O'lchashni davom ettirish",
-        "arScanStepFloor" to "1/3 — pol",
-        "arScanStepCorners" to "2/3 — burchaklar",
-        "arScanStepHeight" to "3/3 — balandlik",
+        "arScanStepFloor" to "1/4 — pol",
+        "arScanStepCorners" to "2/4 — burchaklar",
+        "arScanStepHeight" to "3/4 — balandlik",
+        "arScanStepOpenings" to "4/4 — eshik va derazalar",
+        "arScanOpeningsHint" to "Eshik yoki derazaning chap va o'ng cheti tagiga nishonni qo'yib, «Chet qo'shish»ni bosing",
+        "arScanAddEdge" to "Chet qo'shish",
+        "arScanDone" to "Tayyor",
+        "arScanDoor" to "Eshik",
+        "arScanWindow" to "Deraza",
+        "arScanOpeningOtherWall" to "Ikkala chet bitta devorda bo'lsin",
+        "arScanOpeningTooNarrow" to "Juda tor — chetlarni qayta belgilang",
+        "arScanOpeningOverlap" to "Bu joyda allaqachon eshik yoki deraza bor",
+        "arScanAimWallBase" to "Nishonni devor tagiga olib boring",
     )
     private lateinit var strings: Map<String, String>
     private fun s(key: String) = strings[key] ?: fallback[key] ?: key
@@ -99,6 +109,9 @@ class ArScanActivity : Activity(), GLSurfaceView.Renderer {
     private lateinit var leftButton: Button
     private lateinit var mainButton: Button
     private lateinit var rightButton: Button
+    private lateinit var typeRow: LinearLayout
+    private lateinit var doorButton: Button
+    private lateinit var windowButton: Button
 
     private var session: Session? = null
     private var installRequested = false
@@ -118,6 +131,16 @@ class ArScanActivity : Activity(), GLSurfaceView.Renderer {
     // The wall corner the target is snapped to this frame (the button uses it too).
     private var snapTarget: CornerCandidate? = null
     @Volatile private var liveHeight: Float? = null
+    // Doors and windows (after the height). The height is kept until "Tayyor".
+    private val openings = OpeningCapture()
+    @Volatile private var openingType = OpeningType.DOOR
+    private var chosenHeight = 0f
+    private var chosenMeasured = false
+    // Where the target sits on the outline this frame (OPENINGS only).
+    private var edgeHit: EdgeHit? = null
+    // A rejected opening's notice and until when it shows (elapsedRealtime).
+    @Volatile private var openingNotice: String? = null
+    @Volatile private var openingNoticeUntil = 0L
     @Volatile private var tracking = false
     private var wasTracking = false
     @Volatile private var step = Step.FIND_FLOOR
@@ -211,6 +234,18 @@ class ArScanActivity : Activity(), GLSurfaceView.Renderer {
         bottom.addView(mainButton, lp(1.4f))
         bottom.addView(rightButton, lp(1f))
         chrome.addView(bottom, FrameLayout.LayoutParams(-1, -2, Gravity.BOTTOM))
+
+        typeRow = LinearLayout(this).apply {
+            orientation = LinearLayout.HORIZONTAL
+            gravity = Gravity.CENTER
+            setPadding(dp(16), 0, dp(16), dp(108))
+            visibility = View.GONE
+        }
+        doorButton = button(false).apply { text = s("arScanDoor"); setOnClickListener { openingType = OpeningType.DOOR; render() } }
+        windowButton = button(false).apply { text = s("arScanWindow"); setOnClickListener { openingType = OpeningType.WINDOW; render() } }
+        typeRow.addView(doorButton, lp(1f))
+        typeRow.addView(windowButton, lp(1f))
+        chrome.addView(typeRow, FrameLayout.LayoutParams(-1, -2, Gravity.BOTTOM))
         return chrome
     }
 
@@ -221,17 +256,20 @@ class ArScanActivity : Activity(), GLSurfaceView.Renderer {
         n: Int = 0,
         height: Float? = null,
         notice: String? = null, // informational: shown, but doesn't block adding corners
+        onWall: Boolean = false,
     ) {
         stepLabel.text = when (step) {
             Step.FIND_FLOOR -> s("arScanStepFloor")
             Step.CORNERS -> s("arScanStepCorners")
             Step.HEIGHT -> s("arScanStepHeight")
+            Step.OPENINGS -> s("arScanStepOpenings")
         }
         hint.text = trackingHint ?: notice ?: when (step) {
             Step.FIND_FLOOR ->
                 if (SystemClock.elapsedRealtime() - startedAt > FLOOR_HINT_AFTER_MS) s("arScanFloorHint") else s("arScanFindFloor")
             Step.CORNERS -> if (snapping) s("arScanSnapToFirst") else s("arScanCornersHint")
             Step.HEIGHT -> height?.let { "${s("arScanAimCeiling")} · ${ArOverlayView.metres(it)}" } ?: s("arScanAimCeiling")
+            Step.OPENINGS -> if (onWall) s("arScanOpeningsHint") else s("arScanAimWallBase")
         }
         when (step) {
             Step.FIND_FLOOR, Step.CORNERS -> {
@@ -244,7 +282,15 @@ class ArScanActivity : Activity(), GLSurfaceView.Renderer {
                 mainButton.text = s("arScanConfirm"); mainButton.isEnabled = height != null
                 rightButton.text = s("arScanEnterManually"); rightButton.isEnabled = true
             }
+            Step.OPENINGS -> {
+                leftButton.text = s("arScanUndo"); leftButton.isEnabled = true
+                mainButton.text = s("arScanAddEdge"); mainButton.isEnabled = onWall && trackingHint == null
+                rightButton.text = s("arScanDone"); rightButton.isEnabled = true
+            }
         }
+        typeRow.visibility = if (step == Step.OPENINGS) View.VISIBLE else View.GONE
+        doorButton.background = pill(if (openingType == OpeningType.DOOR) Color.rgb(34, 197, 94) else Color.argb(150, 0, 0, 0))
+        windowButton.background = pill(if (openingType == OpeningType.WINDOW) Color.rgb(59, 130, 246) else Color.argb(150, 0, 0, 0))
         listOf(leftButton, mainButton, rightButton).forEach { it.alpha = if (it.isEnabled) 1f else 0.45f }
     }
 
@@ -261,13 +307,16 @@ class ArScanActivity : Activity(), GLSurfaceView.Renderer {
     private fun onMain() = onGl {
         when (step) {
             Step.FIND_FLOOR, Step.CORNERS -> snapTarget?.let { addCornerAt(it.x, it.z, auto = false) } ?: addCorner()
-            Step.HEIGHT -> liveHeight?.let { finishWith(it, measured = true) }
+            Step.HEIGHT -> liveHeight?.let { chooseHeight(it, measured = true) }
+            Step.OPENINGS -> edgeHit?.let { addOpeningEdge(it) }
         }
     }
 
     private fun onLeft() = onGl {
         cornersLost = false
-        if (step == Step.HEIGHT) {
+        if (step == Step.OPENINGS) {
+            if (!openings.undo()) step = Step.HEIGHT
+        } else if (step == Step.HEIGHT) {
             // Reopen in one tap: a snap-closed outline drops its closing tap
             // (and that anchor), so "add corner" works straight away.
             if (capture.reopen()) anchors.removeLastOrNull()?.detach()
@@ -282,10 +331,36 @@ class ArScanActivity : Activity(), GLSurfaceView.Renderer {
             val labels = PRESET_HEIGHTS.map { ArOverlayView.metres(it) }.toTypedArray()
             AlertDialog.Builder(this)
                 .setTitle(s("arScanEnterManually"))
-                .setItems(labels) { _, i -> onGl { finishWith(PRESET_HEIGHTS[i], measured = false) } }
+                .setItems(labels) { _, i -> onGl { chooseHeight(PRESET_HEIGHTS[i], measured = false) } }
                 .show()
+        } else if (step == Step.OPENINGS) {
+            onGl { finishWith(chosenHeight, chosenMeasured) }
         } else {
             onGl { if (capture.corners.size >= 3) step = Step.HEIGHT }
+        }
+    }
+
+    /** GL thread: the height is taken; doors and windows come next. */
+    private fun chooseHeight(height: Float, measured: Boolean) {
+        chosenHeight = height
+        chosenMeasured = measured
+        step = Step.OPENINGS
+    }
+
+    /** GL thread: one edge of a door/window on the outline. */
+    private fun addOpeningEdge(hit: EdgeHit) {
+        if (!tracking) return
+        val loop = openings.loop(capture.corners, capture.isClosed)
+        val notice = when (openings.addEdge(hit, openingType, loop)) {
+            OpeningAddResult.PENDING -> null
+            OpeningAddResult.ADDED -> { cornerAdded = true; null }
+            OpeningAddResult.REJECTED_OTHER_WALL -> s("arScanOpeningOtherWall")
+            OpeningAddResult.REJECTED_TOO_NARROW -> s("arScanOpeningTooNarrow")
+            OpeningAddResult.REJECTED_OVERLAP -> s("arScanOpeningOverlap")
+        }
+        if (notice != null) {
+            openingNotice = notice
+            openingNoticeUntil = SystemClock.elapsedRealtime() + NOTICE_MS
         }
     }
 
@@ -356,7 +431,7 @@ class ArScanActivity : Activity(), GLSurfaceView.Renderer {
     private fun finishWith(height: Float, measured: Boolean) {
         if (finished) return
         val seconds = ((SystemClock.elapsedRealtime() - startedAt) / 1000).toInt()
-        val result = capture.toResult(height, measured, seconds)
+        val result = capture.toResult(height, measured, seconds, openings.openings)
         val json = JSONObject().apply {
             put("corners", JSONArray().apply {
                 @Suppress("UNCHECKED_CAST")
@@ -365,6 +440,10 @@ class ArScanActivity : Activity(), GLSurfaceView.Renderer {
             put("height", result["height"]); put("heightMeasured", result["heightMeasured"])
             put("closed", result["closed"]); put("trackingLossCount", result["trackingLossCount"])
             put("durationSec", result["durationSec"])
+            put("openings", JSONArray().apply {
+                @Suppress("UNCHECKED_CAST")
+                (result["openings"] as List<Map<String, Any>>).forEach { put(JSONObject(it)) }
+            })
         }.toString()
         Log.i(TAG, json)
         finished = true
@@ -494,7 +573,9 @@ class ArScanActivity : Activity(), GLSurfaceView.Renderer {
                 anchors.subList(keep, anchors.size).forEach { it.detach() }
                 while (anchors.size > keep) anchors.removeAt(anchors.size - 1)
                 cornersLost = true
-                if (step == Step.HEIGHT) step = Step.CORNERS
+                // Openings hang on edge indices of the old outline: drop them with it.
+                if (step == Step.OPENINGS) openings.clear()
+                if (step == Step.HEIGHT || step == Step.OPENINGS) step = Step.CORNERS
             }
 
             // Floor under the reticle.
@@ -544,6 +625,10 @@ class ArScanActivity : Activity(), GLSurfaceView.Renderer {
             }
             snapTarget = snapTo
 
+            // Doors and windows: the target slides along the outline's nearest wall.
+            val loop = openings.loop(capture.corners, capture.isClosed)
+            edgeHit = if (step == Step.OPENINGS && tracking) reticle?.let { openings.snap(it, loop) } else null
+
             // Ceiling height along the first corner's vertical axis.
             liveHeight = if (step == Step.HEIGHT && tracking) {
                 val p = camera.pose
@@ -576,7 +661,26 @@ class ArScanActivity : Activity(), GLSurfaceView.Renderer {
             }
             val candidateDots = if (wallFrame == null || wallY == null) emptyList() else
                 wallFrame.candidates.mapNotNull { pr.project(Vec3(it.x, wallY, it.z)) }
-            val reticleAt = snapTo?.let { t -> wallY?.let { pr.project(Vec3(t.x, it, t.z)) } }
+            fun onLoop(edge: Int, t: Float): Vec3? {
+                val y = wallY ?: return null
+                if (edge >= loop.size) return null
+                val a = loop[edge]; val b = loop[(edge + 1) % loop.size]
+                return Vec3(a.x + (b.x - a.x) * t, y, a.z + (b.z - a.z) * t)
+            }
+            val hit = edgeHit
+            val reticleAt = (hit?.let { h -> wallY?.let { pr.project(Vec3(h.x, it, h.z)) } })
+                ?: snapTo?.let { t -> wallY?.let { pr.project(Vec3(t.x, it, t.z)) } }
+            val openingLines = if (step != Step.OPENINGS) emptyList() else openings.openings.mapNotNull { o ->
+                val a = onLoop(o.edge, o.t0)?.let { pr.project(it) }
+                val b = onLoop(o.edge, o.t1)?.let { pr.project(it) }
+                if (a == null || b == null) null else Triple(a, b, o.type == OpeningType.WINDOW)
+            }
+            val pending = if (step == Step.OPENINGS) openings.pending else null
+            val pendingAt = pending?.let { p -> onLoop(p.edge, p.t)?.let { pr.project(it) } }
+            val pendingLabel = if (pending != null && hit != null && hit.edge == pending.edge) {
+                val probe = CapturedOpening(openingType, pending.edge, minOf(pending.t, hit.t), maxOf(pending.t, hit.t))
+                ArOverlayView.metres(openings.widthM(probe, loop))
+            } else null
             val trackingHint = if (tracking) null else when (camera.trackingFailureReason) {
                 TrackingFailureReason.NONE -> null
                 else -> s("arScanTrackingLost")
@@ -586,14 +690,17 @@ class ArScanActivity : Activity(), GLSurfaceView.Renderer {
                 snapping = snapping, closed = capture.isClosed, heightAxis = axis,
                 heightLabel = liveHeight?.let { ArOverlayView.metres(it) },
                 walls = wallLines, candidates = candidateDots, dwell = dwellProgress, reticleAt = reticleAt,
+                openings = openingLines, pendingEdge = pendingAt, pendingLabel = pendingLabel,
             )
             val n = corners.size
             val height = liveHeight
             val notice = when {
                 cornersLost -> s("arScanCornersLost")
                 SystemClock.elapsedRealtime() < noFloorUntil -> s("arScanNoFloorHere")
+                SystemClock.elapsedRealtime() < openingNoticeUntil -> openingNotice
                 else -> null
             }
+            val onWall = hit != null
             val buzz = cornerAdded
             cornerAdded = false
             runOnUiThread {
@@ -601,7 +708,7 @@ class ArScanActivity : Activity(), GLSurfaceView.Renderer {
                 if (buzz) overlay.performHapticFeedback(
                     if (Build.VERSION.SDK_INT >= 30) HapticFeedbackConstants.CONFIRM else HapticFeedbackConstants.VIRTUAL_KEY,
                 )
-                render(trackingHint, snapping, n, height, notice)
+                render(trackingHint, snapping, n, height, notice, onWall)
             }
         } catch (e: Exception) {
             Log.w(TAG, "frame failed", e)

@@ -73,6 +73,12 @@ class OpeningCapture(val snapM: Float = 0.30f, val minWidthM: Float = 0.30f) {
         return true
     }
 
+    /** The outline changed under them (corners lost): start over. */
+    fun clear() {
+        pending = null
+        openings = emptyList()
+    }
+
     fun widthM(o: CapturedOpening, loop: List<Vec3>): Float {
         val a = loop[o.edge]
         val b = loop[(o.edge + 1) % loop.size]
