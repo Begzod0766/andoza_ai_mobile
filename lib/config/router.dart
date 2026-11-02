@@ -170,21 +170,6 @@ final routerProvider = Provider<GoRouter>((ref) {
               child: const E4ProfileSettingsScreen(),
             ),
           ),
-          GoRoute(
-            path: '/setup/dimensions',
-            builder: (context, state) => const DimensionsEntryScreen(),
-          ),
-          GoRoute(
-            path: '/setup/wall-measurements',
-            builder: (context, state) => const WallMeasurementsScreen(),
-          ),
-          // A8 (Eshik/Deraza qo'shish) has no standalone route — it's only
-          // ever shown as a modal sheet with a real onAdd callback, from A7
-          // (wall_measurements_screen.dart's _showAddOpeningSheet).
-          GoRoute(
-            path: '/setup/summary',
-            builder: (context, state) => const RoomSummaryScreen(),
-          ),
           // Batch B Routes (Room state & entering the 3D room) — B1 kept
           // (matches spec), B1-alt/B2/B3 are genuinely missing and get
           // built fresh in Step 5. B2-B4 route paths retired here since
@@ -313,15 +298,6 @@ final routerProvider = Provider<GoRouter>((ref) {
             path: '/shop/s5',
             builder: (context, state) => const S5ShoppingCartScreen(),
           ),
-          GoRoute(
-            path: '/shop/s6',
-            builder: (context, state) => const S6CheckoutScreen(),
-          ),
-          GoRoute(
-            path: '/shop/s7',
-            builder: (context, state) =>
-                S7OrderConfirmationScreen(order: state.extra as ShopOrder?),
-          ),
           // Masters Routes — U2 has no standalone route, it's a bottom
           // sheet shown from U1 (see u1_masters_intro_screen.dart's
           // _PinSheet).
@@ -333,18 +309,9 @@ final routerProvider = Provider<GoRouter>((ref) {
             ),
           ),
           GoRoute(
-            path: '/masters/u3',
-            builder: (context, state) => const U3RequestBookingScreen(),
-          ),
-          GoRoute(
             path: '/masters/u4',
             builder: (context, state) =>
                 U4ReviewRatingScreen(master: state.extra as MockMaster?),
-          ),
-          GoRoute(
-            path: '/masters/u5',
-            builder: (context, state) =>
-                U5BookingConfirmationScreen(master: state.extra as MockMaster?),
           ),
           // Profile Routes (E5-E6, E11 — E4 lives at the shell's /profile
           // root, no separate /profile/e4 alias needed)
@@ -396,6 +363,48 @@ final routerProvider = Provider<GoRouter>((ref) {
             builder: (context, state) => const ShopProductsScreen(),
           ),
         ],
+      ),
+      // Checkout, master booking and room setup are flows: outside the shell
+      // so the bottom bar can't abandon them halfway.
+      GoRoute(
+        path: '/setup/dimensions',
+        parentNavigatorKey: _rootNavigatorKey,
+        builder: (context, state) => const DimensionsEntryScreen(),
+      ),
+      GoRoute(
+        path: '/setup/wall-measurements',
+        parentNavigatorKey: _rootNavigatorKey,
+        builder: (context, state) => const WallMeasurementsScreen(),
+      ),
+      // A8 (Eshik/Deraza qo'shish) has no standalone route — it's only
+      // ever shown as a modal sheet with a real onAdd callback, from A7
+      // (wall_measurements_screen.dart's _showAddOpeningSheet).
+      GoRoute(
+        path: '/setup/summary',
+        parentNavigatorKey: _rootNavigatorKey,
+        builder: (context, state) => const RoomSummaryScreen(),
+      ),
+      GoRoute(
+        path: '/shop/s6',
+        parentNavigatorKey: _rootNavigatorKey,
+        builder: (context, state) => const S6CheckoutScreen(),
+      ),
+      GoRoute(
+        path: '/shop/s7',
+        parentNavigatorKey: _rootNavigatorKey,
+        builder: (context, state) =>
+            S7OrderConfirmationScreen(order: state.extra as ShopOrder?),
+      ),
+      GoRoute(
+        path: '/masters/u3',
+        parentNavigatorKey: _rootNavigatorKey,
+        builder: (context, state) => const U3RequestBookingScreen(),
+      ),
+      GoRoute(
+        path: '/masters/u5',
+        parentNavigatorKey: _rootNavigatorKey,
+        builder: (context, state) =>
+            U5BookingConfirmationScreen(master: state.extra as MockMaster?),
       ),
       // Scanners are full screen (camera / native capture): outside the shell
       // so the bottom bar does not show through them.
