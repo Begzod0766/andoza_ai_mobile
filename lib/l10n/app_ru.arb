@@ -2663,7 +2663,7 @@
   "deleteAccountTitle": "Удалить аккаунт?",
   "deleteAccountBody": "Вместе с аккаунтом будут удалены все ваши проекты, фотографии, заказы, а также профиль магазина или мастера. Это необратимо, отменить удаление нельзя.",
   "deleteAccountPasswordLabel": "Пароль",
-  "deleteAccountPasswordHint": "Если входили по коду из SMS, оставьте пустым",
+  "deleteAccountPasswordHint": "Если входили по коду из SMS, через Google или Apple, оставьте пустым",
   "deleteAccountDone": "Ваш аккаунт удалён",
   "scanFailedReason": "Причина: {reason}",
   "@scanFailedReason": {"placeholders": {"reason": {"type": "String"}}},

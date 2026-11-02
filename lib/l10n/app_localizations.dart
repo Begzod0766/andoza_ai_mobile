@@ -4561,7 +4561,7 @@ abstract class AppLocalizations {
   /// No description provided for @deleteAccountPasswordHint.
   ///
   /// In uz, this message translates to:
-  /// **'Telefon kodi bilan kirgan bo\'lsangiz, bo\'sh qoldiring'**
+  /// **'Telefon kodi, Google yoki Apple orqali kirgan bo\'lsangiz, bo\'sh qoldiring'**
   String get deleteAccountPasswordHint;
 
   /// No description provided for @deleteAccountDone.

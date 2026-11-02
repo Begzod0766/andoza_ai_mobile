@@ -2483,7 +2483,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get deleteAccountPasswordHint =>
-      'If you sign in with a phone code, leave this empty';
+      'If you sign in with a phone code, Google or Apple, leave this empty';
 
   @override
   String get deleteAccountDone => 'Your account was deleted';

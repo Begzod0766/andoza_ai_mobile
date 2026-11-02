@@ -2663,7 +2663,7 @@
   "deleteAccountTitle": "Delete your account?",
   "deleteAccountBody": "Your projects, photos, orders and any shop or usta profile will be deleted along with your account. This is permanent and cannot be undone.",
   "deleteAccountPasswordLabel": "Password",
-  "deleteAccountPasswordHint": "If you sign in with a phone code, leave this empty",
+  "deleteAccountPasswordHint": "If you sign in with a phone code, Google or Apple, leave this empty",
   "deleteAccountDone": "Your account was deleted",
   "scanFailedReason": "Reason: {reason}",
   "@scanFailedReason": {"placeholders": {"reason": {"type": "String"}}},

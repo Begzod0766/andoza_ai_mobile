@@ -2483,7 +2483,7 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get deleteAccountPasswordHint =>
-      'Если входили по коду из SMS, оставьте пустым';
+      'Если входили по коду из SMS, через Google или Apple, оставьте пустым';
 
   @override
   String get deleteAccountDone => 'Ваш аккаунт удалён';
