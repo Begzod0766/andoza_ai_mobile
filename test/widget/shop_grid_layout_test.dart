@@ -89,4 +89,17 @@ void main() {
       }
     });
   }
+
+  testWidgets('category chips are not clipped at large text', (tester) async {
+    await _pump(tester, 2.0);
+    final chip = find.text('Barchasi');
+    final row = find.ancestor(of: chip, matching: find.byType(Scrollable)).first;
+    expect(tester.getRect(chip).bottom, lessThanOrEqualTo(tester.getRect(row).bottom));
+    expect(tester.getRect(chip).top, greaterThanOrEqualTo(tester.getRect(row).top));
+  });
+
+  testWidgets('the shop pulls to refresh', (tester) async {
+    await _pump(tester, 1.0);
+    expect(find.byType(RefreshIndicator), findsOneWidget);
+  });
 }
