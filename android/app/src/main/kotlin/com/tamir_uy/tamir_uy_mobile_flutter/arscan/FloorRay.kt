@@ -10,7 +10,8 @@ import kotlin.math.sqrt
  */
 object FloorRay {
     const val MAX_DISTANCE_M = 8f
-    const val PLANE_TOLERANCE_M = 0.25f
+    // A korpacha or a mattress on the floor is ~10–20 cm: only a hit this close counts as floor.
+    const val PLANE_TOLERANCE_M = 0.05f
 
     /** The ray `origin + s·dir` on `y = floorY`; `null` if it doesn't point down or lands too far. */
     fun hit(origin: Vec3, dir: Vec3, floorY: Float): Vec3? {

@@ -102,4 +102,17 @@ class ScanFlowTest {
         assertFalse(f.ui(false, Vec3(1f, 0f, 1f), null).mainEnabled)
         assertEquals("arScanTrackingLost", f.ui(false, Vec3(1f, 0f, 1f), null).hintKey)
     }
+
+    @Test fun `close room is hidden while tracking is lost`() {
+        val f = walls(); f.addCorner(Vec3(4f, 0f, 0f)); f.addCorner(Vec3(4f, 0f, 3f))
+        assertFalse(f.ui(false, Vec3(0f, 0f, 3f), null).closeVisible)
+    }
+
+    @Test fun `a tap made in WALLS is stale once the room closed`() {
+        val f = walls(); f.addCorner(Vec3(4f, 0f, 0f)); f.addCorner(Vec3(4f, 0f, 3f))
+        assertTrue(f.isCurrent(ScanStep.WALLS))
+        f.addCorner(Vec3(0.05f, 0f, 0.05f)) // snaps and closes
+        assertFalse(f.isCurrent(ScanStep.WALLS))
+        assertTrue(f.isCurrent(ScanStep.DONE))
+    }
 }

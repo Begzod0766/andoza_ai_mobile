@@ -27,6 +27,13 @@ class ScanFlow(val capture: FloorPlanCapture = FloorPlanCapture()) {
     var heightMeasured = false
         private set
 
+    /**
+     * Taps are queued onto the GL thread: one made while the screen showed
+     * [tappedIn] is stale if the step has moved on since (a quick second tap
+     * on "Burchak qo'shish" must not also press "Rejani yaratish").
+     */
+    fun isCurrent(tappedIn: ScanStep): Boolean = step == tappedIn
+
     fun floorFound() {
         if (step == ScanStep.FIND_FLOOR) step = ScanStep.BASE
     }
@@ -100,7 +107,7 @@ class ScanFlow(val capture: FloorPlanCapture = FloorPlanCapture()) {
             ScanStep.HEIGHT -> FlowUi("arScanAimCeiling", "arScanConfirm", tracking && liveHeight != null, true, false, true)
             ScanStep.WALLS -> FlowUi(
                 if (reticle != null && capture.wouldSnap(reticle)) "arScanSnapToFirst" else "arScanCornersHint",
-                "arScanAddCorner", ok, true, capture.corners.size >= 3, false,
+                "arScanAddCorner", ok, true, tracking && capture.corners.size >= 3, false,
             )
             ScanStep.DONE -> FlowUi("arScanDoneHint", "arScanCreatePlan", true, true, false, false)
         }

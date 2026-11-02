@@ -86,7 +86,7 @@ ARCore turlarisiz bo'laklar JVM'da test qilinadi.
 - `floorY`: nishon ostidagi birinchi `HORIZONTAL_UPWARD_FACING` tekislik
   urilishidan; bazaviy nuqta qo'yilganda qotadi.
 - Har kadrda nishon: avval haqiqiy pol bo'lagiga hit-test (`floorY` dan
-  ±25 sm), bo'lmasa `FloorRay`. Pol bo'lagi ichidagi cheklov olib tashlanadi.
+  ±5 sm — ko'rpacha yoki to'shak pol hisoblanmaydi), bo'lmasa `FloorRay`. Pol bo'lagi ichidagi cheklov olib tashlanadi.
 - Har burchak ARCore anchoriga bog'lanadi; nurdan topilgan nuqta uchun
   `session.createAnchor(pose)`. Anchor `STOPPED` bo'lsa — hozirgi mantiq
   (`updatePositions`): u va keyingi burchaklar olib tashlanadi.

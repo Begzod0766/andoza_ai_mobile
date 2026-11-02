@@ -113,6 +113,8 @@ class ArScanActivity : Activity(), GLSurfaceView.Renderer {
 
     private val startedAt = SystemClock.elapsedRealtime()
     @Volatile private var finished = false
+    // The step the chrome last showed (UI thread); a tap carries it so a stale one is dropped.
+    private var shownStep = ScanStep.FIND_FLOOR
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -167,12 +169,18 @@ class ArScanActivity : Activity(), GLSurfaceView.Renderer {
 
     private fun Anchor.vec() = Vec3(pose.tx(), pose.ty(), pose.tz())
 
-    private fun onMain() = onGl {
+    private fun onMain() {
+        val tappedIn = shownStep
+        onGl { if (flow.isCurrent(tappedIn)) main() }
+    }
+
+    /** GL thread. */
+    private fun main() {
         cornersLost = false
         when (flow.step) {
             ScanStep.FIND_FLOOR -> Unit
             ScanStep.BASE -> {
-                val anchor = anchorAtReticle() ?: return@onGl
+                val anchor = anchorAtReticle() ?: return
                 if (flow.placeBase(anchor.vec())) {
                     anchors.add(anchor); haptic(HapticFeedbackConstants.VIRTUAL_KEY)
                 } else {
@@ -181,7 +189,7 @@ class ArScanActivity : Activity(), GLSurfaceView.Renderer {
             }
             ScanStep.HEIGHT -> liveHeight?.let { flow.confirmHeight(it, measured = true) }
             ScanStep.WALLS -> {
-                val anchor = anchorAtReticle() ?: return@onGl
+                val anchor = anchorAtReticle() ?: return
                 when (flow.addCorner(anchor.vec())) {
                     AddResult.ADDED -> { anchors.add(anchor); haptic(HapticFeedbackConstants.VIRTUAL_KEY) }
                     AddResult.CLOSED -> { anchors.add(anchor); haptic(HapticFeedbackConstants.LONG_PRESS) }
@@ -192,13 +200,21 @@ class ArScanActivity : Activity(), GLSurfaceView.Renderer {
         }
     }
 
-    private fun onCloseRoom() = onGl {
-        cornersLost = false
-        val first = anchors.firstOrNull() ?: return@onGl
-        if (flow.closeRoom()) {
-            // close() appended a copy of the first corner; keep one anchor per corner.
-            session?.createAnchor(first.pose)?.let(anchors::add)
-            haptic(HapticFeedbackConstants.LONG_PRESS)
+    private fun onCloseRoom() {
+        val tappedIn = shownStep
+        onGl {
+            if (!flow.isCurrent(tappedIn) || !tracking) return@onGl
+            cornersLost = false
+            // Anchor first (it throws while not tracking): close() appends a copy
+            // of the first corner, and every corner needs its anchor.
+            val first = anchors.firstOrNull() ?: return@onGl
+            val copy = session?.createAnchor(first.pose) ?: return@onGl
+            if (flow.closeRoom()) {
+                anchors.add(copy)
+                haptic(HapticFeedbackConstants.LONG_PRESS)
+            } else {
+                copy.detach()
+            }
         }
     }
 
@@ -407,7 +423,9 @@ class ArScanActivity : Activity(), GLSurfaceView.Renderer {
                 else -> ui.hintKey
             }
             val summary = flow.height?.takeIf { flow.step == ScanStep.DONE }?.let(::summaryText)
+            val step = flow.step
             runOnUiThread {
+                shownStep = step
                 overlay.state = state
                 chrome.bind(ui, s(hintKey), summary)
             }

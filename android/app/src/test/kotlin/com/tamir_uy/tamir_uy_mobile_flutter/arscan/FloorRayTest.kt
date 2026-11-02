@@ -35,4 +35,10 @@ class FloorRayTest {
         val h = Vec3(1f, -1.3f, -1f)
         assertEquals(h, FloorRay.pick(h, null, null))
     }
+
+    @Test fun `pick ignores a low platform 20 cm up`() {
+        val korpacha = Vec3(1f, 0.2f, -1f)
+        val ray = Vec3(1.3f, 0f, -1.5f)
+        assertEquals(ray, FloorRay.pick(korpacha, ray, 0f))
+    }
 }
