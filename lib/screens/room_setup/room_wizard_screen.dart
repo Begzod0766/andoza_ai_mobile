@@ -324,7 +324,7 @@ class _RoomWizardScreenState extends ConsumerState<RoomWizardScreen> {
       context: context,
       isScrollControlled: true,
       builder: (sheetContext) => DoorWindowModal(
-        onAdd: (type, width, height, offset) {
+        onAdd: (type, width, height, offset, _) {
           _addOpening(index, type, width, height, offset);
           Navigator.of(sheetContext).pop();
         },

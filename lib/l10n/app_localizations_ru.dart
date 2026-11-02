@@ -2897,4 +2897,34 @@ class AppLocalizationsRu extends AppLocalizations {
   String roomMenuTooltip(String name) {
     return 'Действия: «$name»';
   }
+
+  @override
+  String get openingWidthCm => 'Ширина (см)';
+
+  @override
+  String get openingHeightCm => 'Высота (см)';
+
+  @override
+  String get openingSillCm => 'Высота подоконника (см)';
+
+  @override
+  String get openingSave => 'Сохранить';
+
+  @override
+  String get openingDelete => 'Удалить';
+
+  @override
+  String get openingOffsetCm => 'Слева (см)';
+
+  @override
+  String get scanReviewOpeningsTitle => 'Двери и окна';
+
+  @override
+  String get scanReviewOpeningAdd => '+ Добавить';
+
+  @override
+  String get scanReviewPickWall => 'На какую стену?';
+
+  @override
+  String get scanReviewOpeningsEmpty => 'Пока нет дверей и окон';
 }

@@ -3154,5 +3154,45 @@
         "type": "String"
       }
     }
+  },
+  "openingWidthCm": "Eni (sm)",
+  "@openingWidthCm": {
+    "description": "door/window sheet: width field, centimetres"
+  },
+  "openingHeightCm": "Bo'yi (sm)",
+  "@openingHeightCm": {
+    "description": "door/window sheet: height field, centimetres"
+  },
+  "openingSillCm": "Deraza tagi (sm)",
+  "@openingSillCm": {
+    "description": "door/window sheet: window sill height above the floor, centimetres"
+  },
+  "openingSave": "Saqlash",
+  "@openingSave": {
+    "description": "door/window sheet: save an edited opening"
+  },
+  "openingDelete": "O'chirish",
+  "@openingDelete": {
+    "description": "door/window sheet: remove the opening"
+  },
+  "openingOffsetCm": "Chapdan (sm)",
+  "@openingOffsetCm": {
+    "description": "door/window sheet: distance from the wall start to the opening's left edge, centimetres"
+  },
+  "scanReviewOpeningsTitle": "Eshik va derazalar",
+  "@scanReviewOpeningsTitle": {
+    "description": "Room-scan review: heading of the editable doors/windows list"
+  },
+  "scanReviewOpeningAdd": "+ Qo'shish",
+  "@scanReviewOpeningAdd": {
+    "description": "Room-scan review: adds a door or window by hand"
+  },
+  "scanReviewPickWall": "Qaysi devorga?",
+  "@scanReviewPickWall": {
+    "description": "Room-scan review: title of the wall picker before adding an opening"
+  },
+  "scanReviewOpeningsEmpty": "Hali eshik yoki deraza yo'q",
+  "@scanReviewOpeningsEmpty": {
+    "description": "Room-scan review: the doors/windows list is empty"
   }
 }

@@ -2804,5 +2804,45 @@
   "projectDeleteBody": "“{name}” and its {rooms} rooms will be deleted for good. This can't be undone.",
   "roomDeleteTitle": "Delete this room?",
   "roomDeleteBody": "“{name}” and its design will be deleted for good. This can't be undone.",
-  "roomMenuTooltip": "Actions for “{name}”"
+  "roomMenuTooltip": "Actions for “{name}”",
+  "openingWidthCm": "Width (cm)",
+  "@openingWidthCm": {
+    "description": "door/window sheet: width field, centimetres"
+  },
+  "openingHeightCm": "Height (cm)",
+  "@openingHeightCm": {
+    "description": "door/window sheet: height field, centimetres"
+  },
+  "openingSillCm": "Sill height (cm)",
+  "@openingSillCm": {
+    "description": "door/window sheet: window sill height above the floor, centimetres"
+  },
+  "openingSave": "Save",
+  "@openingSave": {
+    "description": "door/window sheet: save an edited opening"
+  },
+  "openingDelete": "Delete",
+  "@openingDelete": {
+    "description": "door/window sheet: remove the opening"
+  },
+  "openingOffsetCm": "From the left (cm)",
+  "@openingOffsetCm": {
+    "description": "door/window sheet: distance from the wall start to the opening's left edge, centimetres"
+  },
+  "scanReviewOpeningsTitle": "Doors and windows",
+  "@scanReviewOpeningsTitle": {
+    "description": "Room-scan review: heading of the editable doors/windows list"
+  },
+  "scanReviewOpeningAdd": "+ Add",
+  "@scanReviewOpeningAdd": {
+    "description": "Room-scan review: adds a door or window by hand"
+  },
+  "scanReviewPickWall": "Which wall?",
+  "@scanReviewPickWall": {
+    "description": "Room-scan review: title of the wall picker before adding an opening"
+  },
+  "scanReviewOpeningsEmpty": "No doors or windows yet",
+  "@scanReviewOpeningsEmpty": {
+    "description": "Room-scan review: the doors/windows list is empty"
+  }
 }
