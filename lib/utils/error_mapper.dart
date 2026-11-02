@@ -2,15 +2,17 @@ import 'dart:io';
 
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter/widgets.dart';
 import 'package:logger/logger.dart';
 
+import '../l10n/app_localizations.dart';
 import '../services/api_client.dart';
 
 /// Centralized, single-source-of-truth error → user-message mapping.
 ///
 /// Turns any thrown error — especially a [DioException] (timeout, no
 /// connection, 4xx/5xx) or the app's own [ApiException] wrapper — into a short,
-/// user-friendly **Uzbek** message safe to show in an [ErrorView], a snackbar
+/// user-friendly message in the app's language safe to show in an [ErrorView], a snackbar
 /// or an inline banner. It never leaks a raw exception/stack string to the UI.
 ///
 /// Covered cases: no internet / connection, timeout, 400/422 (validation),
@@ -76,35 +78,41 @@ String _describeDio(DioException error) {
       '${statusCode == null ? '' : ' → $statusCode'}';
 }
 
+/// Language of the messages below. The mapper runs without a BuildContext (it
+/// is called from providers too), so the app sets this whenever its locale
+/// changes — see `MyApp` in main.dart.
+Locale _locale = const Locale('uz');
+
+void setErrorMessagesLocale(Locale locale) => _locale = locale;
+
+AppLocalizations get _t => lookupAppLocalizations(_locale);
+
 /// "No internet / connection" — the device can't reach the network at all.
-const String errorNoInternet = 'Internet aloqasi yo\'q. Ulanishni tekshiring.';
+String get errorNoInternet => _t.errorNoInternet;
 
 /// The request reached the network but the server didn't answer in time.
-const String errorTimeout = 'Server javob bermadi. Qayta urinib ko\'ring.';
+String get errorTimeout => _t.errorTimeout;
 
 /// 400 / 422 — the request payload failed client-side / server-side validation.
-const String errorValidation =
-    'Kiritilgan ma\'lumotlar noto\'g\'ri. Tekshirib, qaytadan kiriting.';
+String get errorValidation => _t.errorValidation;
 
 /// 401 — the session is no longer valid; the user must re-authenticate.
-const String errorSession = 'Sessiya tugadi. Iltimos, qaytadan kiring.';
+String get errorSession => _t.errorSession;
 
 /// 403 — authenticated, but not allowed to perform this action.
-const String errorForbidden = 'Bu amalni bajarishga ruxsatingiz yo\'q.';
+String get errorForbidden => _t.errorForbidden;
 
 /// 404 — the requested resource doesn't exist.
-const String errorNotFound = 'Ma\'lumot topilmadi.';
+String get errorNotFound => _t.errorNotFound;
 
 /// 409 — the request conflicts with the current server state.
-const String errorConflict =
-    'Ma\'lumotlarda ziddiyat yuz berdi. Iltimos, qaytadan urinib ko\'ring.';
+String get errorConflict => _t.errorConflict;
 
 /// 5xx / bad certificate — the server itself failed.
-const String errorServer =
-    'Serverda xatolik yuz berdi. Birozdan so\'ng urinib ko\'ring.';
+String get errorServer => _t.errorServer;
 
 /// Fallback for anything not otherwise recognised.
-const String errorGeneric = 'Xatolik yuz berdi. Qayta urinib ko\'ring.';
+String get errorGeneric => _t.errorGeneric;
 
 String _mapDio(DioException error) {
   switch (error.type) {

@@ -2779,5 +2779,14 @@
   "scanCoachTurnOnLight": "The room is dark — turn on the light",
   "scanCoachLowTexture": "This surface is too plain — point the camera elsewhere",
   "scanCoachGood": "Going well — keep walking around the room at this pace",
-  "scanCoachKeepGoing": "Keep scanning"
+  "scanCoachKeepGoing": "Keep scanning",
+  "errorNoInternet": "No internet connection. Check your connection.",
+  "errorTimeout": "The server didn't respond. Try again.",
+  "errorValidation": "Some of the details are invalid. Check them and try again.",
+  "errorSession": "Your session has ended. Please sign in again.",
+  "errorForbidden": "You aren't allowed to do this.",
+  "errorNotFound": "Not found.",
+  "errorConflict": "The data has changed in the meantime. Please try again.",
+  "errorServer": "Something went wrong on the server. Try again a bit later.",
+  "errorGeneric": "Something went wrong. Try again."
 }

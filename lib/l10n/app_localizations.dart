@@ -5169,6 +5169,60 @@ abstract class AppLocalizations {
   /// In uz, this message translates to:
   /// **'Skanerlashda davom eting'**
   String get scanCoachKeepGoing;
+
+  /// Error message: the device has no network connection
+  ///
+  /// In uz, this message translates to:
+  /// **'Internet aloqasi yo\'q. Ulanishni tekshiring.'**
+  String get errorNoInternet;
+
+  /// Error message: the server did not answer in time
+  ///
+  /// In uz, this message translates to:
+  /// **'Server javob bermadi. Qayta urinib ko\'ring.'**
+  String get errorTimeout;
+
+  /// Error message: HTTP 400/422, invalid input
+  ///
+  /// In uz, this message translates to:
+  /// **'Kiritilgan ma\'lumotlar noto\'g\'ri. Tekshirib, qaytadan kiriting.'**
+  String get errorValidation;
+
+  /// Error message: HTTP 401, the session expired
+  ///
+  /// In uz, this message translates to:
+  /// **'Sessiya tugadi. Iltimos, qaytadan kiring.'**
+  String get errorSession;
+
+  /// Error message: HTTP 403
+  ///
+  /// In uz, this message translates to:
+  /// **'Bu amalni bajarishga ruxsatingiz yo\'q.'**
+  String get errorForbidden;
+
+  /// Error message: HTTP 404
+  ///
+  /// In uz, this message translates to:
+  /// **'Ma\'lumot topilmadi.'**
+  String get errorNotFound;
+
+  /// Error message: HTTP 409
+  ///
+  /// In uz, this message translates to:
+  /// **'Ma\'lumotlarda ziddiyat yuz berdi. Iltimos, qaytadan urinib ko\'ring.'**
+  String get errorConflict;
+
+  /// Error message: HTTP 5xx or a bad certificate
+  ///
+  /// In uz, this message translates to:
+  /// **'Serverda xatolik yuz berdi. Birozdan so\'ng urinib ko\'ring.'**
+  String get errorServer;
+
+  /// Error message: any other failure
+  ///
+  /// In uz, this message translates to:
+  /// **'Xatolik yuz berdi. Qayta urinib ko\'ring.'**
+  String get errorGeneric;
 }
 
 class _AppLocalizationsDelegate

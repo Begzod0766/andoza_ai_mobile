@@ -36,6 +36,15 @@ class _FakePersistence extends RoomPersistenceNotifier {
   }
 }
 
+/// Fails the save itself with an internal error the user must not see.
+class _ThrowingPersistence extends RoomPersistenceNotifier {
+  _ThrowingPersistence(super.ref);
+
+  @override
+  Future<void> ensurePersisted({RoomCreate? override}) async =>
+      throw StateError('internal detail');
+}
+
 /// Reproduces the backend bug this guard exists for: every artifact upload
 /// fails, while the room itself is already created.
 class _FailingScanService implements RoomScanService {
@@ -139,4 +148,33 @@ void main() {
       expect(find.textContaining(errorGeneric), findsOneWidget);
     },
   );
+
+  testWidgets('a failed save shows a plain message, not the exception', (tester) async {
+    final router = GoRouter(
+      initialLocation: '/review',
+      routes: [GoRoute(path: '/review', builder: (_, _) => RoomScanReviewPage(args: _args()))],
+    );
+    await tester.pumpWidget(ProviderScope(
+      overrides: [
+        roomPersistenceProvider.overrideWith((r) => _ThrowingPersistence(r)),
+        roomScanServiceProvider.overrideWithValue(_FailingScanService()),
+      ],
+      child: MaterialApp.router(
+        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        supportedLocales: AppLocalizations.supportedLocales,
+        locale: const Locale('uz'),
+        routerConfig: router,
+      ),
+    ));
+    await tester.pumpAndSettle();
+    final continueButton = find.text('Davom etish');
+    await tester.scrollUntilVisible(continueButton, 300);
+    await tester.pumpAndSettle();
+    await tester.tap(continueButton);
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 100));
+    expect(find.textContaining('internal detail'), findsNothing);
+    expect(find.textContaining('StateError'), findsNothing);
+    expect(find.text(errorGeneric), findsOneWidget);
+  });
 }

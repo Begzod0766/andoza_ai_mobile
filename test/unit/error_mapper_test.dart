@@ -1,7 +1,9 @@
 import 'dart:io';
 
 import 'package:dio/dio.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:tamir_uy_mobile_flutter/l10n/app_localizations.dart';
 import 'package:logger/logger.dart';
 import 'package:tamir_uy_mobile_flutter/services/api_client.dart';
 import 'package:tamir_uy_mobile_flutter/utils/error_mapper.dart';
@@ -373,6 +375,33 @@ void main() {
         )),
         'Fayl haqiqiy .glb emas',
       );
+    });
+  });
+
+  group('messages follow the app language', () {
+    tearDown(() => setErrorMessagesLocale(const Locale('uz')));
+
+    DioException status(int code) => DioException(
+          requestOptions: RequestOptions(path: '/x'),
+          type: DioExceptionType.badResponse,
+          response: Response(requestOptions: RequestOptions(path: '/x'), statusCode: code),
+        );
+
+    for (final code in ['ru', 'en']) {
+      test(code, () {
+        setErrorMessagesLocale(Locale(code));
+        final t = lookupAppLocalizations(Locale(code));
+        expect(mapErrorToMessage(const SocketException('x')), t.errorNoInternet);
+        expect(mapErrorToMessage(status(500)), t.errorServer);
+        expect(mapErrorToMessage(status(401)), t.errorSession);
+        expect(mapErrorToMessage(Exception('?')), t.errorGeneric);
+        expect(t.errorNoInternet, isNot(lookupAppLocalizations(const Locale('uz')).errorNoInternet));
+      });
+    }
+
+    test('Uzbek by default', () {
+      expect(mapErrorToMessage(const SocketException('x')),
+          lookupAppLocalizations(const Locale('uz')).errorNoInternet);
     });
   });
 }

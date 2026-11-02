@@ -2809,4 +2809,34 @@ class AppLocalizationsUz extends AppLocalizations {
 
   @override
   String get scanCoachKeepGoing => 'Skanerlashda davom eting';
+
+  @override
+  String get errorNoInternet => 'Internet aloqasi yo\'q. Ulanishni tekshiring.';
+
+  @override
+  String get errorTimeout => 'Server javob bermadi. Qayta urinib ko\'ring.';
+
+  @override
+  String get errorValidation =>
+      'Kiritilgan ma\'lumotlar noto\'g\'ri. Tekshirib, qaytadan kiriting.';
+
+  @override
+  String get errorSession => 'Sessiya tugadi. Iltimos, qaytadan kiring.';
+
+  @override
+  String get errorForbidden => 'Bu amalni bajarishga ruxsatingiz yo\'q.';
+
+  @override
+  String get errorNotFound => 'Ma\'lumot topilmadi.';
+
+  @override
+  String get errorConflict =>
+      'Ma\'lumotlarda ziddiyat yuz berdi. Iltimos, qaytadan urinib ko\'ring.';
+
+  @override
+  String get errorServer =>
+      'Serverda xatolik yuz berdi. Birozdan so\'ng urinib ko\'ring.';
+
+  @override
+  String get errorGeneric => 'Xatolik yuz berdi. Qayta urinib ko\'ring.';
 }

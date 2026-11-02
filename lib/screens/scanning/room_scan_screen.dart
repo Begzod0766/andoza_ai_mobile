@@ -223,7 +223,8 @@ class _RoomScanScreenState extends ConsumerState<RoomScanScreen> {
         final reason = e.message.trim();
         return reason.isEmpty ? l10n.scanFailedRetry : '${l10n.scanFailedRetry}\n\n${l10n.scanFailedReason(reason)}';
       default:
-        return l10n.scanErrorPrefixed(e.message);
+        // An unexpected native code: its message is for the logs, not the user.
+        return l10n.scanFailedRetry;
     }
   }
 
