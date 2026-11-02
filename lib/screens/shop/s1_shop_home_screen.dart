@@ -235,23 +235,32 @@ class _S1ShopHomeScreenState extends ConsumerState<S1ShopHomeScreen> {
               ),
             )
           else
-          GridView.builder(
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            itemCount: products.length,
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 2,
-              mainAxisSpacing: DesignTokens.spacingMd,
-              crossAxisSpacing: DesignTokens.spacingMd,
-              childAspectRatio: 0.72,
-            ),
-            itemBuilder: (context, index) {
-              final product = products[index];
-              return _ProductCard(
-                product: product,
-                onTap: () => context.push('/shop/s3', extra: product),
-              );
-            },
+          // Two per row, each row as tall as its tallest card: a fixed aspect
+          // ratio clipped two-line names and, at large text sizes, the price.
+          Column(
+            children: [
+              for (var i = 0; i < products.length; i += 2) ...[
+                if (i > 0) const SizedBox(height: DesignTokens.spacingMd),
+                IntrinsicHeight(
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      for (final j in [i, i + 1]) ...[
+                        if (j > i) const SizedBox(width: DesignTokens.spacingMd),
+                        Expanded(
+                          child: j < products.length
+                              ? _ProductCard(
+                                  product: products[j],
+                                  onTap: () => context.push('/shop/s3', extra: products[j]),
+                                )
+                              : const SizedBox.shrink(),
+                        ),
+                      ],
+                    ],
+                  ),
+                ),
+              ],
+            ],
           ),
         ],
       ),
@@ -423,7 +432,10 @@ class _ProductCard extends StatelessWidget {
               style: DesignTokens.caption.copyWith(
                 color: DesignTokens.textGray,
               ),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
             ),
+            const SizedBox(height: DesignTokens.spacingXs),
             const Spacer(),
             Text(
               '${formatSom(product.pricePerUnit)} / ${product.unit}',
