@@ -116,7 +116,7 @@ class _S3ProductDetailScreenState extends ConsumerState<S3ProductDetailScreen> {
                     child: Text(
                       l10n.shopOfficialDealer,
                       style: DesignTokens.caption.copyWith(
-                        color: DesignTokens.successGreen,
+                        color: DesignTokens.successText,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
@@ -270,7 +270,7 @@ class _S3ProductDetailScreenState extends ConsumerState<S3ProductDetailScreen> {
                 height: DesignTokens.buttonHeightLarge,
                 child: ElevatedButton(
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: DesignTokens.accentOrange,
+                    backgroundColor: DesignTokens.accentOrangeStrong,
                   ),
                   onPressed: () {
                     ref

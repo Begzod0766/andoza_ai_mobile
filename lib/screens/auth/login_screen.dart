@@ -818,7 +818,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       ? const SizedBox.shrink()
       : Padding(
           padding: const EdgeInsets.only(top: DesignTokens.spacing12),
-          child: Text(_error!, style: DesignTokens.bodySmall.copyWith(color: DesignTokens.error)),
+          child: Text(_error!, style: DesignTokens.bodySmall.copyWith(color: DesignTokens.errorText)),
         );
 }
 

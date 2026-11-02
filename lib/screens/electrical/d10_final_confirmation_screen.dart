@@ -65,7 +65,7 @@ class D10FinalConfirmationScreen extends ConsumerWidget {
                     height: DesignTokens.buttonHeightLarge,
                     child: ElevatedButton(
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: DesignTokens.accentOrange,
+                        backgroundColor: DesignTokens.accentOrangeStrong,
                       ),
                       onPressed: () => context.push('/estimation/e1'),
                       child: Text(l10n.electricalViewEstimate),

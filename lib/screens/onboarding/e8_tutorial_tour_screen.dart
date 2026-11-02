@@ -77,7 +77,7 @@ class E8TutorialTourScreen extends StatelessWidget {
             height: DesignTokens.buttonHeightLarge,
             child: ElevatedButton(
               style: ElevatedButton.styleFrom(
-                backgroundColor: DesignTokens.accentOrange,
+                backgroundColor: DesignTokens.accentOrangeStrong,
               ),
               onPressed: () => showNewProjectSheet(context),
               child: Text(l10n.onboardingDemoTryMyself),

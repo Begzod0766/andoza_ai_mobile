@@ -136,7 +136,7 @@ class _E2MaterialCostsScreenState extends ConsumerState<E2MaterialCostsScreen> {
                     height: DesignTokens.buttonHeightLarge,
                     child: ElevatedButton(
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: DesignTokens.accentOrange,
+                        backgroundColor: DesignTokens.accentOrangeStrong,
                       ),
                       onPressed: () => context.push('/shop/s2'),
                       child: Text(l10n.estimateAddMaterialsToCart),

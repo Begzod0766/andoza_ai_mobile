@@ -85,7 +85,7 @@ class E4ProfileSettingsScreen extends ConsumerWidget {
                 Text(
                   l10n.commonVerifiedBadge,
                   style: DesignTokens.caption.copyWith(
-                    color: DesignTokens.successGreen,
+                    color: DesignTokens.successText,
                     fontWeight: FontWeight.bold,
                   ),
                 ),

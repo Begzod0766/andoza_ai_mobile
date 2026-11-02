@@ -1179,7 +1179,7 @@ class _BottomPanel extends StatelessWidget {
               Text(
                 l10n.drawAreaWarning,
                 style: DesignTokens.caption
-                    .copyWith(color: DesignTokens.accentOrange),
+                    .copyWith(color: DesignTokens.accentOrangeStrong),
               ),
             const SizedBox(height: DesignTokens.spacingXs),
             Text(l10n.ceilingHeightLabel,

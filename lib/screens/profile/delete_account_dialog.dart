@@ -86,7 +86,7 @@ class _DeleteAccountDialogState extends ConsumerState<DeleteAccountDialog> {
             ),
             if (_error != null) ...[
               const SizedBox(height: DesignTokens.spacingSm),
-              Text(_error!, style: const TextStyle(color: DesignTokens.errorRed)),
+              Text(_error!, style: const TextStyle(color: DesignTokens.errorText)),
             ],
           ],
         ),

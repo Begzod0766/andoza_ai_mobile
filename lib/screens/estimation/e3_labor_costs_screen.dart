@@ -136,7 +136,7 @@ class E3LaborCostsScreen extends ConsumerWidget {
                     height: DesignTokens.buttonHeightLarge,
                     child: ElevatedButton(
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: DesignTokens.accentOrange,
+                        backgroundColor: DesignTokens.accentOrangeStrong,
                       ),
                       onPressed: () => context.pop(),
                       child: Text(l10n.estimateSaveEstimate),

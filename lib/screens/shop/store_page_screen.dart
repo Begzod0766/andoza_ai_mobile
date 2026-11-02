@@ -185,7 +185,7 @@ class _StoreHeader extends StatelessWidget {
                       Text(
                         l10n.shopOfficialDealer,
                         style: DesignTokens.caption.copyWith(
-                          color: DesignTokens.successGreen,
+                          color: DesignTokens.successText,
                         ),
                       ),
                   ],

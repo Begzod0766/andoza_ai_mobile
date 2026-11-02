@@ -331,7 +331,7 @@ class _S6CheckoutScreenState extends ConsumerState<S6CheckoutScreen> {
                     height: DesignTokens.buttonHeightLarge,
                     child: ElevatedButton(
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: DesignTokens.accentOrange,
+                        backgroundColor: DesignTokens.accentOrangeStrong,
                       ),
                       onPressed: _isPlacing || lines.isEmpty
                           ? null

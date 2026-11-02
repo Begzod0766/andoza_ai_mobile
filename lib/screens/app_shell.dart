@@ -228,7 +228,7 @@ class _BottomNavWithFab extends StatelessWidget {
             alignment: Alignment.center,
             decoration: const BoxDecoration(
               shape: BoxShape.circle,
-              color: DesignTokens.accentOrange,
+              color: DesignTokens.accentOrangeStrong,
             ),
             child: const Icon(Icons.add, color: DesignTokens.white, size: 22),
           ),
