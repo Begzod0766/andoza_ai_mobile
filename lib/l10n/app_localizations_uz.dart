@@ -2478,7 +2478,7 @@ class AppLocalizationsUz extends AppLocalizations {
 
   @override
   String get deleteAccountPasswordHint =>
-      'Telefon kodi bilan kirgan bo\'lsangiz, bo\'sh qoldiring';
+      'Telefon kodi, Google yoki Apple orqali kirgan bo\'lsangiz, bo\'sh qoldiring';
 
   @override
   String get deleteAccountDone => 'Hisobingiz o\'chirildi';

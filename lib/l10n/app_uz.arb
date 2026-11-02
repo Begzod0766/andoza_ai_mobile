@@ -2725,7 +2725,7 @@
   "deleteAccountTitle": "Hisobni o'chirasizmi?",
   "deleteAccountBody": "Hisobingiz bilan birga barcha loyihalaringiz, rasmlaringiz, buyurtmalaringiz hamda do'koningiz yoki usta profilingiz o'chiriladi. Bu doimiy va uni qaytarib bo'lmaydi.",
   "deleteAccountPasswordLabel": "Parol",
-  "deleteAccountPasswordHint": "Telefon kodi bilan kirgan bo'lsangiz, bo'sh qoldiring",
+  "deleteAccountPasswordHint": "Telefon kodi, Google yoki Apple orqali kirgan bo'lsangiz, bo'sh qoldiring",
   "deleteAccountDone": "Hisobingiz o'chirildi",
   "scanFailedReason": "Sabab: {reason}",
   "@scanFailedReason": {"placeholders": {"reason": {"type": "String"}}},

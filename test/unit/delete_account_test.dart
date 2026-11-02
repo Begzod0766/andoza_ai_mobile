@@ -5,6 +5,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:tamir_uy_mobile_flutter/l10n/app_localizations.dart';
 import 'package:tamir_uy_mobile_flutter/models/user_model.dart';
 import 'package:tamir_uy_mobile_flutter/providers/auth_provider.dart';
 import 'package:tamir_uy_mobile_flutter/repositories/auth_repository.dart';
@@ -183,4 +184,12 @@ void main() {
       expect(n.state, isA<AuthInitial>());
     },
   );
+
+  test('the password hint tells Google and Apple users to leave it empty too', () {
+    for (final code in ['uz', 'ru', 'en']) {
+      final hint = lookupAppLocalizations(Locale(code)).deleteAccountPasswordHint;
+      expect(hint, contains('Google'), reason: code);
+      expect(hint, contains('Apple'), reason: code);
+    }
+  });
 }
