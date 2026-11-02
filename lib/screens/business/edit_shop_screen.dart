@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../widgets/common/phone_field.dart';
 import '../../config/design_tokens.dart';
 import '../../l10n/app_localizations.dart';
 import '../../models/business_profile.dart';
@@ -51,7 +52,7 @@ class _EditShopScreenState extends ConsumerState<EditShopScreen> {
     _loaded = true;
     _name.text = s.name;
     _district.text = s.district ?? '';
-    _phone.text = s.phone ?? '';
+    _phone.text = displayPhone(s.phone ?? '');
     _telegram.text = s.telegram ?? '';
   }
 
@@ -115,11 +116,7 @@ class _EditShopScreenState extends ConsumerState<EditShopScreen> {
                 const SizedBox(height: DesignTokens.spacingSm),
                 TextField(controller: _district, decoration: InputDecoration(labelText: l10n.businessFieldDistrict)),
                 const SizedBox(height: DesignTokens.spacingSm),
-                TextField(
-                  controller: _phone,
-                  keyboardType: TextInputType.phone,
-                  decoration: InputDecoration(labelText: l10n.businessFieldPhone),
-                ),
+                PhoneField(controller: _phone, label: l10n.businessFieldPhone, hint: null),
                 const SizedBox(height: DesignTokens.spacingSm),
                 TextField(controller: _telegram, decoration: InputDecoration(labelText: l10n.businessFieldTelegram)),
                 const SizedBox(height: DesignTokens.spacingMd),
