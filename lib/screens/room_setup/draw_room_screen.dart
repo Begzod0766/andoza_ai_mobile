@@ -823,15 +823,39 @@ class _DrawRoomScreenState extends ConsumerState<DrawRoomScreen>
   Future<void> _finish() async {
     setState(() => _saving = true);
     final plan = _plan;
-    try {
-      final roomId = await handoffRoomPlan(ref, plan);
-      if (!mounted) return;
-      context.go(roomId != null ? '/studio/$roomId' : '/design/b1');
-    } catch (_) {
-      if (mounted) context.go('/design/b1');
-    } finally {
-      if (mounted) setState(() => _saving = false);
+    final saved = await saveDrawnRoom(
+      () => handoffRoomPlan(ref, plan),
+      onSaved: (roomId) {
+        if (mounted) context.go('/studio/$roomId');
+      },
+    );
+    if (!mounted) return;
+    setState(() => _saving = false);
+    if (!saved) {
+      // Keep the drawing: the user retries instead of losing it.
+      final l10n = AppLocalizations.of(context)!;
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text(l10n.roomSaveFailed),
+        action: SnackBarAction(label: l10n.actionRetry, onPressed: _finish),
+      ));
     }
+  }
+}
+
+/// Saves the drawn room and hands its id to [onSaved]. False when the save
+/// threw or the server gave no room — the caller stays on the drawing then,
+/// rather than detouring into the old offline design flow.
+Future<bool> saveDrawnRoom(
+  Future<String?> Function() save, {
+  required void Function(String roomId) onSaved,
+}) async {
+  try {
+    final roomId = await save();
+    if (roomId == null) return false;
+    onSaved(roomId);
+    return true;
+  } catch (_) {
+    return false;
   }
 }
 
