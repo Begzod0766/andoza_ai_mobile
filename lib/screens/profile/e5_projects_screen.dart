@@ -88,22 +88,35 @@ class _E5ProjectsScreenState extends ConsumerState<E5ProjectsScreen> {
             ),
           ),
           Expanded(
-            child: status ?? (visible.isEmpty
-                ? Padding(
-                    padding: const EdgeInsets.all(
-                      DesignTokens.screenPaddingHorizontal,
-                    ),
-                    child: Center(
-                      child: EmptyStatePattern(
-                        icon: Icons.architecture_outlined,
-                        title: l10n.profileProjectsEmptyTitle,
-                        message: l10n.profileProjectsEmptyMessage,
-                        actionLabel: l10n.profileProjectsEmptyAction,
-                        onAction: () => showNewProjectSheet(context),
-                      ),
+            child: status ?? RefreshIndicator(
+              onRefresh: () => ref.refresh(apartmentsProvider.future),
+              child: visible.isEmpty
+                ? LayoutBuilder(
+                    builder: (context, box) => ListView(
+                      physics: const AlwaysScrollableScrollPhysics(),
+                      children: [
+                        ConstrainedBox(
+                          constraints: BoxConstraints(minHeight: box.maxHeight),
+                          child: Padding(
+                            padding: const EdgeInsets.all(
+                              DesignTokens.screenPaddingHorizontal,
+                            ),
+                            child: Center(
+                              child: EmptyStatePattern(
+                                icon: Icons.architecture_outlined,
+                                title: l10n.profileProjectsEmptyTitle,
+                                message: l10n.profileProjectsEmptyMessage,
+                                actionLabel: l10n.profileProjectsEmptyAction,
+                                onAction: () => showNewProjectSheet(context),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                   )
                 : ListView.separated(
+                    physics: const AlwaysScrollableScrollPhysics(),
                     padding: const EdgeInsets.all(
                       DesignTokens.screenPaddingHorizontal,
                     ),

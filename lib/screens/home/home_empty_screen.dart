@@ -95,15 +95,15 @@ class _StoryCircleState extends State<_StoryCircle>
                   ),
           ),
           const SizedBox(height: DesignTokens.spacingXs),
-          SizedBox(
-            width: 72,
-            child: Text(
-              widget.label,
-              textAlign: TextAlign.center,
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
-              style: DesignTokens.caption,
-            ),
+          // The whole column width (a third of the row), and at most 1.5×
+          // text: a fixed 72 px split "Qanday" mid-word at large text.
+          Text(
+            widget.label,
+            textAlign: TextAlign.center,
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+            style: DesignTokens.caption,
+            textScaler: MediaQuery.textScalerOf(context).clamp(maxScaleFactor: 1.5),
           ),
         ],
       ),
@@ -154,6 +154,8 @@ class HomeEmptyBody extends StatelessWidget {
     final l10n = AppLocalizations.of(context)!;
     return SafeArea(
       child: SingleChildScrollView(
+        // Always scrollable so the home's pull-to-refresh works when it fits.
+        physics: const AlwaysScrollableScrollPhysics(),
         padding: const EdgeInsets.symmetric(
           horizontal: DesignTokens.screenPaddingHorizontal,
           vertical: DesignTokens.spacingLg,
@@ -162,26 +164,33 @@ class HomeEmptyBody extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // Three story-circle onboarding shortcuts.
+            // Top-aligned so a one-line label doesn't drop its circle lower.
             Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                _StoryCircle(
-                  icon: Icons.help_outline,
-                  label: l10n.homeStoryHowItWorks,
-                  seen: false,
-                  onTap: () => context.push('/onboarding/e7'),
+                Expanded(
+                  child: _StoryCircle(
+                    icon: Icons.help_outline,
+                    label: l10n.homeStoryHowItWorks,
+                    seen: false,
+                    onTap: () => context.push('/onboarding/e7'),
+                  ),
                 ),
-                _StoryCircle(
-                  icon: Icons.play_circle_outline,
-                  label: l10n.homeStoryDemoGuide,
-                  seen: true,
-                  onTap: () => context.push('/onboarding/e8'),
+                Expanded(
+                  child: _StoryCircle(
+                    icon: Icons.play_circle_outline,
+                    label: l10n.homeStoryDemoGuide,
+                    seen: true,
+                    onTap: () => context.push('/onboarding/e8'),
+                  ),
                 ),
-                _StoryCircle(
-                  icon: Icons.auto_awesome,
-                  label: l10n.homeStoryDemo,
-                  seen: false,
-                  onTap: () => context.push('/onboarding/e8'),
+                Expanded(
+                  child: _StoryCircle(
+                    icon: Icons.auto_awesome,
+                    label: l10n.homeStoryDemo,
+                    seen: false,
+                    onTap: () => context.push('/onboarding/e8'),
+                  ),
                 ),
               ],
             ),

@@ -45,17 +45,23 @@ class HomeWithProjectsScreen extends ConsumerWidget {
         ),
       ),
       data: (projects) {
+        // Pull down to pick up projects made elsewhere (web, another phone).
+        Future<void> refresh() => ref.refresh(apartmentsProvider.future);
         if (projects.isEmpty) {
-          return const HomeEmptyBody();
+          return RefreshIndicator(onRefresh: refresh, child: const HomeEmptyBody());
         }
 
         return SafeArea(
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.symmetric(
-              horizontal: DesignTokens.screenPaddingHorizontal,
-              vertical: DesignTokens.spacingLg,
+          child: RefreshIndicator(
+            onRefresh: refresh,
+            child: SingleChildScrollView(
+              physics: const AlwaysScrollableScrollPhysics(),
+              padding: const EdgeInsets.symmetric(
+                horizontal: DesignTokens.screenPaddingHorizontal,
+                vertical: DesignTokens.spacingLg,
+              ),
+              child: _ProjectList(projects: projects),
             ),
-            child: _ProjectList(projects: projects),
           ),
         );
       },

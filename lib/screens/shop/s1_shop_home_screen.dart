@@ -155,7 +155,14 @@ class _S1ShopHomeScreenState extends ConsumerState<S1ShopHomeScreen> {
           const SizedBox(width: DesignTokens.spacingSm),
         ],
       ),
-      body: ListView(
+      // Pull down for fresh prices and stock.
+      body: RefreshIndicator(
+        onRefresh: () => Future.wait([
+          ref.refresh(materialsProvider(null).future),
+          ref.refresh(storesProvider.future),
+        ]),
+        child: ListView(
+        physics: const AlwaysScrollableScrollPhysics(),
         padding: const EdgeInsets.all(DesignTokens.screenPaddingHorizontal),
         children: [
           Container(
@@ -179,9 +186,8 @@ class _S1ShopHomeScreenState extends ConsumerState<S1ShopHomeScreen> {
             ),
           ),
           const SizedBox(height: DesignTokens.spacingLg),
-          SizedBox(
-            height: 40,
-            child: ShaderMask(
+          // Sized by its chips (no fixed 40 px), so large text doesn't clip them.
+          ShaderMask(
               shaderCallback: (bounds) {
                 return const LinearGradient(
                   begin: Alignment.centerLeft,
@@ -191,9 +197,9 @@ class _S1ShopHomeScreenState extends ConsumerState<S1ShopHomeScreen> {
                 ).createShader(bounds);
               },
               blendMode: BlendMode.dstIn,
-              child: ListView(
+              child: SingleChildScrollView(
                 scrollDirection: Axis.horizontal,
-                children: [
+                child: Row(children: [
                   _CategoryChip(
                     label: l10n.shopFilterAll,
                     selected: _filter == null,
@@ -263,7 +269,7 @@ class _S1ShopHomeScreenState extends ConsumerState<S1ShopHomeScreen> {
             ],
           ),
         ],
-      ),
+      )),
     );
   }
 }

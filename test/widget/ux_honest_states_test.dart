@@ -111,4 +111,21 @@ void main() {
     );
     expect(m.initial, '?');
   });
+
+  testWidgets('projects pull to refresh, empty or not', (tester) async {
+    var calls = 0;
+    await tester.pumpWidget(_projects(apartmentsProvider.overrideWith((ref) async {
+      calls++;
+      return [_apartment()];
+    })));
+    await tester.pumpAndSettle();
+    expect(find.byType(RefreshIndicator), findsOneWidget);
+    await tester.fling(find.byType(Scrollable).last, const Offset(0, 400), 1000);
+    await tester.pumpAndSettle();
+    expect(calls, 2);
+
+    await tester.pumpWidget(_projects(apartmentsProvider.overrideWith((ref) async => const [])));
+    await tester.pumpAndSettle();
+    expect(find.byType(RefreshIndicator), findsOneWidget);
+  });
 }

@@ -95,4 +95,15 @@ void main() {
     expect(find.byType(HomeEmptyBody), findsOneWidget);
     expect(find.text('Davom etish'), findsNothing);
   });
+
+  testWidgets('projects and the empty home both pull to refresh', (tester) async {
+    await _pumpWithProjects(tester, AsyncData([_project('Mening loyiham')]));
+    await tester.pumpAndSettle();
+    expect(find.byType(RefreshIndicator), findsOneWidget);
+
+    await _pumpWithProjects(tester, const AsyncData(<ProjectItem>[]));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 50));
+    expect(find.byType(RefreshIndicator), findsOneWidget);
+  });
 }
