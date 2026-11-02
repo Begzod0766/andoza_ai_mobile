@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
+import 'package:tamir_uy_mobile_flutter/screens/projects/project_menu.dart';
 import 'package:tamir_uy_mobile_flutter/l10n/app_localizations.dart';
 import 'package:tamir_uy_mobile_flutter/models/api/api.dart';
 import 'package:tamir_uy_mobile_flutter/providers/apartment_provider.dart';
@@ -127,5 +128,11 @@ void main() {
     await tester.pumpWidget(_projects(apartmentsProvider.overrideWith((ref) async => const [])));
     await tester.pumpAndSettle();
     expect(find.byType(RefreshIndicator), findsOneWidget);
+  });
+
+  testWidgets('each project in Loyihalarim has the ⋮ menu', (tester) async {
+    await tester.pumpWidget(_projects(apartmentsProvider.overrideWith((ref) async => [_apartment()])));
+    await tester.pumpAndSettle();
+    expect(find.byType(ProjectMenuButton), findsOneWidget);
   });
 }

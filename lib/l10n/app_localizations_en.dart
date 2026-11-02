@@ -2842,4 +2842,43 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get errorGeneric => 'Something went wrong. Try again.';
+
+  @override
+  String get projectMenuTooltip => 'Project actions';
+
+  @override
+  String get projectRename => 'Rename';
+
+  @override
+  String get projectRooms => 'Rooms';
+
+  @override
+  String get projectDelete => 'Delete project';
+
+  @override
+  String get projectRenameTitle => 'Project name';
+
+  @override
+  String get roomRenameTitle => 'Room name';
+
+  @override
+  String get projectDeleteTitle => 'Delete this project?';
+
+  @override
+  String projectDeleteBody(String name, int rooms) {
+    return '“$name” and its $rooms rooms will be deleted for good. This can\'t be undone.';
+  }
+
+  @override
+  String get roomDeleteTitle => 'Delete this room?';
+
+  @override
+  String roomDeleteBody(String name) {
+    return '“$name” and its design will be deleted for good. This can\'t be undone.';
+  }
+
+  @override
+  String roomMenuTooltip(String name) {
+    return 'Actions for “$name”';
+  }
 }

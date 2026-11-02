@@ -3072,5 +3072,67 @@
   "errorGeneric": "Xatolik yuz berdi. Qayta urinib ko'ring.",
   "@errorGeneric": {
     "description": "Error message: any other failure"
+  },
+  "projectMenuTooltip": "Loyiha amallari",
+  "@projectMenuTooltip": {
+    "description": "Project card: tooltip of the ⋮ menu button"
+  },
+  "projectRename": "Nomini o'zgartirish",
+  "@projectRename": {
+    "description": "Project/room menu: rename"
+  },
+  "projectRooms": "Xonalar",
+  "@projectRooms": {
+    "description": "Project menu: opens the list of the project's rooms"
+  },
+  "projectDelete": "Loyihani o'chirish",
+  "@projectDelete": {
+    "description": "Project menu: delete the project"
+  },
+  "projectRenameTitle": "Loyiha nomi",
+  "@projectRenameTitle": {
+    "description": "Rename dialog title for a project"
+  },
+  "roomRenameTitle": "Xona nomi",
+  "@roomRenameTitle": {
+    "description": "Rename dialog title for a room"
+  },
+  "projectDeleteTitle": "Loyihani o'chirasizmi?",
+  "@projectDeleteTitle": {
+    "description": "Confirm dialog title before deleting a project"
+  },
+  "projectDeleteBody": "«{name}» va undagi {rooms} ta xona butunlay o'chiriladi. Buni qaytarib bo'lmaydi.",
+  "@projectDeleteBody": {
+    "description": "Confirm dialog body before deleting a project",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "rooms": {
+        "type": "int"
+      }
+    }
+  },
+  "roomDeleteTitle": "Xonani o'chirasizmi?",
+  "@roomDeleteTitle": {
+    "description": "Confirm dialog title before deleting a room"
+  },
+  "roomDeleteBody": "«{name}» xonasi va uning dizayni butunlay o'chiriladi. Buni qaytarib bo'lmaydi.",
+  "@roomDeleteBody": {
+    "description": "Confirm dialog body before deleting a room",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "roomMenuTooltip": "«{name}» amallari",
+  "@roomMenuTooltip": {
+    "description": "Rooms sheet: tooltip of a room's ⋮ menu",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
   }
 }

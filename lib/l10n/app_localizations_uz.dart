@@ -2839,4 +2839,43 @@ class AppLocalizationsUz extends AppLocalizations {
 
   @override
   String get errorGeneric => 'Xatolik yuz berdi. Qayta urinib ko\'ring.';
+
+  @override
+  String get projectMenuTooltip => 'Loyiha amallari';
+
+  @override
+  String get projectRename => 'Nomini o\'zgartirish';
+
+  @override
+  String get projectRooms => 'Xonalar';
+
+  @override
+  String get projectDelete => 'Loyihani o\'chirish';
+
+  @override
+  String get projectRenameTitle => 'Loyiha nomi';
+
+  @override
+  String get roomRenameTitle => 'Xona nomi';
+
+  @override
+  String get projectDeleteTitle => 'Loyihani o\'chirasizmi?';
+
+  @override
+  String projectDeleteBody(String name, int rooms) {
+    return '«$name» va undagi $rooms ta xona butunlay o\'chiriladi. Buni qaytarib bo\'lmaydi.';
+  }
+
+  @override
+  String get roomDeleteTitle => 'Xonani o\'chirasizmi?';
+
+  @override
+  String roomDeleteBody(String name) {
+    return '«$name» xonasi va uning dizayni butunlay o\'chiriladi. Buni qaytarib bo\'lmaydi.';
+  }
+
+  @override
+  String roomMenuTooltip(String name) {
+    return '«$name» amallari';
+  }
 }

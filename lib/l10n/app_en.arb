@@ -2788,5 +2788,16 @@
   "errorNotFound": "Not found.",
   "errorConflict": "The data has changed in the meantime. Please try again.",
   "errorServer": "Something went wrong on the server. Try again a bit later.",
-  "errorGeneric": "Something went wrong. Try again."
+  "errorGeneric": "Something went wrong. Try again.",
+  "projectMenuTooltip": "Project actions",
+  "projectRename": "Rename",
+  "projectRooms": "Rooms",
+  "projectDelete": "Delete project",
+  "projectRenameTitle": "Project name",
+  "roomRenameTitle": "Room name",
+  "projectDeleteTitle": "Delete this project?",
+  "projectDeleteBody": "“{name}” and its {rooms} rooms will be deleted for good. This can't be undone.",
+  "roomDeleteTitle": "Delete this room?",
+  "roomDeleteBody": "“{name}” and its design will be deleted for good. This can't be undone.",
+  "roomMenuTooltip": "Actions for “{name}”"
 }
