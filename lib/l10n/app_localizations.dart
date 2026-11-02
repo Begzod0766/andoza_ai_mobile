@@ -2608,6 +2608,36 @@ abstract class AppLocalizations {
   /// **'Devorga qo\'shish'**
   String get openingAddToWall;
 
+  /// door/window sheet: width field, centimetres
+  ///
+  /// In uz, this message translates to:
+  /// **'Eni (sm)'**
+  String get openingWidthCm;
+
+  /// door/window sheet: height field, centimetres
+  ///
+  /// In uz, this message translates to:
+  /// **'Bo\'yi (sm)'**
+  String get openingHeightCm;
+
+  /// door/window sheet: window sill height above the floor, centimetres
+  ///
+  /// In uz, this message translates to:
+  /// **'Deraza tagi (sm)'**
+  String get openingSillCm;
+
+  /// door/window sheet: save an edited opening
+  ///
+  /// In uz, this message translates to:
+  /// **'Saqlash'**
+  String get openingSave;
+
+  /// door/window sheet: remove the opening
+  ///
+  /// In uz, this message translates to:
+  /// **'O\'chirish'**
+  String get openingDelete;
+
   /// New-project bottom sheet title.
   ///
   /// In uz, this message translates to:

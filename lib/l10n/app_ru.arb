@@ -1715,6 +1715,26 @@
   "@openingAddToWall": {
     "description": "Door/window sheet: confirm button that adds the opening to the wall."
   },
+  "openingWidthCm": "Ширина (см)",
+  "@openingWidthCm": {
+    "description": "door/window sheet: width field, centimetres"
+  },
+  "openingHeightCm": "Высота (см)",
+  "@openingHeightCm": {
+    "description": "door/window sheet: height field, centimetres"
+  },
+  "openingSillCm": "Высота подоконника (см)",
+  "@openingSillCm": {
+    "description": "door/window sheet: window sill height above the floor, centimetres"
+  },
+  "openingSave": "Сохранить",
+  "@openingSave": {
+    "description": "door/window sheet: save an edited opening"
+  },
+  "openingDelete": "Удалить",
+  "@openingDelete": {
+    "description": "door/window sheet: remove the opening"
+  },
   "newProjectTitle": "Новый проект",
   "@newProjectTitle": {
     "description": "New-project bottom sheet title."

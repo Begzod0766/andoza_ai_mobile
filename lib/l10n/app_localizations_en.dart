@@ -1408,6 +1408,21 @@ class AppLocalizationsEn extends AppLocalizations {
   String get openingAddToWall => 'Add to wall';
 
   @override
+  String get openingWidthCm => 'Width (cm)';
+
+  @override
+  String get openingHeightCm => 'Height (cm)';
+
+  @override
+  String get openingSillCm => 'Sill height (cm)';
+
+  @override
+  String get openingSave => 'Save';
+
+  @override
+  String get openingDelete => 'Delete';
+
+  @override
   String get newProjectTitle => 'New project';
 
   @override

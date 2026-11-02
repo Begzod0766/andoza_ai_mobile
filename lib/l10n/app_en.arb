@@ -1715,6 +1715,26 @@
   "@openingAddToWall": {
     "description": "Door/window sheet: confirm button that adds the opening to the wall."
   },
+  "openingWidthCm": "Width (cm)",
+  "@openingWidthCm": {
+    "description": "door/window sheet: width field, centimetres"
+  },
+  "openingHeightCm": "Height (cm)",
+  "@openingHeightCm": {
+    "description": "door/window sheet: height field, centimetres"
+  },
+  "openingSillCm": "Sill height (cm)",
+  "@openingSillCm": {
+    "description": "door/window sheet: window sill height above the floor, centimetres"
+  },
+  "openingSave": "Save",
+  "@openingSave": {
+    "description": "door/window sheet: save an edited opening"
+  },
+  "openingDelete": "Delete",
+  "@openingDelete": {
+    "description": "door/window sheet: remove the opening"
+  },
   "newProjectTitle": "New project",
   "@newProjectTitle": {
     "description": "New-project bottom sheet title."

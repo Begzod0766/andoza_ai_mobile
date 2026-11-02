@@ -1402,6 +1402,21 @@ class AppLocalizationsRu extends AppLocalizations {
   String get openingAddToWall => 'Добавить к стене';
 
   @override
+  String get openingWidthCm => 'Ширина (см)';
+
+  @override
+  String get openingHeightCm => 'Высота (см)';
+
+  @override
+  String get openingSillCm => 'Высота подоконника (см)';
+
+  @override
+  String get openingSave => 'Сохранить';
+
+  @override
+  String get openingDelete => 'Удалить';
+
+  @override
   String get newProjectTitle => 'Новый проект';
 
   @override

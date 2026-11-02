@@ -1833,6 +1833,26 @@
   "@openingAddToWall": {
     "description": "Door/window sheet: confirm button that adds the opening to the wall."
   },
+  "openingWidthCm": "Eni (sm)",
+  "@openingWidthCm": {
+    "description": "door/window sheet: width field, centimetres"
+  },
+  "openingHeightCm": "Bo'yi (sm)",
+  "@openingHeightCm": {
+    "description": "door/window sheet: height field, centimetres"
+  },
+  "openingSillCm": "Deraza tagi (sm)",
+  "@openingSillCm": {
+    "description": "door/window sheet: window sill height above the floor, centimetres"
+  },
+  "openingSave": "Saqlash",
+  "@openingSave": {
+    "description": "door/window sheet: save an edited opening"
+  },
+  "openingDelete": "O'chirish",
+  "@openingDelete": {
+    "description": "door/window sheet: remove the opening"
+  },
 
   "newProjectTitle": "Yangi loyiha",
   "@newProjectTitle": {

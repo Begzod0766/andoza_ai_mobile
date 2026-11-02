@@ -311,7 +311,7 @@ class _WallMeasurementsScreenState
       context: context,
       isScrollControlled: true,
       builder: (sheetContext) => DoorWindowModal(
-        onAdd: (type, width, height, offset) {
+        onAdd: (type, width, height, offset, _) {
           ref
               .read(wallMeasurementsProvider.notifier)
               .addOpening(

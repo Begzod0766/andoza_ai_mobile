@@ -1395,6 +1395,21 @@ class AppLocalizationsUz extends AppLocalizations {
   String get openingAddToWall => 'Devorga qo\'shish';
 
   @override
+  String get openingWidthCm => 'Eni (sm)';
+
+  @override
+  String get openingHeightCm => 'Bo\'yi (sm)';
+
+  @override
+  String get openingSillCm => 'Deraza tagi (sm)';
+
+  @override
+  String get openingSave => 'Saqlash';
+
+  @override
+  String get openingDelete => 'O\'chirish';
+
+  @override
   String get newProjectTitle => 'Yangi loyiha';
 
   @override
