@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import '../../utils/phone.dart';
 import '../../config/design_tokens.dart';
 import '../../l10n/app_localizations.dart';
 import '../../providers/auth_provider.dart';
@@ -76,7 +77,7 @@ class E4ProfileSettingsScreen extends ConsumerWidget {
                 ),
                 if (phone != null)
                   Text(
-                    phone,
+                    displayPhone(phone),
                     style: DesignTokens.body2.copyWith(
                       color: DesignTokens.textGray,
                     ),

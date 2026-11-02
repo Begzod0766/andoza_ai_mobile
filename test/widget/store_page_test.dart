@@ -310,4 +310,9 @@ void main() {
       expect(find.text('Mebel'), findsNothing);
     });
   });
+
+  testWidgets('the store page pulls to refresh', (tester) async {
+    await _pump(tester, '/shop/store/s1');
+    expect(find.byType(RefreshIndicator), findsOneWidget);
+  });
 }
