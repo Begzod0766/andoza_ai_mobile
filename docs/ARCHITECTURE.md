@@ -155,8 +155,28 @@ nusxani olib tashlaydi (`andoza_ai` backend, `room_scan_dedupe`).
 3. Natija `PendingScanStore.saveFlat` ga saqlanadi va `/scanning/roomplan/review-flat` (`FlatScanReviewPage`) ochiladi: xonalar rejada, har biriga nom.
 4. `handoffScannedFlat` (`services/flat_scan_handoff.dart`) hamma xonani bitta kvartirada yaratadi va `layoutPos` ni yozadi; skanerlar bitta `scan_group` bilan yuklanadi (backend ularni bir-birining nusxasi deb o'chirmaydi); studiya butun kvartira bilan ochiladi (`/studio/{birinchi id}`, `focus` siz).
 
-**Android:** `andoza/roomscan` u yerda yo'q, shuning uchun foydalanuvchiga foto
-rejimi yoki xonani chizish taklif qilinadi.
+## Kamera bilan o'lchash (Android ARCore)
+
+**Kanal:** `andoza/arscan` (`android/.../arscan/ArScanChannel.kt`, `ArScanActivity.kt`;
+Dart: `features/ar_scan/`, ekran `/scanning/arcore`). ARCore yo'q qurilmada foto rejimi
+yoki xonani chizish taklif qilinadi.
+
+**Qadamlar:** pol → burchaklar → balandlik → eshik va derazalar.
+- Burchaklar: ARCore vertikal tekisliklaridan devorlar topiladi (`WallTracker`),
+  kesishgan joy barqaror bo'lsa burchak o'zi qo'shiladi; nishon burchakka
+  yopishadi yoki bir joyda ushlab turilsa qo'shiladi (`DwellDetector`).
+- Eshik/deraza: nishon kontur devoriga yopishadi (≤ 30 sm), chap va o'ng chet
+  "Chet qo'shish" bilan belgilanadi (`OpeningCapture`). Bo'yi standart
+  (eshik 2.0 m; deraza 1.5 m, tagi 0.9 m) — ko'rib chiqish ekranida tuzatiladi.
+
+**Natija:** `{corners: [[x,z]], height, heightMeasured, closed, trackingLossCount,
+durationSec, openings: [{type, edge, t0, t1}]}`. `edge` — kontur qirrasi (yopilgan
+konturda yopuvchi nuqtasiz), `t0..t1` — shu qirra bo'ylab ulush. `buildArcorePlan`
+(`arcore_plan.dart`) burchaklarni to'g'rilaydi va har opening'ni o'z devoriga
+joylaydi, keyin iOS bilan bir xil ko'rib chiqish ekrani ochiladi.
+
+**Ko'rib chiqish ekrani** (iOS va Android): `ScanOpeningsEditor` eshik/derazalarni
+tahrirlash, o'chirish va devor tanlab qo'shishga imkon beradi (`DoorWindowModal`).
 
 **Eski kod:** `com.tamir_uy/lidar` kanali (`LidarMethodChannel.swift`, Android
 ARCore `DepthScanActivity.kt`) va uning Dart qismi (`services/lidar_service.dart`,
