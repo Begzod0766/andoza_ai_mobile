@@ -90,6 +90,18 @@ void main() {
     expect(s.containsKey('arScanStepFloor'), isFalse);
   });
 
+  testWidgets('passes the scanner its tracking-trouble copy', (tester) async {
+    final fake = _FakeArScan(raw: _scan([[0, 0], [4, 0], [4, 3], [0, 3]]));
+    await _pump(tester, fake);
+    final s = fake.lastStrings!;
+    for (final e in {
+      'arScanLostMotion': l10n.arScanLostMotion, 'arScanLostLight': l10n.arScanLostLight,
+      'arScanLostFeatures': l10n.arScanLostFeatures, 'arScanTrackingSettling': l10n.arScanTrackingSettling,
+    }.entries) {
+      expect(s[e.key], e.value, reason: e.key);
+    }
+  });
+
   testWidgets('passes the scanner its doors-and-windows copy', (tester) async {
     final fake = _FakeArScan(raw: _scan([[0, 0], [4, 0], [4, 3], [0, 3]]));
     await _pump(tester, fake);

@@ -567,6 +567,20 @@ class AppLocalizationsUz extends AppLocalizations {
       'Yorug\'lik kam yoki telefon tez harakatlandi';
 
   @override
+  String get arScanLostMotion => 'Telefonni sekinroq harakatlantiring';
+
+  @override
+  String get arScanLostLight => 'Yorug\'lik kam — chiroqni yoqing';
+
+  @override
+  String get arScanLostFeatures =>
+      'Bo\'sh devor yoki polga qaramang — naqshli joyga, mebelga qarating';
+
+  @override
+  String get arScanTrackingSettling =>
+      'Joylashuv tiklanmoqda — telefonni bir zum qimirlatmang';
+
+  @override
   String get arScanFloorHint =>
       'Yorug\'roq joyda, gilam yoki naqshli polga qarating';
 

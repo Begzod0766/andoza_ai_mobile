@@ -577,6 +577,20 @@ class AppLocalizationsEn extends AppLocalizations {
       'Too little light, or the phone moved too fast';
 
   @override
+  String get arScanLostMotion => 'Move the phone more slowly';
+
+  @override
+  String get arScanLostLight => 'Too dark — turn on a light';
+
+  @override
+  String get arScanLostFeatures =>
+      'Avoid blank walls and floors — aim at furniture or a pattern';
+
+  @override
+  String get arScanTrackingSettling =>
+      'Getting back on track — hold the phone still for a moment';
+
+  @override
   String get arScanFloorHint =>
       'Try brighter light, and aim at a rug or a patterned floor';
 

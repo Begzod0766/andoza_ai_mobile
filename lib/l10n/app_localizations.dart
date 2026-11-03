@@ -1123,6 +1123,30 @@ abstract class AppLocalizations {
   /// Android ARCore floor-plan scanner
   ///
   /// In uz, this message translates to:
+  /// **'Telefonni sekinroq harakatlantiring'**
+  String get arScanLostMotion;
+
+  /// Android ARCore floor-plan scanner
+  ///
+  /// In uz, this message translates to:
+  /// **'Yorug\'lik kam — chiroqni yoqing'**
+  String get arScanLostLight;
+
+  /// Android ARCore floor-plan scanner
+  ///
+  /// In uz, this message translates to:
+  /// **'Bo\'sh devor yoki polga qaramang — naqshli joyga, mebelga qarating'**
+  String get arScanLostFeatures;
+
+  /// Android ARCore floor-plan scanner
+  ///
+  /// In uz, this message translates to:
+  /// **'Joylashuv tiklanmoqda — telefonni bir zum qimirlatmang'**
+  String get arScanTrackingSettling;
+
+  /// Android ARCore floor-plan scanner
+  ///
+  /// In uz, this message translates to:
   /// **'Yorug\'roq joyda, gilam yoki naqshli polga qarating'**
   String get arScanFloorHint;
 

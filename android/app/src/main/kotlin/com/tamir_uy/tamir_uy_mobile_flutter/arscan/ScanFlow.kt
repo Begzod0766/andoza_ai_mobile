@@ -142,29 +142,45 @@ class ScanFlow(val capture: FloorPlanCapture = FloorPlanCapture()) {
         }
     }
 
-    fun ui(tracking: Boolean, reticle: Vec3?, liveHeight: Float?): FlowUi {
-        val ok = tracking && reticle != null
+    fun ui(
+        tracking: Boolean,
+        reticle: Vec3?,
+        liveHeight: Float?,
+        lostHintKey: String = "arScanTrackingLost",
+        settling: Boolean = false,
+    ): FlowUi {
+        val ok = tracking && !settling && reticle != null
         val ui = when (step) {
             ScanStep.FIND_FLOOR -> FlowUi("arScanFindFloor", null, false, false, false, false)
             ScanStep.BASE -> FlowUi(
                 if (reticle == null) "arScanNoFloorHere" else "arScanBaseHint",
                 "arScanStart", ok, false, false, false,
             )
-            ScanStep.HEIGHT -> FlowUi("arScanAimCeiling", "arScanConfirm", tracking && liveHeight != null, true, false, true)
-            ScanStep.WALLS -> FlowUi(
-                if (reticle != null && capture.wouldSnap(reticle)) "arScanSnapToFirst" else "arScanCornersHint",
-                "arScanAddCorner", ok, true, tracking && capture.corners.size >= 3, false,
-            )
+            ScanStep.HEIGHT -> FlowUi("arScanAimCeiling", "arScanConfirm", tracking && !settling && liveHeight != null, true, false, true)
+            ScanStep.WALLS -> {
+                // A tap there closes the room, so the button says so.
+                val snap = reticle != null && capture.wouldSnap(reticle)
+                FlowUi(
+                    if (snap) "arScanSnapToFirst" else "arScanCornersHint",
+                    if (snap) "arScanCloseRoom" else "arScanAddCorner",
+                    ok, true, tracking && !settling && capture.corners.size >= 3, false,
+                )
+            }
             ScanStep.DONE -> FlowUi("arScanDoneHint", "arScanCreatePlan", true, true, false, false, secondaryKey = "arScanAddOpenings")
             ScanStep.OPENINGS -> {
                 val onWall = edgeAt(reticle) != null
                 FlowUi(
                     if (onWall) "arScanOpeningsHint" else "arScanAimWallBase",
-                    "arScanAddEdge", tracking && onWall, true, false, false,
+                    "arScanAddEdge", tracking && !settling && onWall, true, false, false,
                     secondaryKey = "arScanOpeningsDone", typeChipsVisible = true,
                 )
             }
         }
-        return if (!tracking && step != ScanStep.DONE && step != ScanStep.OPENINGS) ui.copy(hintKey = "arScanTrackingLost") else ui
+        val live = step != ScanStep.DONE && step != ScanStep.OPENINGS
+        return when {
+            !tracking && live -> ui.copy(hintKey = lostHintKey)
+            settling && step != ScanStep.DONE && step != ScanStep.FIND_FLOOR -> ui.copy(hintKey = "arScanTrackingSettling")
+            else -> ui
+        }
     }
 }

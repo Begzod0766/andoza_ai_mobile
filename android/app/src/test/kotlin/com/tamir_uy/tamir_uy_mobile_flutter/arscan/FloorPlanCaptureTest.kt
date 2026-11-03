@@ -23,7 +23,7 @@ class FloorPlanCaptureTest {
         assertEquals(-1.2f, c.corners[1].y, 1e-6f)
     }
 
-    @Test fun `snaps to the first corner within 20 cm`() {
+    @Test fun `snaps to the first corner when the aim is near it`() {
         val c = FloorPlanCapture()
         square(c)
         assertTrue(c.wouldSnap(Vec3(0.15f, 0f, 0.1f)))
@@ -192,5 +192,30 @@ class FloorPlanCaptureTest {
         val m = c.toResult(2.7f, true, 1, listOf(CapturedOpening(OpeningType.WINDOW, 2, 0.25f, 0.5f)))
         assertEquals(listOf(mapOf("type" to "window", "edge" to 2, "t0" to 0.25, "t1" to 0.5)), m["openings"])
         assertEquals(emptyList<Any>(), c.toResult(2.7f, true, 1)["openings"])
+    }
+
+    @Test fun `the floor follows the first corner's anchor when the map shifts`() {
+        val c = FloorPlanCapture()
+        square(c)
+        // ARCore relocalised: every anchor moved 0.6 m down.
+        c.updatePositions(c.corners.map { Vec3(it.x, it.y - 0.6f, it.z) })
+        assertEquals(-0.6f, c.floorY!!, 1e-6f)
+        assertTrue(c.corners.all { kotlin.math.abs(it.y + 0.6f) < 1e-6f })
+    }
+
+    @Test fun `the ceiling is measured from the shifted floor`() {
+        val c = FloorPlanCapture()
+        c.addCorner(Vec3(0f, 0f, 0f))
+        c.updatePositions(listOf(Vec3(0f, -1f, 0f)))
+        // Camera 1.4 m above the moved floor, 1 m from the axis, looking up at 45°: ceiling at 2.4 m.
+        val h = c.heightFromRay(Vec3(1f, 0.4f, 0f), Vec3(-1f, 1f, 0f))!!
+        assertEquals(2.4f, h, 1e-4f)
+    }
+
+    @Test fun `snaps to the first corner within 35 cm, not beyond`() {
+        val c = FloorPlanCapture()
+        square(c)
+        assertTrue(c.wouldSnap(Vec3(0.3f, 0f, 0.1f)))
+        assertFalse(c.wouldSnap(Vec3(0.4f, 0f, 0f)))
     }
 }

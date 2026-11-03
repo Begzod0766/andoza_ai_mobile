@@ -172,5 +172,26 @@ class ScanFlowTest {
         assertEquals(ScanStep.WALLS, f.step); assertTrue(f.openings.openings.isEmpty())
     }
 
+    @Test fun `aiming at the first corner turns the main button into Xonani yopish`() {
+        val f = walls()
+        f.addCorner(Vec3(4f, 0f, 0f)); f.addCorner(Vec3(4f, 0f, 3f)); f.addCorner(Vec3(0f, 0f, 3f))
+        val ui = f.ui(true, Vec3(0.25f, 0f, 0.1f), null)
+        assertEquals("arScanCloseRoom", ui.mainKey); assertEquals("arScanSnapToFirst", ui.hintKey)
+        assertEquals("arScanAddCorner", f.ui(true, Vec3(2f, 0f, 2f), null).mainKey)
+    }
+
+    @Test fun `lost tracking shows the reason's hint`() {
+        val f = walls()
+        assertEquals("arScanLostMotion", f.ui(false, null, null, lostHintKey = "arScanLostMotion").hintKey)
+    }
+
+    @Test fun `while tracking settles nothing can be marked`() {
+        val f = walls()
+        val ui = f.ui(true, Vec3(4f, 0f, 0f), null, settling = true)
+        assertEquals("arScanTrackingSettling", ui.hintKey); assertFalse(ui.mainEnabled); assertFalse(ui.closeVisible)
+        val base = ScanFlow().apply { floorFound() }.ui(true, Vec3(1f, 0f, 1f), null, settling = true)
+        assertFalse(base.mainEnabled)
+    }
+
     private fun finishOpenings(f: ScanFlow) = assertTrue(f.finishOpenings())
 }

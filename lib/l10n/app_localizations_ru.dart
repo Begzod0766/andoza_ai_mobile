@@ -569,6 +569,20 @@ class AppLocalizationsRu extends AppLocalizations {
       'Мало света или телефон двигался слишком быстро';
 
   @override
+  String get arScanLostMotion => 'Двигайте телефон медленнее';
+
+  @override
+  String get arScanLostLight => 'Мало света — включите освещение';
+
+  @override
+  String get arScanLostFeatures =>
+      'Не наводите на пустую стену или пол — наведите на мебель или узор';
+
+  @override
+  String get arScanTrackingSettling =>
+      'Положение восстанавливается — не двигайте телефон пару секунд';
+
+  @override
   String get arScanFloorHint =>
       'Попробуйте при лучшем свете, наведите на ковёр или пол с узором';
 

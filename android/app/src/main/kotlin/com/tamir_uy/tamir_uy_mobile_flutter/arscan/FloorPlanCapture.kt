@@ -21,13 +21,16 @@ data class RoomSummary(val perimeterM: Float, val areaM2: Float, val volumeM3: F
  * frame, the anchors' refreshed positions; it decides snapping/closing and the
  * ceiling height. All cleaning-up (squaring, merging) happens in Dart.
  */
-class FloorPlanCapture(val snapDistanceM: Float = 0.20f) {
+class FloorPlanCapture(val snapDistanceM: Float = 0.35f) {
 
     // Swapped whole, never mutated in place: the GL thread refreshes it every
     // frame while the UI thread may read it (a tap on "Tasdiqlash").
     @Volatile private var points: List<Vec3> = emptyList()
 
-    /** Height of the floor plane — the first corner's Y; later corners are pinned to it. */
+    /**
+     * Height of the floor plane — the first corner's Y, following its anchor
+     * when ARCore moves the map; every corner is pinned to it.
+     */
     @Volatile var floorY: Float? = null
         private set
 
@@ -118,7 +121,9 @@ class FloorPlanCapture(val snapDistanceM: Float = 0.20f) {
     fun updatePositions(positions: List<Vec3?>): Int {
         val current = points
         if (positions.size != current.size) return 0
-        val y = floorY ?: return 0
+        if (floorY == null) return 0
+        // A relocalised map moves the anchors up or down too: the floor moves with the first.
+        val y = positions[0]?.y?.also { floorY = it } ?: floorY!!
         val firstLost = positions.indexOfFirst { it == null }
         val keep = if (firstLost < 0) positions.size else firstLost
         points = positions.take(keep).map { Vec3(it!!.x, y, it.z) }

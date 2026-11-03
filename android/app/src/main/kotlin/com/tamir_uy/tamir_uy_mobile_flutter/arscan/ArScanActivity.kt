@@ -82,6 +82,10 @@ class ArScanActivity : Activity(), GLSurfaceView.Renderer {
         "arScanExitConfirm" to "O'lchovni to'xtatasizmi? Belgilangan burchaklar yo'qoladi.",
         "arScanKeepMeasuring" to "O'lchashni davom ettirish",
         "arScanTrackingLost" to "Yorug'lik kam yoki telefon tez harakatlandi",
+        "arScanLostMotion" to "Telefonni sekinroq harakatlantiring",
+        "arScanLostLight" to "Yorug'lik kam — chiroqni yoqing",
+        "arScanLostFeatures" to "Bo'sh devor yoki polga qaramang — naqshli joyga, mebelga qarating",
+        "arScanTrackingSettling" to "Joylashuv tiklanmoqda — telefonni bir zum qimirlatmang",
         "arScanCornersLost" to "Ba'zi burchaklar yo'qoldi — ularni qayta belgilang",
         "arScanNoFloorHere" to "Nishon polga tushmayapti — telefonni pastroq qarating",
         "arScanPerimeter" to "Perimetr",
@@ -120,6 +124,8 @@ class ArScanActivity : Activity(), GLSurfaceView.Renderer {
     @Volatile private var liveHeight: Float? = null
     @Volatile private var tracking = false
     private var wasTracking = false
+    private val gate = TrackingGate()
+    @Volatile private var lostHintKey = "arScanTrackingLost"
     // Set when anchors stopped tracking and corners were dropped; stays up
     // until the user's next action (a one-frame hint is never seen).
     @Volatile private var cornersLost = false
@@ -196,6 +202,8 @@ class ArScanActivity : Activity(), GLSurfaceView.Renderer {
 
     /** GL thread. */
     private fun main() {
+        // Right after tracking returns the pose can still be a metre off: no marks yet.
+        if (flow.step != ScanStep.DONE && !gate.steady(SystemClock.elapsedRealtime())) return
         cornersLost = false
         when (flow.step) {
             ScanStep.FIND_FLOOR -> Unit
@@ -245,7 +253,7 @@ class ArScanActivity : Activity(), GLSurfaceView.Renderer {
                 ScanStep.OPENINGS -> { flow.finishOpenings(); return@onGl }
                 else -> Unit
             }
-            if (!tracking) return@onGl
+            if (!gate.steady(SystemClock.elapsedRealtime())) return@onGl
             cornersLost = false
             // Anchor first (it throws while not tracking): close() appends a copy
             // of the first corner, and every corner needs its anchor.
@@ -417,6 +425,9 @@ class ArScanActivity : Activity(), GLSurfaceView.Renderer {
             tracking = camera.trackingState == TrackingState.TRACKING
             if (wasTracking && !tracking) flow.capture.trackingLossCount++
             wasTracking = tracking
+            val now = SystemClock.elapsedRealtime()
+            gate.update(tracking, now)
+            if (!tracking) lostHintKey = TrackingGate.hintKey(camera.trackingFailureReason)
 
             // Anchors drift as ARCore refines its map — keep corners in step;
             // stopped anchors are dropped together with their corners.
@@ -461,7 +472,7 @@ class ArScanActivity : Activity(), GLSurfaceView.Renderer {
             val view = FloatArray(16).also { camera.getViewMatrix(it, 0) }
             val proj = FloatArray(16).also { camera.getProjectionMatrix(it, 0, 0.05f, 100f) }
             val state = overlayState(WallGeometry(view, proj, viewportW, viewportH))
-            val ui = flow.ui(tracking, reticle, liveHeight)
+            val ui = flow.ui(tracking, reticle, liveHeight, lostHintKey, gate.settling(now))
             val hintKey = when {
                 flow.step == ScanStep.FIND_FLOOR && tracking &&
                     SystemClock.elapsedRealtime() - startedAt > FLOOR_HINT_AFTER_MS -> "arScanFloorHint"

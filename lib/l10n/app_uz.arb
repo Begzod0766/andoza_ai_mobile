@@ -747,6 +747,22 @@
   "@arScanTrackingLost": {
     "description": "Android ARCore floor-plan scanner"
   },
+  "arScanLostMotion": "Telefonni sekinroq harakatlantiring",
+  "@arScanLostMotion": {
+    "description": "Android ARCore floor-plan scanner"
+  },
+  "arScanLostLight": "Yorug'lik kam — chiroqni yoqing",
+  "@arScanLostLight": {
+    "description": "Android ARCore floor-plan scanner"
+  },
+  "arScanLostFeatures": "Bo'sh devor yoki polga qaramang — naqshli joyga, mebelga qarating",
+  "@arScanLostFeatures": {
+    "description": "Android ARCore floor-plan scanner"
+  },
+  "arScanTrackingSettling": "Joylashuv tiklanmoqda — telefonni bir zum qimirlatmang",
+  "@arScanTrackingSettling": {
+    "description": "Android ARCore floor-plan scanner"
+  },
   "arScanFloorHint": "Yorug'roq joyda, gilam yoki naqshli polga qarating",
   "@arScanFloorHint": {
     "description": "Android ARCore floor-plan scanner"
