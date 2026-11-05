@@ -337,9 +337,8 @@ class _StudioWebViewScreenState extends ConsumerState<StudioWebViewScreen> {
     WebViewController controller,
   ) async {
     await seedStudioCookies(auth, ref.read(secureStorageProvider));
-    // First load: the origin root establishes the origin so localStorage is
-    // writable. It may bounce to /login (not yet seeded) — that's expected.
-    await controller.loadRequest(Uri.parse(AppConfig.studioBaseUrl));
+    // First load: a static page on the origin so localStorage is writable.
+    await controller.loadRequest(studioBootstrapUri(AppConfig.studioBaseUrl));
   }
 
   /// Whether [url] is a page *outside* the 3D Studio, i.e. the web app has

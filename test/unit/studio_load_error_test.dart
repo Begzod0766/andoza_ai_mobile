@@ -28,4 +28,12 @@ void main() {
     const err = WebResourceError(errorCode: -6, description: 'connect failed');
     expect(isStudioLoadFailure(err), isTrue);
   });
+
+  test('the bootstrap page is a static file, not the web app', () {
+    // The SPA at "/" reloads itself when its chunk fetches are cut off by the
+    // studio navigation, which cancels that navigation.
+    expect(studioBootstrapUri('https://andozaai.uz').toString(), 'https://andozaai.uz/favicon.svg');
+    expect(studioBootstrapUri('https://andozaai.uz/').toString(), 'https://andozaai.uz/favicon.svg');
+    expect(studioBootstrapUri('http://127.0.0.1:5173').toString(), 'http://127.0.0.1:5173/favicon.svg');
+  });
 }
