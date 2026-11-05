@@ -613,6 +613,30 @@ class AppLocalizationsEn extends AppLocalizations {
   String get arScanFirstCorner => 'Starting point';
 
   @override
+  String get arScanGuideTitle => 'For an accurate measurement';
+
+  @override
+  String get arScanGuideHold =>
+      'Hold the phone at chest height, tilted toward the floor';
+
+  @override
+  String get arScanGuideLight =>
+      'Use a lit room; aim at furniture or patterns, not blank walls';
+
+  @override
+  String get arScanGuideWalk =>
+      'Walk slowly along the walls and mark the corners in order';
+
+  @override
+  String get arScanGuideClose => 'Get within 2 m of each corner';
+
+  @override
+  String get arScanGuideStart => 'Start';
+
+  @override
+  String get arScanGuideHelp => 'Tips';
+
+  @override
   String get arScanFloorHint =>
       'Try brighter light, and aim at a rug or a patterned floor';
 

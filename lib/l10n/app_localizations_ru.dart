@@ -605,6 +605,30 @@ class AppLocalizationsRu extends AppLocalizations {
   String get arScanFirstCorner => 'Начальная точка';
 
   @override
+  String get arScanGuideTitle => 'Для точного замера';
+
+  @override
+  String get arScanGuideHold =>
+      'Держите телефон на уровне груди, наклонив к полу';
+
+  @override
+  String get arScanGuideLight =>
+      'Нужен свет; наводите на мебель или узоры, а не на пустую стену';
+
+  @override
+  String get arScanGuideWalk =>
+      'Медленно идите вдоль стен и отмечайте углы по порядку';
+
+  @override
+  String get arScanGuideClose => 'Подходите к каждому углу ближе чем на 2 м';
+
+  @override
+  String get arScanGuideStart => 'Начать';
+
+  @override
+  String get arScanGuideHelp => 'Подсказки';
+
+  @override
   String get arScanFloorHint =>
       'Попробуйте при лучшем свете, наведите на ковёр или пол с узором';
 

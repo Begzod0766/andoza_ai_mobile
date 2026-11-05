@@ -1189,6 +1189,48 @@ abstract class AppLocalizations {
   /// Android ARCore floor-plan scanner
   ///
   /// In uz, this message translates to:
+  /// **'Yaxshi o\'lchash uchun'**
+  String get arScanGuideTitle;
+
+  /// Android ARCore floor-plan scanner
+  ///
+  /// In uz, this message translates to:
+  /// **'Telefonni ko\'krak balandligida, polga qiya qilib ushlang'**
+  String get arScanGuideHold;
+
+  /// Android ARCore floor-plan scanner
+  ///
+  /// In uz, this message translates to:
+  /// **'Xona yorug\' bo\'lsin; mebel yoki naqshli joylarga qarating, bo\'sh devorga emas'**
+  String get arScanGuideLight;
+
+  /// Android ARCore floor-plan scanner
+  ///
+  /// In uz, this message translates to:
+  /// **'Devor bo\'ylab sekin yuring, burchaklarni ketma-ket belgilang'**
+  String get arScanGuideWalk;
+
+  /// Android ARCore floor-plan scanner
+  ///
+  /// In uz, this message translates to:
+  /// **'Har bir burchakka 2 m dan yaqinroq boring'**
+  String get arScanGuideClose;
+
+  /// Android ARCore floor-plan scanner
+  ///
+  /// In uz, this message translates to:
+  /// **'Boshlash'**
+  String get arScanGuideStart;
+
+  /// Android ARCore floor-plan scanner
+  ///
+  /// In uz, this message translates to:
+  /// **'Qo\'llanma'**
+  String get arScanGuideHelp;
+
+  /// Android ARCore floor-plan scanner
+  ///
+  /// In uz, this message translates to:
   /// **'Yorug\'roq joyda, gilam yoki naqshli polga qarating'**
   String get arScanFloorHint;
 

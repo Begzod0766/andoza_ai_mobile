@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
+import 'package:tamir_uy_mobile_flutter/features/ar_scan/ar_scan_guide_prefs.dart';
 import 'package:tamir_uy_mobile_flutter/features/ar_scan/ar_scan_service.dart';
 import 'package:tamir_uy_mobile_flutter/features/ar_scan/arcore_plan.dart';
 import 'package:tamir_uy_mobile_flutter/l10n/app_localizations.dart';
@@ -38,6 +39,25 @@ class _FakeArScan implements ArScanService {
   }
 }
 
+class _FakeGuide implements ArScanGuidePrefs {
+  _FakeGuide({this.isSeen = true, this.fails = false});
+  bool isSeen;
+  final bool fails;
+  int marks = 0;
+
+  @override
+  Future<bool> seen() async {
+    if (fails) throw Exception('prefs unavailable');
+    return isSeen;
+  }
+
+  @override
+  Future<void> markSeen() async {
+    marks++;
+    isSeen = true;
+  }
+}
+
 Map<String, dynamic> _scan(List<List<double>> corners) => {
       'corners': corners,
       'height': 2.7,
@@ -47,7 +67,7 @@ Map<String, dynamic> _scan(List<List<double>> corners) => {
       'durationSec': 60,
     };
 
-Future<void> _pump(WidgetTester tester, _FakeArScan fake) async {
+Future<void> _pump(WidgetTester tester, _FakeArScan fake, {ArScanGuidePrefs? guide}) async {
   final router = GoRouter(initialLocation: '/home', routes: [
     GoRoute(path: '/home', builder: (_, _) => const Text('home')),
     GoRoute(path: '/scan', builder: (_, _) => const ArScanScreen()),
@@ -58,7 +78,10 @@ Future<void> _pump(WidgetTester tester, _FakeArScan fake) async {
     GoRoute(path: '/setup/draw', builder: (_, _) => const Text('draw')),
   ]);
   await tester.pumpWidget(ProviderScope(
-    overrides: [arScanServiceProvider.overrideWithValue(fake)],
+    overrides: [
+      arScanServiceProvider.overrideWithValue(fake),
+      arScanGuidePrefsProvider.overrideWithValue(guide ?? _FakeGuide()),
+    ],
     child: MaterialApp.router(
       localizationsDelegates: AppLocalizations.localizationsDelegates,
       supportedLocales: AppLocalizations.supportedLocales,
@@ -72,6 +95,44 @@ Future<void> _pump(WidgetTester tester, _FakeArScan fake) async {
 
 void main() {
   final l10n = lookupAppLocalizations(const Locale('uz'));
+
+  testWidgets('first run shows the guide, Boshlash starts the scan', (tester) async {
+    final fake = _FakeArScan();
+    final guide = _FakeGuide(isSeen: false);
+    await _pump(tester, fake, guide: guide);
+    expect(find.text(l10n.arScanGuideTitle), findsOneWidget);
+    expect(find.text(l10n.arScanGuideClose), findsOneWidget);
+    expect(fake.checks, 0);
+    await tester.tap(find.text(l10n.arScanGuideStart));
+    await tester.pumpAndSettle();
+    expect(guide.marks, 1);
+    expect(fake.checks, 1);
+  });
+
+  testWidgets('a seen guide goes straight to the scan', (tester) async {
+    final fake = _FakeArScan();
+    await _pump(tester, fake);
+    expect(fake.checks, 1);
+    expect(find.text(l10n.arScanGuideTitle), findsNothing);
+  });
+
+  testWidgets('help reopens the guide', (tester) async {
+    final fake = _FakeArScan(raw: _scan([[0, 0], [4, 3], [4, 0], [0, 3]]));
+    await _pump(tester, fake);
+    expect(find.text(l10n.arScanRejected_self_intersecting), findsOneWidget);
+    await tester.tap(find.byTooltip(l10n.arScanGuideHelp));
+    await tester.pumpAndSettle();
+    expect(find.text(l10n.arScanGuideTitle), findsOneWidget);
+    await tester.tap(find.text(l10n.arScanGuideStart));
+    await tester.pumpAndSettle();
+    expect(fake.checks, 2);
+  });
+
+  testWidgets('a prefs failure never blocks the scan', (tester) async {
+    final fake = _FakeArScan();
+    await _pump(tester, fake, guide: _FakeGuide(fails: true));
+    expect(fake.checks, 1);
+  });
 
   testWidgets('passes the scanner its flow copy', (tester) async {
     final fake = _FakeArScan(raw: _scan([[0, 0], [4, 0], [4, 3], [0, 3]]));

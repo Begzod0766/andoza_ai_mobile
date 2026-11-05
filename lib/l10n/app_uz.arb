@@ -791,6 +791,34 @@
   "@arScanFirstCorner": {
     "description": "Android ARCore floor-plan scanner"
   },
+  "arScanGuideTitle": "Yaxshi o'lchash uchun",
+  "@arScanGuideTitle": {
+    "description": "Android ARCore floor-plan scanner"
+  },
+  "arScanGuideHold": "Telefonni ko'krak balandligida, polga qiya qilib ushlang",
+  "@arScanGuideHold": {
+    "description": "Android ARCore floor-plan scanner"
+  },
+  "arScanGuideLight": "Xona yorug' bo'lsin; mebel yoki naqshli joylarga qarating, bo'sh devorga emas",
+  "@arScanGuideLight": {
+    "description": "Android ARCore floor-plan scanner"
+  },
+  "arScanGuideWalk": "Devor bo'ylab sekin yuring, burchaklarni ketma-ket belgilang",
+  "@arScanGuideWalk": {
+    "description": "Android ARCore floor-plan scanner"
+  },
+  "arScanGuideClose": "Har bir burchakka 2 m dan yaqinroq boring",
+  "@arScanGuideClose": {
+    "description": "Android ARCore floor-plan scanner"
+  },
+  "arScanGuideStart": "Boshlash",
+  "@arScanGuideStart": {
+    "description": "Android ARCore floor-plan scanner"
+  },
+  "arScanGuideHelp": "Qo'llanma",
+  "@arScanGuideHelp": {
+    "description": "Android ARCore floor-plan scanner"
+  },
   "arScanFloorHint": "Yorug'roq joyda, gilam yoki naqshli polga qarating",
   "@arScanFloorHint": {
     "description": "Android ARCore floor-plan scanner"

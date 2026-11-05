@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../config/design_tokens.dart';
+import '../../features/ar_scan/ar_scan_guide_prefs.dart';
 import '../../features/ar_scan/ar_scan_service.dart';
 import '../../features/ar_scan/arcore_plan.dart';
 import '../../features/room_scan/room_scan_converter.dart';
@@ -33,6 +34,8 @@ enum _Problem { notInstalled, cameraDenied, unsupported, rejected, failed }
 
 class _ArScanScreenState extends ConsumerState<ArScanScreen> with WidgetsBindingObserver {
   bool _busy = true;
+  /// The tips page shown before the first scan (and from the help button).
+  bool _guide = false;
   _Problem? _problem;
   String? _message;
 
@@ -40,7 +43,7 @@ class _ArScanScreenState extends ConsumerState<ArScanScreen> with WidgetsBinding
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
-    WidgetsBinding.instance.addPostFrameCallback((_) => _start());
+    WidgetsBinding.instance.addPostFrameCallback((_) => _maybeGuide());
   }
 
   @override
@@ -102,6 +105,32 @@ class _ArScanScreenState extends ConsumerState<ArScanScreen> with WidgetsBinding
         'arScanAddOpenings': l10n.arScanAddOpenings,
         'arScanOpeningsDone': l10n.arScanOpeningsDone,
       };
+
+  Future<void> _maybeGuide() async {
+    bool seen;
+    try {
+      seen = await ref.read(arScanGuidePrefsProvider).seen();
+    } catch (_) {
+      seen = true; // the tips are a nicety; never block the scan on them
+    }
+    if (!mounted) return;
+    if (seen) {
+      _start();
+    } else {
+      setState(() {
+        _guide = true;
+        _busy = false;
+      });
+    }
+  }
+
+  Future<void> _startFromGuide() async {
+    setState(() => _guide = false);
+    try {
+      await ref.read(arScanGuidePrefsProvider).markSeen();
+    } catch (_) {}
+    if (mounted) _start();
+  }
 
   Future<void> _start() async {
     final l10n = AppLocalizations.of(context)!;
@@ -169,9 +198,21 @@ class _ArScanScreenState extends ConsumerState<ArScanScreen> with WidgetsBinding
     final l10n = AppLocalizations.of(context)!;
     final problem = _problem;
     return Scaffold(
-      appBar: AppBar(title: Text(l10n.newProjectArScanTitle)),
+      appBar: AppBar(
+        title: Text(l10n.newProjectArScanTitle),
+        actions: [
+          if (!_busy && !_guide)
+            IconButton(
+              icon: const Icon(Icons.help_outline),
+              tooltip: l10n.arScanGuideHelp,
+              onPressed: () => setState(() => _guide = true),
+            ),
+        ],
+      ),
       body: SafeArea(
-        child: _busy || problem == null
+        child: _guide
+            ? _ArScanGuide(onStart: _startFromGuide)
+            : _busy || problem == null
             ? const Center(child: CircularProgressIndicator())
             : Padding(
                 padding: const EdgeInsets.all(DesignTokens.screenPaddingHorizontal),
@@ -217,6 +258,45 @@ class _ArScanScreenState extends ConsumerState<ArScanScreen> with WidgetsBinding
                 ),
               ),
       ),
+    );
+  }
+}
+
+/// Four tips for a good measurement, then "Boshlash".
+class _ArScanGuide extends StatelessWidget {
+  const _ArScanGuide({required this.onStart});
+
+  final VoidCallback onStart;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final tips = [
+      (Icons.smartphone, l10n.arScanGuideHold),
+      (Icons.lightbulb_outline, l10n.arScanGuideLight),
+      (Icons.directions_walk, l10n.arScanGuideWalk),
+      (Icons.near_me_outlined, l10n.arScanGuideClose),
+    ];
+    return ListView(
+      padding: const EdgeInsets.all(DesignTokens.screenPaddingHorizontal),
+      children: [
+        Text(l10n.arScanGuideTitle, style: DesignTokens.headingMedium),
+        const SizedBox(height: DesignTokens.spacingMd),
+        for (final (icon, text) in tips)
+          Padding(
+            padding: const EdgeInsets.only(bottom: DesignTokens.spacingMd),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Icon(icon, color: DesignTokens.primary),
+                const SizedBox(width: DesignTokens.spacingMd),
+                Expanded(child: Text(text, style: DesignTokens.bodyMedium)),
+              ],
+            ),
+          ),
+        const SizedBox(height: DesignTokens.spacingMd),
+        ElevatedButton(onPressed: onStart, child: Text(l10n.arScanGuideStart)),
+      ],
     );
   }
 }

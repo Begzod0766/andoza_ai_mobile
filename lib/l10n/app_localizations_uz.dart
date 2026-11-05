@@ -603,6 +603,30 @@ class AppLocalizationsUz extends AppLocalizations {
   String get arScanFirstCorner => 'Boshlang\'ich nuqta';
 
   @override
+  String get arScanGuideTitle => 'Yaxshi o\'lchash uchun';
+
+  @override
+  String get arScanGuideHold =>
+      'Telefonni ko\'krak balandligida, polga qiya qilib ushlang';
+
+  @override
+  String get arScanGuideLight =>
+      'Xona yorug\' bo\'lsin; mebel yoki naqshli joylarga qarating, bo\'sh devorga emas';
+
+  @override
+  String get arScanGuideWalk =>
+      'Devor bo\'ylab sekin yuring, burchaklarni ketma-ket belgilang';
+
+  @override
+  String get arScanGuideClose => 'Har bir burchakka 2 m dan yaqinroq boring';
+
+  @override
+  String get arScanGuideStart => 'Boshlash';
+
+  @override
+  String get arScanGuideHelp => 'Qo\'llanma';
+
+  @override
   String get arScanFloorHint =>
       'Yorug\'roq joyda, gilam yoki naqshli polga qarating';
 
