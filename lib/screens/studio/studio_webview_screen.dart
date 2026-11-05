@@ -240,8 +240,9 @@ class _StudioWebViewScreenState extends ConsumerState<StudioWebViewScreen> {
             if (_studioReady) _pageChanged(url);
           },
           onWebResourceError: (err) {
-            // Ignore sub-resource errors; only surface a hard main-frame fail.
-            if (err.isForMainFrame ?? true) {
+            // Ignore sub-resource errors and cancelled navigations; only
+            // surface a hard main-frame fail.
+            if (isStudioLoadFailure(err)) {
               if (mounted) {
                 setState(() {
                   _loading = false;

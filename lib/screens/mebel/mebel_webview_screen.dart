@@ -105,7 +105,7 @@ class _MebelWebViewScreenState extends ConsumerState<MebelWebViewScreen> {
             if (mounted && _loading) setState(() => _loading = false);
           },
           onWebResourceError: (err) {
-            if ((err.isForMainFrame ?? true) && mounted) {
+            if (isStudioLoadFailure(err) && mounted) {
               setState(() {
                 _loading = false;
                 _error = AppLocalizations.of(context)!.studioLoadFailed(err.description);
