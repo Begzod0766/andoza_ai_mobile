@@ -193,5 +193,40 @@ class ScanFlowTest {
         assertFalse(base.mainEnabled)
     }
 
+    @Test fun `progress follows the five steps`() {
+        val f = ScanFlow()
+        assertEquals(ScanProgress(1, 5, "arScanStepFloor"), f.progress())
+        f.floorFound(); assertEquals(ScanProgress(2, 5, "arScanStepBase"), f.progress())
+        f.placeBase(Vec3(0f, 0f, 0f)); assertEquals(ScanProgress(3, 5, "arScanStepHeight"), f.progress())
+        f.confirmHeight(2.5f, true); assertEquals(ScanProgress(4, 5, "arScanStepWalls"), f.progress())
+        f.addCorner(Vec3(4f, 0f, 0f)); f.addCorner(Vec3(4f, 0f, 3f)); f.addCorner(Vec3(0f, 0f, 3f)); f.closeRoom()
+        assertEquals(ScanStep.DONE, f.step); assertEquals(4, f.progress().index)
+        f.startOpenings(); assertEquals(ScanProgress(5, 5, "arScanStepOpenings"), f.progress())
+    }
+
+    @Test fun `far aim asks to step closer without disabling`() {
+        val f = walls()
+        val ui = f.ui(true, Vec3(2f, 0f, 2f), null, aimDistM = 3.5f)
+        assertEquals("arScanStepCloser", ui.hintKey); assertTrue(ui.mainEnabled)
+        assertEquals("arScanCornersHint", f.ui(true, Vec3(2f, 0f, 2f), null, aimDistM = 2.5f).hintKey)
+    }
+
+    @Test fun `far aim in the base step`() {
+        val ui = ScanFlow().apply { floorFound() }.ui(true, Vec3(1f, 0f, 1f), null, aimDistM = 4f)
+        assertEquals("arScanStepCloser", ui.hintKey)
+    }
+
+    @Test fun `snap beats far aim`() {
+        val f = walls()
+        f.addCorner(Vec3(4f, 0f, 0f)); f.addCorner(Vec3(4f, 0f, 3f)); f.addCorner(Vec3(0f, 0f, 3f))
+        assertEquals("arScanSnapToFirst", f.ui(true, Vec3(0.2f, 0f, 0.1f), null, aimDistM = 3.5f).hintKey)
+    }
+
+    @Test fun `settling and lost beat far aim`() {
+        val f = walls()
+        assertEquals("arScanTrackingSettling", f.ui(true, Vec3(2f, 0f, 2f), null, settling = true, aimDistM = 4f).hintKey)
+        assertEquals("arScanTrackingLost", f.ui(false, Vec3(2f, 0f, 2f), null, aimDistM = 4f).hintKey)
+    }
+
     private fun finishOpenings(f: ScanFlow) = assertTrue(f.finishOpenings())
 }

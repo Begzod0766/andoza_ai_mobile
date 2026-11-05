@@ -16,6 +16,9 @@ data class FlowUi(
     val typeChipsVisible: Boolean = false,
 )
 
+/** Where the user is in the flow: "[index]/[total] · label". */
+data class ScanProgress(val index: Int, val total: Int, val labelKey: String)
+
 /**
  * The scanner's steps: find the floor → base point where wall meets floor →
  * height → corners (walls) → done. The base point is the first corner.
@@ -68,6 +71,14 @@ class ScanFlow(val capture: FloorPlanCapture = FloorPlanCapture()) {
      * on "Burchak qo'shish" must not also press "Rejani yaratish").
      */
     fun isCurrent(tappedIn: ScanStep): Boolean = step == tappedIn
+
+    fun progress(): ScanProgress = when (step) {
+        ScanStep.FIND_FLOOR -> ScanProgress(1, STEPS, "arScanStepFloor")
+        ScanStep.BASE -> ScanProgress(2, STEPS, "arScanStepBase")
+        ScanStep.HEIGHT -> ScanProgress(3, STEPS, "arScanStepHeight")
+        ScanStep.WALLS, ScanStep.DONE -> ScanProgress(4, STEPS, "arScanStepWalls")
+        ScanStep.OPENINGS -> ScanProgress(5, STEPS, "arScanStepOpenings")
+    }
 
     fun floorFound() {
         if (step == ScanStep.FIND_FLOOR) step = ScanStep.BASE
@@ -148,6 +159,8 @@ class ScanFlow(val capture: FloorPlanCapture = FloorPlanCapture()) {
         liveHeight: Float?,
         lostHintKey: String = "arScanTrackingLost",
         settling: Boolean = false,
+        /** Horizontal distance from the camera to the reticle. */
+        aimDistM: Float? = null,
     ): FlowUi {
         val ok = tracking && !settling && reticle != null
         val ui = when (step) {
@@ -177,10 +190,19 @@ class ScanFlow(val capture: FloorPlanCapture = FloorPlanCapture()) {
             }
         }
         val live = step != ScanStep.DONE && step != ScanStep.OPENINGS
+        // Corners marked from far away at a grazing angle were the least accurate.
+        val far = aimDistM != null && aimDistM > FAR_AIM_M &&
+            (step == ScanStep.BASE || step == ScanStep.WALLS) && ui.hintKey != "arScanSnapToFirst"
         return when {
             !tracking && live -> ui.copy(hintKey = lostHintKey)
             settling && step != ScanStep.DONE && step != ScanStep.FIND_FLOOR -> ui.copy(hintKey = "arScanTrackingSettling")
+            far -> ui.copy(hintKey = "arScanStepCloser")
             else -> ui
         }
+    }
+
+    companion object {
+        private const val STEPS = 5
+        const val FAR_AIM_M = 3.0f
     }
 }
