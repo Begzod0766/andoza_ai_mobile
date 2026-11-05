@@ -581,6 +581,28 @@ class AppLocalizationsUz extends AppLocalizations {
       'Joylashuv tiklanmoqda — telefonni bir zum qimirlatmang';
 
   @override
+  String get arScanStepFloor => 'Pol';
+
+  @override
+  String get arScanStepBase => 'Boshlang\'ich burchak';
+
+  @override
+  String get arScanStepHeight => 'Balandlik';
+
+  @override
+  String get arScanStepWalls => 'Devorlar';
+
+  @override
+  String get arScanStepOpenings => 'Eshik/deraza';
+
+  @override
+  String get arScanStepCloser =>
+      'Burchakka yaqinroq boring — uzoqdan aniqlik pasayadi';
+
+  @override
+  String get arScanFirstCorner => 'Boshlang\'ich nuqta';
+
+  @override
   String get arScanFloorHint =>
       'Yorug\'roq joyda, gilam yoki naqshli polga qarating';
 

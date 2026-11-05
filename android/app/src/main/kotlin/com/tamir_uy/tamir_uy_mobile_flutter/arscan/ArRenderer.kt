@@ -9,6 +9,7 @@ import android.graphics.RectF
 import android.os.SystemClock
 import android.view.View
 import kotlin.math.PI
+import kotlin.math.cos
 import kotlin.math.roundToInt
 import kotlin.math.sin
 
@@ -24,6 +25,11 @@ data class OverlayState(
     val onboarding: Boolean = false,
     /** Doors and windows on the walls: (outline, isWindow). */
     val openings: List<Pair<List<Px>, Boolean>> = emptyList(),
+    /** The first corner while the room can be closed: a ring on it, or an arrow at the edge. */
+    val firstCorner: ScreenTarget? = null,
+    val firstCornerLabel: String? = null,
+    /** Height step before the ray reaches the ceiling: "turn the phone up". */
+    val ceilingArrow: Boolean = false,
 )
 
 /**
@@ -46,6 +52,7 @@ class ArOverlayView(context: Context) : View(context) {
     private val windowFill = Paint(Paint.ANTI_ALIAS_FLAG).apply { color = Color.argb(120, 59, 130, 246); style = Paint.Style.FILL }
     private val chipBg = Paint(Paint.ANTI_ALIAS_FLAG).apply { color = Color.WHITE }
     private val chipText = Paint(Paint.ANTI_ALIAS_FLAG).apply { color = Color.rgb(64, 56, 160); textSize = dp(13f); textAlign = Paint.Align.CENTER; isFakeBoldText = true }
+    private val pulseRing = Paint(Paint.ANTI_ALIAS_FLAG).apply { color = Color.WHITE; strokeWidth = dp(3f); style = Paint.Style.STROKE }
     private val guide = Paint(Paint.ANTI_ALIAS_FLAG).apply { color = Color.WHITE; strokeWidth = dp(2.5f); style = Paint.Style.STROKE; strokeJoin = Paint.Join.ROUND }
 
     var state = OverlayState()
@@ -76,9 +83,53 @@ class ArOverlayView(context: Context) : View(context) {
 
         for ((at, text) in s.labels) chip(canvas, at, text)
         s.heightLabel?.let { (at, text) -> chip(canvas, at, text) }
+        s.firstCorner?.let { drawFirstCorner(canvas, it, s.firstCornerLabel) }
+        if (s.ceilingArrow) drawCeilingArrow(canvas)
         if (s.onboarding) {
             drawOnboarding(canvas)
             postInvalidateOnAnimation()
+        }
+    }
+
+    private fun pulse(periodMs: Long) = (SystemClock.uptimeMillis() % periodMs) / periodMs.toFloat()
+
+    private fun drawFirstCorner(canvas: Canvas, t: ScreenTarget, label: String?) {
+        when (t) {
+            is ScreenTarget.OnScreen -> {
+                val (x, y) = t.at
+                val p = pulse(1200L)
+                pulseRing.alpha = ((1f - p) * 220).toInt()
+                canvas.drawCircle(x, y, dp(16f) + dp(18f) * p, pulseRing)
+                canvas.drawCircle(x, y, dp(10f), reticleEdge)
+                label?.let { chip(canvas, Px(x, y + dp(40f)), it) }
+            }
+            is ScreenTarget.OffScreen -> {
+                val (x, y) = t.at
+                val size = dp(22f)
+                canvas.save()
+                canvas.rotate(Math.toDegrees(t.angleRad.toDouble()).toFloat(), x, y)
+                val arrow = Path().apply {
+                    moveTo(x + size, y); lineTo(x - size * 0.6f, y - size * 0.8f)
+                    lineTo(x - size * 0.2f, y); lineTo(x - size * 0.6f, y + size * 0.8f); close()
+                }
+                canvas.drawPath(arrow, reticleSnapFill)
+                canvas.drawPath(arrow, reticleFill)
+                canvas.restore()
+                // The label sits on the screen side of the arrow.
+                val back = dp(44f)
+                label?.let { chip(canvas, Px(x - cos(t.angleRad) * back, y - sin(t.angleRad) * back), it) }
+            }
+        }
+    }
+
+    /** Two chevrons above the centre, drifting up. */
+    private fun drawCeilingArrow(canvas: Canvas) {
+        val cx = width / 2f
+        val base = height * 0.35f - dp(12f) * pulse(1000L)
+        for (i in 0..1) {
+            val y = base - i * dp(18f)
+            canvas.drawLine(cx - dp(18f), y + dp(10f), cx, y - dp(6f), guide)
+            canvas.drawLine(cx, y - dp(6f), cx + dp(18f), y + dp(10f), guide)
         }
     }
 

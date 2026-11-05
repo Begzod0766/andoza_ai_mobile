@@ -44,6 +44,11 @@ class ArScanChrome(private val activity: Activity, private val s: (String) -> St
         setPadding(dp(18), dp(12), dp(18), dp(12))
         background = rounded(Color.argb(150, 0, 0, 0), 16)
     }
+    private val progress = TextView(activity).apply {
+        setTextColor(Color.WHITE); textSize = 13f; gravity = Gravity.CENTER
+        setPadding(dp(12), dp(6), dp(12), dp(6))
+        background = rounded(Color.argb(110, 0, 0, 0), 14)
+    }
     private val closeRoom = TextView(activity).apply {
         text = s("arScanCloseRoom"); setTextColor(accent); textSize = 15f
         setPadding(dp(18), dp(10), dp(18), dp(10))
@@ -109,10 +114,11 @@ class ArScanChrome(private val activity: Activity, private val s: (String) -> St
         val top = LinearLayout(activity).apply {
             orientation = LinearLayout.VERTICAL
             gravity = Gravity.CENTER_HORIZONTAL
+            addView(progress, LinearLayout.LayoutParams(-2, -2).apply { bottomMargin = dp(8) })
             addView(hint, LinearLayout.LayoutParams(-2, -2))
             addView(closeRoom, LinearLayout.LayoutParams(-2, -2).apply { topMargin = dp(12) })
         }
-        addView(top, FrameLayout.LayoutParams(-1, -2, Gravity.TOP).apply { topMargin = dp(100) })
+        addView(top, FrameLayout.LayoutParams(-1, -2, Gravity.TOP).apply { topMargin = dp(96) })
 
         val bottom = LinearLayout(activity).apply {
             orientation = LinearLayout.VERTICAL
@@ -127,8 +133,19 @@ class ArScanChrome(private val activity: Activity, private val s: (String) -> St
         paintTypes()
     }
 
-    fun bind(ui: FlowUi, hintText: String, summaryText: String?, openingType: OpeningType = OpeningType.DOOR) {
+    fun bind(
+        ui: FlowUi,
+        hintText: String,
+        summaryText: String?,
+        openingType: OpeningType = OpeningType.DOOR,
+        step: ScanProgress? = null,
+    ) {
         hint.text = hintText
+        progress.visibility = if (step != null) View.VISIBLE else View.GONE
+        if (step != null) {
+            val dots = (1..step.total).joinToString(" ") { if (it <= step.index) "●" else "○" }
+            progress.text = "$dots   ${step.index}/${step.total} · ${s(step.labelKey)}"
+        }
         undo.visibility = if (ui.undoVisible) View.VISIBLE else View.INVISIBLE
         // The same pill: "Xonani yopish" while walling, else the doors/windows action.
         closeRoom.visibility = if (ui.closeVisible || ui.secondaryKey != null) View.VISIBLE else View.GONE

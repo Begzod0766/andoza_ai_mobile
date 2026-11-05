@@ -763,6 +763,34 @@
   "@arScanTrackingSettling": {
     "description": "Android ARCore floor-plan scanner"
   },
+  "arScanStepFloor": "Pol",
+  "@arScanStepFloor": {
+    "description": "Android ARCore floor-plan scanner"
+  },
+  "arScanStepBase": "Boshlang'ich burchak",
+  "@arScanStepBase": {
+    "description": "Android ARCore floor-plan scanner"
+  },
+  "arScanStepHeight": "Balandlik",
+  "@arScanStepHeight": {
+    "description": "Android ARCore floor-plan scanner"
+  },
+  "arScanStepWalls": "Devorlar",
+  "@arScanStepWalls": {
+    "description": "Android ARCore floor-plan scanner"
+  },
+  "arScanStepOpenings": "Eshik/deraza",
+  "@arScanStepOpenings": {
+    "description": "Android ARCore floor-plan scanner"
+  },
+  "arScanStepCloser": "Burchakka yaqinroq boring — uzoqdan aniqlik pasayadi",
+  "@arScanStepCloser": {
+    "description": "Android ARCore floor-plan scanner"
+  },
+  "arScanFirstCorner": "Boshlang'ich nuqta",
+  "@arScanFirstCorner": {
+    "description": "Android ARCore floor-plan scanner"
+  },
   "arScanFloorHint": "Yorug'roq joyda, gilam yoki naqshli polga qarating",
   "@arScanFloorHint": {
     "description": "Android ARCore floor-plan scanner"

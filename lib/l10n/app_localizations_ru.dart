@@ -583,6 +583,28 @@ class AppLocalizationsRu extends AppLocalizations {
       'Положение восстанавливается — не двигайте телефон пару секунд';
 
   @override
+  String get arScanStepFloor => 'Пол';
+
+  @override
+  String get arScanStepBase => 'Начальный угол';
+
+  @override
+  String get arScanStepHeight => 'Высота';
+
+  @override
+  String get arScanStepWalls => 'Стены';
+
+  @override
+  String get arScanStepOpenings => 'Двери/окна';
+
+  @override
+  String get arScanStepCloser =>
+      'Подойдите ближе к углу — издалека точность падает';
+
+  @override
+  String get arScanFirstCorner => 'Начальная точка';
+
+  @override
   String get arScanFloorHint =>
       'Попробуйте при лучшем свете, наведите на ковёр или пол с узором';
 

@@ -591,6 +591,28 @@ class AppLocalizationsEn extends AppLocalizations {
       'Getting back on track — hold the phone still for a moment';
 
   @override
+  String get arScanStepFloor => 'Floor';
+
+  @override
+  String get arScanStepBase => 'Starting corner';
+
+  @override
+  String get arScanStepHeight => 'Height';
+
+  @override
+  String get arScanStepWalls => 'Walls';
+
+  @override
+  String get arScanStepOpenings => 'Doors/windows';
+
+  @override
+  String get arScanStepCloser =>
+      'Step closer to the corner — accuracy drops from far away';
+
+  @override
+  String get arScanFirstCorner => 'Starting point';
+
+  @override
   String get arScanFloorHint =>
       'Try brighter light, and aim at a rug or a patterned floor';
 

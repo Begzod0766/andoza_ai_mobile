@@ -87,7 +87,6 @@ void main() {
     }.entries) {
       expect(s[e.key], e.value, reason: e.key);
     }
-    expect(s.containsKey('arScanStepFloor'), isFalse);
   });
 
   testWidgets('passes the scanner its tracking-trouble copy', (tester) async {
@@ -97,6 +96,20 @@ void main() {
     for (final e in {
       'arScanLostMotion': l10n.arScanLostMotion, 'arScanLostLight': l10n.arScanLostLight,
       'arScanLostFeatures': l10n.arScanLostFeatures, 'arScanTrackingSettling': l10n.arScanTrackingSettling,
+    }.entries) {
+      expect(s[e.key], e.value, reason: e.key);
+    }
+  });
+
+  testWidgets('passes the scanner its guidance copy', (tester) async {
+    final fake = _FakeArScan(raw: _scan([[0, 0], [4, 0], [4, 3], [0, 3]]));
+    await _pump(tester, fake);
+    final s = fake.lastStrings!;
+    for (final e in {
+      'arScanStepFloor': l10n.arScanStepFloor, 'arScanStepBase': l10n.arScanStepBase,
+      'arScanStepHeight': l10n.arScanStepHeight, 'arScanStepWalls': l10n.arScanStepWalls,
+      'arScanStepOpenings': l10n.arScanStepOpenings, 'arScanStepCloser': l10n.arScanStepCloser,
+      'arScanFirstCorner': l10n.arScanFirstCorner,
     }.entries) {
       expect(s[e.key], e.value, reason: e.key);
     }

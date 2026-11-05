@@ -61,6 +61,7 @@ class ArScanActivity : Activity(), GLSurfaceView.Renderer {
         private const val CEILING_GAP_M = 0.10f
         private val PRESET_HEIGHTS = floatArrayOf(2.5f, 2.7f, 2.8f, 3.0f)
         private const val TAG = "ArScan"
+        private const val FIRST_CORNER_MARGIN_DP = 56f
     }
 
     // Fallbacks only; Flutter passes the copy in the user's language.
@@ -85,6 +86,13 @@ class ArScanActivity : Activity(), GLSurfaceView.Renderer {
         "arScanLostMotion" to "Telefonni sekinroq harakatlantiring",
         "arScanLostLight" to "Yorug'lik kam — chiroqni yoqing",
         "arScanLostFeatures" to "Bo'sh devor yoki polga qaramang — naqshli joyga, mebelga qarating",
+        "arScanStepFloor" to "Pol",
+        "arScanStepBase" to "Boshlang'ich burchak",
+        "arScanStepHeight" to "Balandlik",
+        "arScanStepWalls" to "Devorlar",
+        "arScanStepOpenings" to "Eshik/deraza",
+        "arScanStepCloser" to "Burchakka yaqinroq boring — uzoqdan aniqlik pasayadi",
+        "arScanFirstCorner" to "Boshlang'ich nuqta",
         "arScanTrackingSettling" to "Joylashuv tiklanmoqda — telefonni bir zum qimirlatmang",
         "arScanCornersLost" to "Ba'zi burchaklar yo'qoldi — ularni qayta belgilang",
         "arScanNoFloorHere" to "Nishon polga tushmayapti — telefonni pastroq qarating",
@@ -126,6 +134,7 @@ class ArScanActivity : Activity(), GLSurfaceView.Renderer {
     private var wasTracking = false
     private val gate = TrackingGate()
     @Volatile private var lostHintKey = "arScanTrackingLost"
+    @Volatile private var cameraPos: Vec3? = null
     // Set when anchors stopped tracking and corners were dropped; stays up
     // until the user's next action (a one-frame hint is never seen).
     @Volatile private var cornersLost = false
@@ -449,6 +458,7 @@ class ArScanActivity : Activity(), GLSurfaceView.Renderer {
                     ?.let { floorCandidateY = it; flow.floorFound() }
             }
             val floorY = flow.capture.floorY ?: floorCandidateY
+            cameraPos = camera.pose.let { Vec3(it.tx(), it.ty(), it.tz()) }
 
             // The aim: a real floor hit at the centre, else the camera ray on the floor plane.
             reticle = if (!tracking || floorY == null) null else {
@@ -472,7 +482,8 @@ class ArScanActivity : Activity(), GLSurfaceView.Renderer {
             val view = FloatArray(16).also { camera.getViewMatrix(it, 0) }
             val proj = FloatArray(16).also { camera.getProjectionMatrix(it, 0, 0.05f, 100f) }
             val state = overlayState(WallGeometry(view, proj, viewportW, viewportH))
-            val ui = flow.ui(tracking, reticle, liveHeight, lostHintKey, gate.settling(now))
+            val aimDistM = reticle?.let { r -> cameraPos?.let { c -> hypot(r.x - c.x, r.z - c.z) } }
+            val ui = flow.ui(tracking, reticle, liveHeight, lostHintKey, gate.settling(now), aimDistM)
             val hintKey = when {
                 flow.step == ScanStep.FIND_FLOOR && tracking &&
                     SystemClock.elapsedRealtime() - startedAt > FLOOR_HINT_AFTER_MS -> "arScanFloorHint"
@@ -483,10 +494,11 @@ class ArScanActivity : Activity(), GLSurfaceView.Renderer {
             }
             val summary = flow.height?.takeIf { flow.step == ScanStep.DONE }?.let(::summaryText)
             val step = flow.step
+            val progress = flow.progress()
             runOnUiThread {
                 shownStep = step
                 overlay.state = state
-                chrome.bind(ui, s(hintKey), summary, flow.openingType)
+                chrome.bind(ui, s(hintKey), summary, flow.openingType, progress)
             }
         } catch (e: Exception) {
             Log.w(TAG, "frame failed", e)
@@ -544,6 +556,8 @@ class ArScanActivity : Activity(), GLSurfaceView.Renderer {
         val shownAim = edge?.let { Vec3(it.x, aim!!.y, it.z) } ?: aim
 
         val showReticle = step == ScanStep.BASE || step == ScanStep.WALLS || step == ScanStep.OPENINGS
+        // Once the room can be closed, show where it started.
+        val first = corners.firstOrNull()?.takeIf { step == ScanStep.WALLS && corners.size >= 3 }
         return OverlayState(
             walls = walls,
             liveWall = liveWall,
@@ -554,6 +568,12 @@ class ArScanActivity : Activity(), GLSurfaceView.Renderer {
             openings = openingShapes,
             labels = labels,
             onboarding = step == ScanStep.FIND_FLOOR,
+            firstCorner = first?.let { geo.locate(it, FIRST_CORNER_MARGIN_DP * resources.displayMetrics.density) },
+            firstCornerLabel = first?.let { f ->
+                cameraPos?.let { c -> "${s("arScanFirstCorner")} · ${ArOverlayView.cm(hypot(f.x - c.x, f.z - c.z), cm)}" }
+                    ?: s("arScanFirstCorner")
+            },
+            ceilingArrow = step == ScanStep.HEIGHT && tracking && liveHeight == null,
         )
     }
 
