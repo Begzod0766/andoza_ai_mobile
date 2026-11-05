@@ -12,6 +12,10 @@ typealias Px = Pair<Float, Float>
 
 data class Segment(val a: Px, val b: Px)
 
+/** A label's centre along one axis, moved in so a label [half] wide stays [pad] inside a [size] screen. */
+fun keepOnScreen(center: Float, half: Float, size: Float, pad: Float): Float =
+    if (2 * (half + pad) >= size) size / 2 else center.coerceIn(half + pad, size - half - pad)
+
 /** A world point on screen, or the spot on the screen edge that points toward it. */
 sealed interface ScreenTarget {
     data class OnScreen(val at: Px) : ScreenTarget
@@ -82,20 +86,31 @@ class WallGeometry(
      * direction comes from the view-space offset, so the arrow says which way
      * to turn (straight behind: down).
      */
-    fun locate(p: Vec3, marginPx: Float): ScreenTarget {
+    fun locate(p: Vec3, marginPx: Float): ScreenTarget = locate(p, marginPx, marginPx, marginPx, marginPx)
+
+    /** As above with a separate inset per side, so the arrow stays clear of the buttons and the hint. */
+    fun locate(p: Vec3, left: Float, top: Float, right: Float, bottom: Float): ScreenTarget {
         val v = toView(p)
         val cx = width / 2f; val cy = height / 2f
         var dx: Float; var dy: Float
         if (visible(v)) {
             val s = toScreen(v)
-            if (s.first in marginPx..width - marginPx && s.second in marginPx..height - marginPx) return ScreenTarget.OnScreen(s)
+            if (s.first in left..width - right && s.second in top..height - bottom) return ScreenTarget.OnScreen(s)
             dx = s.first - cx; dy = s.second - cy
         } else {
             dx = v.x; dy = -v.y
         }
         if (abs(dx) < 1e-6f && abs(dy) < 1e-6f) { dx = 0f; dy = 1f }
-        val sx = if (abs(dx) < 1e-6f) Float.MAX_VALUE else (cx - marginPx) / abs(dx)
-        val sy = if (abs(dy) < 1e-6f) Float.MAX_VALUE else (cy - marginPx) / abs(dy)
+        val sx = when {
+            abs(dx) < 1e-6f -> Float.MAX_VALUE
+            dx > 0 -> (width - right - cx) / dx
+            else -> (cx - left) / -dx
+        }
+        val sy = when {
+            abs(dy) < 1e-6f -> Float.MAX_VALUE
+            dy > 0 -> (height - bottom - cy) / dy
+            else -> (cy - top) / -dy
+        }
         val k = minOf(sx, sy)
         return ScreenTarget.OffScreen(Px(cx + dx * k, cy + dy * k), atan2(dy, dx))
     }

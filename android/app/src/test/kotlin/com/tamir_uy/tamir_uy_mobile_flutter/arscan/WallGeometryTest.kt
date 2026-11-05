@@ -106,4 +106,26 @@ class WallGeometryTest {
             assertTrue("$p -> $at", at.first in 49.99f..950.01f && at.second in 49.99f..950.01f)
         }
     }
+
+    @Test fun `arrow keeps clear of the chrome with per-side insets`() {
+        // Straight behind: pinned above the bottom inset (the main button), centred.
+        val t = g.locate(Vec3(0f, 0f, 2f), left = 50f, top = 200f, right = 50f, bottom = 150f) as ScreenTarget.OffScreen
+        assertEquals(850f, t.at.second, 0.01f); assertEquals(500f, t.at.first, 0.01f)
+        // A point on screen but under the bottom chrome counts as off screen.
+        val under = g.locate(Vec3(0f, -1.8f, -2f), left = 50f, top = 200f, right = 50f, bottom = 150f)
+        assertTrue(under is ScreenTarget.OffScreen)
+    }
+
+    @Test fun `a point inside the margin band is off screen and pinned to the border`() {
+        // x = 970 px on a 1000 px screen, margin 50.
+        val t = g.locate(Vec3(0.94f, 0f, -1f), 50f) as ScreenTarget.OffScreen
+        assertEquals(950f, t.at.first, 0.01f)
+    }
+
+    @Test fun `a label centre is pulled in so the label stays on screen`() {
+        assertEquals(118f, keepOnScreen(100f, half = 110f, size = 1080f, pad = 8f), 0.01f)
+        assertEquals(962f, keepOnScreen(1000f, half = 110f, size = 1080f, pad = 8f), 0.01f)
+        assertEquals(540f, keepOnScreen(540f, half = 110f, size = 1080f, pad = 8f), 0.01f)
+        assertEquals(50f, keepOnScreen(10f, half = 600f, size = 100f, pad = 8f), 0.01f) // wider than the screen: centred
+    }
 }

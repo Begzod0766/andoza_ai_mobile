@@ -148,9 +148,11 @@ class ArOverlayView(context: Context) : View(context) {
     private fun chip(canvas: Canvas, at: Px, text: String) {
         val w = chipText.measureText(text) + dp(20f)
         val h = dp(28f)
-        val rect = RectF(at.first - w / 2, at.second - h / 2, at.first + w / 2, at.second + h / 2)
+        val x = keepOnScreen(at.first, w / 2, width.toFloat(), dp(8f))
+        val y = keepOnScreen(at.second, h / 2, height.toFloat(), dp(8f))
+        val rect = RectF(x - w / 2, y - h / 2, x + w / 2, y + h / 2)
         canvas.drawRoundRect(rect, dp(8f), dp(8f), chipBg)
-        canvas.drawText(text, at.first, at.second - (chipText.descent() + chipText.ascent()) / 2, chipText)
+        canvas.drawText(text, x, y - (chipText.descent() + chipText.ascent()) / 2, chipText)
     }
 
     /** A floor tile in perspective with a phone sweeping over it. */

@@ -138,6 +138,7 @@ class _ArScanScreenState extends ConsumerState<ArScanScreen> with WidgetsBinding
     setState(() {
       _busy = true;
       _problem = null;
+      _guide = false; // a scan started by the resume check must not run under the tips
     });
     final support = await svc.checkSupport();
     if (!mounted) return;

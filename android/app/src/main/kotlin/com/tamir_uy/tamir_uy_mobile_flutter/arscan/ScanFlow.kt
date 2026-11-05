@@ -38,6 +38,9 @@ class ScanFlow(val capture: FloorPlanCapture = FloorPlanCapture()) {
     val openings = OpeningCapture()
     @Volatile var openingType = OpeningType.DOOR
 
+    /** The step-closer hint is showing: it stays until the aim comes [FAR_AIM_EXIT_M] closer, so it doesn't flicker. */
+    private var farShown = false
+
     /** The closed outline the openings' edge indices refer to. */
     fun loop(): List<Vec3> = openings.loop(capture.corners, capture.isClosed)
 
@@ -191,8 +194,9 @@ class ScanFlow(val capture: FloorPlanCapture = FloorPlanCapture()) {
         }
         val live = step != ScanStep.DONE && step != ScanStep.OPENINGS
         // Corners marked from far away at a grazing angle were the least accurate.
-        val far = aimDistM != null && aimDistM > FAR_AIM_M &&
+        val far = aimDistM != null && aimDistM > (if (farShown) FAR_AIM_M - FAR_AIM_EXIT_M else FAR_AIM_M) &&
             (step == ScanStep.BASE || step == ScanStep.WALLS) && ui.hintKey != "arScanSnapToFirst"
+        farShown = far
         return when {
             !tracking && live -> ui.copy(hintKey = lostHintKey)
             settling && step != ScanStep.DONE && step != ScanStep.FIND_FLOOR -> ui.copy(hintKey = "arScanTrackingSettling")
@@ -204,5 +208,6 @@ class ScanFlow(val capture: FloorPlanCapture = FloorPlanCapture()) {
     companion object {
         private const val STEPS = 5
         const val FAR_AIM_M = 3.0f
+        private const val FAR_AIM_EXIT_M = 0.2f
     }
 }

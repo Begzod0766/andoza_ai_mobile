@@ -128,6 +128,18 @@ void main() {
     expect(fake.checks, 2);
   });
 
+  testWidgets('a scan started from the resume check closes the guide', (tester) async {
+    final fake = _FakeArScan(support: const ArScanSupport(false, 'arcore_not_installed'));
+    await _pump(tester, fake);
+    await tester.tap(find.byTooltip(l10n.arScanGuideHelp));
+    await tester.pumpAndSettle();
+    expect(find.text(l10n.arScanGuideTitle), findsOneWidget);
+    tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.resumed);
+    await tester.pumpAndSettle();
+    expect(fake.checks, 2);
+    expect(find.text(l10n.arScanGuideTitle), findsNothing);
+  });
+
   testWidgets('a prefs failure never blocks the scan', (tester) async {
     final fake = _FakeArScan();
     await _pump(tester, fake, guide: _FakeGuide(fails: true));

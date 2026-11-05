@@ -228,5 +228,14 @@ class ScanFlowTest {
         assertEquals("arScanTrackingLost", f.ui(false, Vec3(2f, 0f, 2f), null, aimDistM = 4f).hintKey)
     }
 
+    @Test fun `the step-closer hint does not flicker around 3 m`() {
+        val f = walls()
+        fun hint(d: Float) = f.ui(true, Vec3(2f, 0f, 2f), null, aimDistM = d).hintKey
+        assertEquals("arScanStepCloser", hint(3.1f))
+        assertEquals("arScanStepCloser", hint(2.9f))
+        assertEquals("arScanCornersHint", hint(2.7f))
+        assertEquals("arScanCornersHint", hint(2.9f))
+    }
+
     private fun finishOpenings(f: ScanFlow) = assertTrue(f.finishOpenings())
 }

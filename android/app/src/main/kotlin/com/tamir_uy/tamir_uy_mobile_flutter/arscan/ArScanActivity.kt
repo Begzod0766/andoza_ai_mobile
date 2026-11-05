@@ -61,7 +61,9 @@ class ArScanActivity : Activity(), GLSurfaceView.Renderer {
         private const val CEILING_GAP_M = 0.10f
         private val PRESET_HEIGHTS = floatArrayOf(2.5f, 2.7f, 2.8f, 3.0f)
         private const val TAG = "ArScan"
-        private const val FIRST_CORNER_MARGIN_DP = 56f
+        private const val ARROW_SIDE_DP = 56f
+        private const val ARROW_TOP_DP = 150f
+        private const val ARROW_BOTTOM_DP = 130f
     }
 
     // Fallbacks only; Flutter passes the copy in the user's language.
@@ -568,7 +570,11 @@ class ArScanActivity : Activity(), GLSurfaceView.Renderer {
             openings = openingShapes,
             labels = labels,
             onboarding = step == ScanStep.FIND_FLOOR,
-            firstCorner = first?.let { geo.locate(it, FIRST_CORNER_MARGIN_DP * resources.displayMetrics.density) },
+            firstCorner = first?.let {
+                val d = resources.displayMetrics.density
+                // Clear of the exit/undo buttons and hint at the top, the main button at the bottom.
+                geo.locate(it, ARROW_SIDE_DP * d, ARROW_TOP_DP * d, ARROW_SIDE_DP * d, ARROW_BOTTOM_DP * d)
+            },
             firstCornerLabel = first?.let { f ->
                 cameraPos?.let { c -> "${s("arScanFirstCorner")} · ${ArOverlayView.cm(hypot(f.x - c.x, f.z - c.z), cm)}" }
                     ?: s("arScanFirstCorner")
