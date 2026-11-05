@@ -75,4 +75,35 @@ class WallGeometryTest {
     @Test fun `a panel behind the camera is null`() {
         assertNull(g.panel(Vec3(-1f, 0f, 3f), Vec3(1f, 0f, 3f), 0f, 1f, 0f, 2f))
     }
+
+    @Test fun `point ahead is on screen`() {
+        val t = g.locate(Vec3(0f, 0f, -2f), 50f) as ScreenTarget.OnScreen
+        assertEquals(500f, t.at.first, 0.01f); assertEquals(500f, t.at.second, 0.01f)
+    }
+
+    @Test fun `point far right is off screen at the right edge`() {
+        val t = g.locate(Vec3(10f, 0f, -2f), 50f) as ScreenTarget.OffScreen
+        assertEquals(950f, t.at.first, 0.01f); assertEquals(500f, t.at.second, 0.01f)
+        assertEquals(0f, t.angleRad, 1e-3f)
+    }
+
+    @Test fun `point behind and to the left points left`() {
+        val t = g.locate(Vec3(-1f, 0f, 2f), 50f) as ScreenTarget.OffScreen
+        assertEquals(50f, t.at.first, 0.01f)
+        assertEquals(Math.PI.toFloat(), abs(t.angleRad), 1e-3f)
+    }
+
+    @Test fun `point straight behind points down`() {
+        val t = g.locate(Vec3(0f, 0f, 2f), 50f) as ScreenTarget.OffScreen
+        assertEquals((Math.PI / 2).toFloat(), t.angleRad, 1e-3f)
+        assertEquals(950f, t.at.second, 0.01f)
+    }
+
+    @Test fun `off-screen point is always inside the inset bounds`() {
+        for (p in listOf(Vec3(5f, 3f, -1f), Vec3(-4f, -6f, 1f), Vec3(0.1f, 9f, 3f), Vec3(-20f, 0.5f, -0.5f), Vec3(2f, -2f, 0f))) {
+            val t = g.locate(p, 50f)
+            val at = when (t) { is ScreenTarget.OnScreen -> t.at; is ScreenTarget.OffScreen -> t.at }
+            assertTrue("$p -> $at", at.first in 49.99f..950.01f && at.second in 49.99f..950.01f)
+        }
+    }
 }

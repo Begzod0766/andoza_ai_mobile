@@ -1,6 +1,8 @@
 package com.tamir_uy.tamir_uy_mobile_flutter.arscan
 
 import kotlin.math.PI
+import kotlin.math.abs
+import kotlin.math.atan2
 import kotlin.math.cos
 import kotlin.math.hypot
 import kotlin.math.sin
@@ -9,6 +11,13 @@ import kotlin.math.sin
 typealias Px = Pair<Float, Float>
 
 data class Segment(val a: Px, val b: Px)
+
+/** A world point on screen, or the spot on the screen edge that points toward it. */
+sealed interface ScreenTarget {
+    data class OnScreen(val at: Px) : ScreenTarget
+    /** [angleRad]: the way to it in screen space (x right, y down). */
+    data class OffScreen(val at: Px, val angleRad: Float) : ScreenTarget
+}
 
 /** A wall on screen: its (clipped) outline, grid lines, and where its length goes. */
 data class WallShape(val outline: List<Px>, val grid: List<Segment>, val labelAt: Px?)
@@ -66,6 +75,30 @@ class WallGeometry(
 
     /** `null` when the point is behind the near plane. */
     fun point(p: Vec3): Px? = toView(p).takeIf(::visible)?.let(::toScreen)
+
+    /**
+     * Where [p] is for the user: on screen inside a [marginPx] inset, or the
+     * point on that inset border in its direction. Behind the camera the
+     * direction comes from the view-space offset, so the arrow says which way
+     * to turn (straight behind: down).
+     */
+    fun locate(p: Vec3, marginPx: Float): ScreenTarget {
+        val v = toView(p)
+        val cx = width / 2f; val cy = height / 2f
+        var dx: Float; var dy: Float
+        if (visible(v)) {
+            val s = toScreen(v)
+            if (s.first in marginPx..width - marginPx && s.second in marginPx..height - marginPx) return ScreenTarget.OnScreen(s)
+            dx = s.first - cx; dy = s.second - cy
+        } else {
+            dx = v.x; dy = -v.y
+        }
+        if (abs(dx) < 1e-6f && abs(dy) < 1e-6f) { dx = 0f; dy = 1f }
+        val sx = if (abs(dx) < 1e-6f) Float.MAX_VALUE else (cx - marginPx) / abs(dx)
+        val sy = if (abs(dy) < 1e-6f) Float.MAX_VALUE else (cy - marginPx) / abs(dy)
+        val k = minOf(sx, sy)
+        return ScreenTarget.OffScreen(Px(cx + dx * k, cy + dy * k), atan2(dy, dx))
+    }
 
     fun segment(a: Vec3, b: Vec3): Segment? {
         val va = toView(a); val vb = toView(b)
