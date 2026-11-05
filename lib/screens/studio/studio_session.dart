@@ -12,6 +12,22 @@ import '../../services/secure_storage.dart';
 /// mebel workshop): the access and refresh token cookies, and the
 /// `uy-tamir-auth` localStorage flag the web app's route guard reads.
 
+/// The first page a studio WebView loads, only to own the origin so the auth
+/// flag can be written to its localStorage. A static file, not the web app:
+/// the app at "/" reloads itself when the studio navigation cuts off its chunk
+/// fetches (its stale-build guard), and that reload cancels the navigation.
+Uri studioBootstrapUri(String baseUrl) => Uri.parse(baseUrl).resolve('/favicon.svg');
+
+/// NSURLErrorCancelled: WKWebView reports it when a navigation is replaced
+/// by another one — e.g. the bootstrap page while the app loads the studio
+/// route. It is not a failure.
+const _nsUrlErrorCancelled = -999;
+
+/// Whether [err] should replace the studio with the "failed to load" view:
+/// only a main-frame error that isn't a cancelled navigation.
+bool isStudioLoadFailure(WebResourceError err) =>
+    (err.isForMainFrame ?? true) && err.errorCode != _nsUrlErrorCancelled;
+
 /// Whether [host] is a local development host (loopback or private LAN) for
 /// which plaintext http is acceptable. Mirrors the cleartext allow-list in
 /// android/app/src/main/res/xml/network_security_config.xml.

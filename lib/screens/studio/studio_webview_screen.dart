@@ -240,8 +240,9 @@ class _StudioWebViewScreenState extends ConsumerState<StudioWebViewScreen> {
             if (_studioReady) _pageChanged(url);
           },
           onWebResourceError: (err) {
-            // Ignore sub-resource errors; only surface a hard main-frame fail.
-            if (err.isForMainFrame ?? true) {
+            // Ignore sub-resource errors and cancelled navigations; only
+            // surface a hard main-frame fail.
+            if (isStudioLoadFailure(err)) {
               if (mounted) {
                 setState(() {
                   _loading = false;
@@ -336,9 +337,8 @@ class _StudioWebViewScreenState extends ConsumerState<StudioWebViewScreen> {
     WebViewController controller,
   ) async {
     await seedStudioCookies(auth, ref.read(secureStorageProvider));
-    // First load: the origin root establishes the origin so localStorage is
-    // writable. It may bounce to /login (not yet seeded) — that's expected.
-    await controller.loadRequest(Uri.parse(AppConfig.studioBaseUrl));
+    // First load: a static page on the origin so localStorage is writable.
+    await controller.loadRequest(studioBootstrapUri(AppConfig.studioBaseUrl));
   }
 
   /// Whether [url] is a page *outside* the 3D Studio, i.e. the web app has

@@ -105,7 +105,7 @@ class _MebelWebViewScreenState extends ConsumerState<MebelWebViewScreen> {
             if (mounted && _loading) setState(() => _loading = false);
           },
           onWebResourceError: (err) {
-            if ((err.isForMainFrame ?? true) && mounted) {
+            if (isStudioLoadFailure(err) && mounted) {
               setState(() {
                 _loading = false;
                 _error = AppLocalizations.of(context)!.studioLoadFailed(err.description);
@@ -120,8 +120,8 @@ class _MebelWebViewScreenState extends ConsumerState<MebelWebViewScreen> {
 
   Future<void> _bootstrap(AuthAuthenticated auth, WebViewController controller) async {
     await seedStudioCookies(auth, ref.read(secureStorageProvider));
-    // The origin root first, so localStorage is writable for the seed.
-    await controller.loadRequest(Uri.parse(AppConfig.studioBaseUrl));
+    // A static page on the origin first, so localStorage is writable for the seed.
+    await controller.loadRequest(studioBootstrapUri(AppConfig.studioBaseUrl));
   }
 
   /// The screen's area, for the share sheet to point from.
