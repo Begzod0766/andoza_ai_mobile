@@ -62,4 +62,17 @@ class WallGeometryTest {
     @Test fun `floor ellipse behind is null`() {
         assertNull(g.floorEllipse(Vec3(0f, -1.5f, 2f)))
     }
+
+    @Test fun `a panel on a wall spans its stretch and heights`() {
+        // Wall from x=-1 to x=1 at z=-3; a door on its middle half, floor to 2 m.
+        val a = Vec3(-1f, -1.5f, -3f); val b = Vec3(1f, -1.5f, -3f)
+        val p = g.panel(a, b, t0 = 0.25f, t1 = 0.75f, bottom = 0f, top = 2f)!!
+        assertEquals(4, p.size)
+        assertEquals(g.point(Vec3(-0.5f, -1.5f, -3f))!!, p[0])
+        assertEquals(g.point(Vec3(0.5f, 0.5f, -3f))!!, p[2])
+    }
+
+    @Test fun `a panel behind the camera is null`() {
+        assertNull(g.panel(Vec3(-1f, 0f, 3f), Vec3(1f, 0f, 3f), 0f, 1f, 0f, 2f))
+    }
 }

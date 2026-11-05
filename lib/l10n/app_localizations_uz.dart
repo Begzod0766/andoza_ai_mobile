@@ -2925,4 +2925,36 @@ class AppLocalizationsUz extends AppLocalizations {
 
   @override
   String get scanReviewOpeningsEmpty => 'Hali eshik yoki deraza yo\'q';
+
+  @override
+  String get arScanOpeningsHint =>
+      'Eshik yoki derazaning chap va o\'ng cheti tagiga nishonni qo\'yib, «Chet qo\'shish»ni bosing';
+
+  @override
+  String get arScanAddEdge => 'Chet qo\'shish';
+
+  @override
+  String get arScanDoor => 'Eshik';
+
+  @override
+  String get arScanWindow => 'Deraza';
+
+  @override
+  String get arScanOpeningOtherWall => 'Ikkala chet bitta devorda bo\'lsin';
+
+  @override
+  String get arScanOpeningTooNarrow => 'Juda tor — chetlarni qayta belgilang';
+
+  @override
+  String get arScanOpeningOverlap =>
+      'Bu joyda allaqachon eshik yoki deraza bor';
+
+  @override
+  String get arScanAimWallBase => 'Nishonni devor tagiga olib boring';
+
+  @override
+  String get arScanAddOpenings => 'Eshik/deraza qo\'shish';
+
+  @override
+  String get arScanOpeningsDone => 'Tayyor';
 }

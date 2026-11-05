@@ -3194,5 +3194,45 @@
   "scanReviewOpeningsEmpty": "Hali eshik yoki deraza yo'q",
   "@scanReviewOpeningsEmpty": {
     "description": "Room-scan review: the doors/windows list is empty"
+  },
+  "arScanOpeningsHint": "Eshik yoki derazaning chap va o'ng cheti tagiga nishonni qo'yib, «Chet qo'shish»ni bosing",
+  "@arScanOpeningsHint": {
+    "description": "Android ARCore floor-plan scanner: hint on the doors-and-windows step"
+  },
+  "arScanAddEdge": "Chet qo'shish",
+  "@arScanAddEdge": {
+    "description": "Android ARCore floor-plan scanner: main button on the doors-and-windows step: marks one edge of an opening"
+  },
+  "arScanDoor": "Eshik",
+  "@arScanDoor": {
+    "description": "Android ARCore floor-plan scanner: opening type toggle: door"
+  },
+  "arScanWindow": "Deraza",
+  "@arScanWindow": {
+    "description": "Android ARCore floor-plan scanner: opening type toggle: window"
+  },
+  "arScanOpeningOtherWall": "Ikkala chet bitta devorda bo'lsin",
+  "@arScanOpeningOtherWall": {
+    "description": "Android ARCore floor-plan scanner: notice: the two edges were on different walls"
+  },
+  "arScanOpeningTooNarrow": "Juda tor — chetlarni qayta belgilang",
+  "@arScanOpeningTooNarrow": {
+    "description": "Android ARCore floor-plan scanner: notice: the opening is narrower than 30 cm"
+  },
+  "arScanOpeningOverlap": "Bu joyda allaqachon eshik yoki deraza bor",
+  "@arScanOpeningOverlap": {
+    "description": "Android ARCore floor-plan scanner: notice: the opening overlaps another one"
+  },
+  "arScanAimWallBase": "Nishonni devor tagiga olib boring",
+  "@arScanAimWallBase": {
+    "description": "Android ARCore floor-plan scanner: hint: the target is not near any wall of the outline"
+  },
+  "arScanAddOpenings": "Eshik/deraza qo'shish",
+  "@arScanAddOpenings": {
+    "description": "Android ARCore scanner: pill in the finished room that starts marking doors and windows"
+  },
+  "arScanOpeningsDone": "Tayyor",
+  "@arScanOpeningsDone": {
+    "description": "Android ARCore scanner: pill that ends marking doors and windows"
   }
 }

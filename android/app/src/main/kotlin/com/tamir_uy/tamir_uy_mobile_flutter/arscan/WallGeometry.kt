@@ -104,6 +104,16 @@ class WallGeometry(
         return WallShape(outline.map(::toScreen), grid, point(mid))
     }
 
+    /**
+     * The stretch [t0]..[t1] of wall [a]→[b] between [bottom] and [top] metres
+     * above the floor — a door or window drawn on the wall; `null` if wholly behind.
+     */
+    fun panel(a: Vec3, b: Vec3, t0: Float, t1: Float, bottom: Float, top: Float): List<Px>? {
+        fun at(t: Float, h: Float) = Vec3(a.x + (b.x - a.x) * t, a.y + h, a.z + (b.z - a.z) * t)
+        val outline = clip(listOf(at(t0, bottom), at(t1, bottom), at(t1, top), at(t0, top)).map(::toView))
+        return if (outline.size < 3) null else outline.map(::toScreen)
+    }
+
     /** A circle of [radius] lying on the floor at [center], as a screen polygon; `null` unless all of it is in view. */
     fun floorEllipse(center: Vec3, radius: Float = 0.15f, steps: Int = 32): List<Px>? {
         val pts = (0 until steps).map { i ->

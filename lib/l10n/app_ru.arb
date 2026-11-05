@@ -2844,5 +2844,15 @@
   "scanReviewOpeningsEmpty": "Пока нет дверей и окон",
   "@scanReviewOpeningsEmpty": {
     "description": "Room-scan review: the doors/windows list is empty"
-  }
+  },
+  "arScanOpeningsHint": "Наведите прицел под левый и правый край двери или окна и нажмите «Добавить край»",
+  "arScanAddEdge": "Добавить край",
+  "arScanDoor": "Дверь",
+  "arScanWindow": "Окно",
+  "arScanOpeningOtherWall": "Оба края должны быть на одной стене",
+  "arScanOpeningTooNarrow": "Слишком узко — отметьте края заново",
+  "arScanOpeningOverlap": "Здесь уже есть дверь или окно",
+  "arScanAimWallBase": "Наведите прицел на низ стены",
+  "arScanAddOpenings": "Добавить двери и окна",
+  "arScanOpeningsDone": "Готово"
 }

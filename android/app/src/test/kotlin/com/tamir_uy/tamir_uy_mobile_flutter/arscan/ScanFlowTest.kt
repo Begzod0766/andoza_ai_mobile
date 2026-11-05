@@ -115,4 +115,62 @@ class ScanFlowTest {
         assertFalse(f.isCurrent(ScanStep.WALLS))
         assertTrue(f.isCurrent(ScanStep.DONE))
     }
+
+    // ── doors and windows ─────────────────────────────────────────────────
+    // 4 × 3 m room; wall 0 = (0,0)→(4,0), wall 3 = (0,3)→(0,0).
+    private fun done(): ScanFlow = walls().apply {
+        addCorner(Vec3(4f, 0f, 0f)); addCorner(Vec3(4f, 0f, 3f)); addCorner(Vec3(0f, 0f, 3f)); closeRoom()
+    }
+
+    @Test fun `the finished room offers doors and windows`() {
+        val f = done()
+        assertEquals("arScanAddOpenings", f.ui(true, null, null).secondaryKey)
+        assertTrue(f.startOpenings())
+        assertEquals(ScanStep.OPENINGS, f.step)
+        val ui = f.ui(true, Vec3(2f, 0f, 0.2f), null)
+        assertEquals("arScanOpeningsHint", ui.hintKey); assertEquals("arScanAddEdge", ui.mainKey); assertTrue(ui.mainEnabled)
+        assertTrue(ui.typeChipsVisible); assertEquals("arScanOpeningsDone", ui.secondaryKey)
+    }
+
+    @Test fun `off the walls the edge button waits`() {
+        val f = done().apply { startOpenings() }
+        val ui = f.ui(true, Vec3(2f, 0f, 1.5f), null)
+        assertEquals("arScanAimWallBase", ui.hintKey); assertFalse(ui.mainEnabled)
+        assertNull(f.addOpeningEdge(Vec3(2f, 0f, 1.5f)))
+    }
+
+    @Test fun `two edges on a wall make an opening of the chosen type`() {
+        val f = done().apply { startOpenings(); openingType = OpeningType.WINDOW }
+        assertEquals(OpeningAddResult.PENDING, f.addOpeningEdge(Vec3(1f, 0f, 0.1f)))
+        assertEquals(OpeningAddResult.ADDED, f.addOpeningEdge(Vec3(2f, 0f, 0.1f)))
+        assertEquals(CapturedOpening(OpeningType.WINDOW, 0, 0.25f, 0.5f), f.openings.openings.single())
+        assertTrue(f.finishOpenings()); assertEquals(ScanStep.DONE, f.step)
+        assertEquals(1, f.openings.openings.size)
+    }
+
+    @Test fun `undo walks back through openings before the room reopens`() {
+        val f = done().apply { startOpenings() }
+        f.addOpeningEdge(Vec3(1f, 0f, 0.1f)); f.addOpeningEdge(Vec3(2f, 0f, 0.1f))
+        f.addOpeningEdge(Vec3(3f, 0f, 0.1f))
+        assertEquals(0, f.undo()); assertNull(f.openings.pending)          // the half-marked one
+        assertEquals(0, f.undo()); assertTrue(f.openings.openings.isEmpty()) // the opening
+        assertEquals(0, f.undo()); assertEquals(ScanStep.DONE, f.step)      // back to the room
+        assertEquals(1, f.undo()); assertEquals(ScanStep.WALLS, f.step)     // only now reopens
+    }
+
+    @Test fun `in the finished room undo drops openings before reopening`() {
+        val f = done().apply { startOpenings() }
+        f.addOpeningEdge(Vec3(1f, 0f, 0.1f)); f.addOpeningEdge(Vec3(2f, 0f, 0.1f)); finishOpenings(f)
+        assertEquals(0, f.undo()); assertEquals(ScanStep.DONE, f.step); assertTrue(f.openings.openings.isEmpty())
+        assertEquals(1, f.undo()); assertEquals(ScanStep.WALLS, f.step)
+    }
+
+    @Test fun `lost corners drop the openings that hung on them`() {
+        val f = done().apply { startOpenings() }
+        f.addOpeningEdge(Vec3(1f, 0f, 0.1f)); f.addOpeningEdge(Vec3(2f, 0f, 0.1f))
+        f.cornersLost()
+        assertEquals(ScanStep.WALLS, f.step); assertTrue(f.openings.openings.isEmpty())
+    }
+
+    private fun finishOpenings(f: ScanFlow) = assertTrue(f.finishOpenings())
 }

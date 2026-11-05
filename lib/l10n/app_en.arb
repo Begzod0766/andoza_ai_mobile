@@ -2844,5 +2844,15 @@
   "scanReviewOpeningsEmpty": "No doors or windows yet",
   "@scanReviewOpeningsEmpty": {
     "description": "Room-scan review: the doors/windows list is empty"
-  }
+  },
+  "arScanOpeningsHint": "Put the target under the left and right edge of a door or window and tap “Add edge”",
+  "arScanAddEdge": "Add edge",
+  "arScanDoor": "Door",
+  "arScanWindow": "Window",
+  "arScanOpeningOtherWall": "Both edges must be on the same wall",
+  "arScanOpeningTooNarrow": "Too narrow — mark the edges again",
+  "arScanOpeningOverlap": "There is already a door or window here",
+  "arScanAimWallBase": "Move the target to the bottom of a wall",
+  "arScanAddOpenings": "Add doors and windows",
+  "arScanOpeningsDone": "Done"
 }

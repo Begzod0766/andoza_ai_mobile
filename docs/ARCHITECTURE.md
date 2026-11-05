@@ -159,13 +159,18 @@ nusxani olib tashlaydi (`andoza_ai` backend, `room_scan_dedupe`).
 kanali (`arscan/ArScanChannel.kt` → `ArScanActivity`) ishlaydi. Qadamlar: pol topiladi →
 devor bilan pol tutashgan joyga bazaviy nuqta → balandlik yuqoriga tortiladi (yoki
 2.5–3.0 m chiplaridan biri) → burchaklar qo'shiladi, har birida yarim shaffof 3D devor
-o'sadi → "Xonani yopish" yoki birinchi burchakka yaqinlashish → perimetr, maydon, hajm.
+o'sadi → "Xonani yopish" yoki birinchi burchakka yaqinlashish → perimetr, maydon, hajm →
+ixtiyoriy "Eshik/deraza qo'shish": Eshik/Deraza tanlanadi, nishon eng yaqin devor tagiga
+yopishadi (≤ 30 sm), chap va o'ng chet "Chet qo'shish" bilan belgilanadi (`OpeningCapture`),
+devorda rangli panel chiqadi; ↶ avval eshik/derazalarni, keyin xonani qaytaradi.
 Nishon cheksiz pol tekisligiga tushadi (`FloorRay`), shuning uchun devor yonida va
 mebel ortida ham ishlaydi. Mantiq ARCore'siz bo'laklarda va JVM testlari bilan:
 `ScanFlow` (qadamlar), `FloorPlanCapture` (burchaklar, balandlik, yakun), `FloorRay`,
 `WallGeometry` (proyeksiya va near-plane kesish); `ArOverlayView` faqat chizadi.
-Natija (`corners`, `height`, …) `features/ar_scan/arcore_plan.dart` da tozalanadi va
-odatdagi review sahifasiga boradi. ARCore yo'q qurilmada foto rejimi yoki xonani
+Natija (`corners`, `height`, `openings: [{type, edge, t0, t1}]`, …)
+`features/ar_scan/arcore_plan.dart` da tozalanadi (eshik/derazalar to'g'rilangan devorga
+joylanadi) va odatdagi review sahifasiga boradi, u yerda ularni tahrirlash mumkin
+(`ScanOpeningsEditor`). ARCore yo'q qurilmada foto rejimi yoki xonani
 chizish taklif qilinadi.
 
 **Eski kod:** `com.tamir_uy/lidar` kanali (`LidarMethodChannel.swift`, Android
