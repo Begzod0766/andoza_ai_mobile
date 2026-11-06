@@ -2925,4 +2925,7 @@ class AppLocalizationsUz extends AppLocalizations {
 
   @override
   String get scanReviewOpeningsEmpty => 'Hali eshik yoki deraza yo\'q';
+
+  @override
+  String get roomThumbnailScanBadge => 'SKAN';
 }

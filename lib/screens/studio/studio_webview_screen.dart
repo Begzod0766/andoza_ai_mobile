@@ -11,8 +11,10 @@ import '../../config/design_tokens.dart';
 import '../../l10n/app_localizations.dart';
 import '../../providers/auth_provider.dart';
 import '../../providers/locale_provider.dart';
+import '../../services/pdf_share_service.dart';
 import '../../widgets/common/error_view.dart';
 import 'studio_session.dart';
+import 'webview_download.dart';
 import 'webview_file_chooser.dart';
 
 /// Embeds a web page from the React/Three.js frontend (the 3D Studio or the
@@ -175,6 +177,11 @@ class _StudioWebViewScreenState extends ConsumerState<StudioWebViewScreen> {
     final controller = WebViewController()
       ..setJavaScriptMode(JavaScriptMode.unrestricted)
       ..setBackgroundColor(DesignTokens.white)
+      // "Download PDF" and other blob downloads: see webview_download.dart.
+      ..addJavaScriptChannel(
+        webDownloadChannel,
+        onMessageReceived: (m) => _shareDownload(m.message),
+      )
       ..setNavigationDelegate(
         NavigationDelegate(
           // The WebView is meant to host ONLY the 3D Studio. Intercept a *hard*
@@ -237,7 +244,10 @@ class _StudioWebViewScreenState extends ConsumerState<StudioWebViewScreen> {
               _studioReady = true;
             }
             if (mounted && _loading) setState(() => _loading = false);
-            if (_studioReady) _pageChanged(url);
+            if (_studioReady) {
+              _controller?.runJavaScript(webDownloadHookJs).catchError((_) {});
+              _pageChanged(url);
+            }
           },
           onWebResourceError: (err) {
             // Ignore sub-resource errors and cancelled navigations; only
@@ -303,6 +313,31 @@ class _StudioWebViewScreenState extends ConsumerState<StudioWebViewScreen> {
       return parseCssRgb(result.toString());
     } catch (_) {
       return null;
+    }
+  }
+
+  /// Opens the share sheet for a file the page downloaded.
+  Future<void> _shareDownload(String message) async {
+    final download = parseWebDownload(message);
+    if (download == null || !mounted) return;
+    final box = context.findRenderObject() as RenderBox?;
+    final origin = box != null && box.hasSize
+        ? box.localToGlobal(Offset.zero) & box.size
+        : const Rect.fromLTWH(0, 0, 1, 1);
+    try {
+      await shareFileBytes(
+        download.bytes,
+        fileName: download.fileName,
+        mimeType: download.mimeType,
+        origin: origin,
+      );
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(AppLocalizations.of(context)!.estimatePdfFailed('$e')),
+        ),
+      );
     }
   }
 

@@ -94,6 +94,7 @@ tilda ochiladi va uni akkauntga saqlaydi.
 - "Orqaga" bosilganda ilova `window.__captureRoomThumbnail?.()` ni chaqiradi (xona rasmini saqlash) va 150 ms dan keyin yopiladi.
 - JS'dan ilovaga xabar kanali yo'q.
 - **Fayl yuklash (`<input type="file">`).** Studiyadagi rasm yuklashlar (rasmdan AI dizayn, pol teksturasi, mebel fotosi) iOS'da WKWebView'ning o'z oynasi orqali ishlaydi. Android WebView esa ilova javob bermaguncha bu tugmalarni e'tiborsiz qoldiradi. Shuning uchun Android'da `AndroidWebViewController.setOnShowFileSelector` ulangan (`screens/studio/webview_file_chooser.dart`): foydalanuvchi kamera yoki galereyani tanlaydi, `image_picker` rasmni 2048 px gacha kichraytirib, JPEG qilib beradi. Faqat rasm qabul qiladigan input'larga javob beriladi.
+- **Fayl yuklab olish (smeta "Download PDF").** Web fayl saqlash uchun `blob:` havolali `<a download>` ni bosadi; WKWebView ham, Android WebView ham buni o'zi bajarmaydi, tugma hech narsa qilmasdi. Studiya sahifasi yuklanganda `screens/studio/webview_download.dart` dagi JS `URL.createObjectURL` blob'larini eslab qoladi, shunday havola bosilganda faylni base64 qilib `AndozaDownload` kanaliga beradi; ilova uni vaqtinchalik faylga yozib, ulashish oynasini ochadi (`services/pdf_share_service.dart` → `shareFileBytes`). Fayl nomidan yo'l olib tashlanadi. Ikkilik fayllar uchun; mebel ekranidagi CSV ko'prigi (`mebel_bridge.dart`) alohida.
 
 ## Mebel ustaxonasi (WebView)
 
