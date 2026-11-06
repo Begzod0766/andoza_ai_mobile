@@ -2844,5 +2844,9 @@
   "scanReviewOpeningsEmpty": "Пока нет дверей и окон",
   "@scanReviewOpeningsEmpty": {
     "description": "Room-scan review: the doors/windows list is empty"
+  },
+  "roomThumbnailScanBadge": "СКАН",
+  "@roomThumbnailScanBadge": {
+    "description": "Small badge on a room card placeholder marking a scanned room"
   }
 }

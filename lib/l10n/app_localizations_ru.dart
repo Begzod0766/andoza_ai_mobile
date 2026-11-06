@@ -2927,4 +2927,7 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get scanReviewOpeningsEmpty => 'Пока нет дверей и окон';
+
+  @override
+  String get roomThumbnailScanBadge => 'СКАН';
 }

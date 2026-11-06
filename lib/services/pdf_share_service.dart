@@ -19,14 +19,32 @@ Future<String> sharePdfBytes(
   required String fileName,
   required Rect origin,
   String? shareText,
+}) {
+  final safeName = fileName.endsWith('.pdf') ? fileName : '$fileName.pdf';
+  return shareFileBytes(
+    bytes,
+    fileName: safeName,
+    mimeType: 'application/pdf',
+    origin: origin,
+    shareText: shareText,
+  );
+}
+
+/// Like [sharePdfBytes], for any file type (e.g. a file the Studio WebView
+/// downloads). [fileName] must be a bare name, without a path.
+Future<String> shareFileBytes(
+  List<int> bytes, {
+  required String fileName,
+  required String mimeType,
+  required Rect origin,
+  String? shareText,
 }) async {
   final dir = await getTemporaryDirectory();
-  final safeName = fileName.endsWith('.pdf') ? fileName : '$fileName.pdf';
-  final file = File('${dir.path}/$safeName');
+  final file = File('${dir.path}/$fileName');
   await file.writeAsBytes(bytes, flush: true);
 
   await Share.shareXFiles(
-    [XFile(file.path, mimeType: 'application/pdf')],
+    [XFile(file.path, mimeType: mimeType)],
     text: shareText,
     sharePositionOrigin: origin,
   );

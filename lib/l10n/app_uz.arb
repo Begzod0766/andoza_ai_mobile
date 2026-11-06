@@ -3194,5 +3194,9 @@
   "scanReviewOpeningsEmpty": "Hali eshik yoki deraza yo'q",
   "@scanReviewOpeningsEmpty": {
     "description": "Room-scan review: the doors/windows list is empty"
+  },
+  "roomThumbnailScanBadge": "SKAN",
+  "@roomThumbnailScanBadge": {
+    "description": "Small badge on a room card placeholder marking a scanned room"
   }
 }

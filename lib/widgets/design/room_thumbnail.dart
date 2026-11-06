@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../config/design_tokens.dart';
+import '../../l10n/app_localizations.dart';
 import '../common/app_image.dart';
 
 /// Project card thumbnail: shows a real screenshot of the room's 3D Studio
@@ -130,14 +131,14 @@ class _ScanBadge extends StatelessWidget {
         color: const Color(0x8C16232E),
         borderRadius: BorderRadius.circular(20),
       ),
-      child: const Row(
+      child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(Icons.crop_free, size: 10, color: Colors.white),
-          SizedBox(width: 4),
+          const Icon(Icons.crop_free, size: 10, color: Colors.white),
+          const SizedBox(width: 4),
           Text(
-            'SKAN',
-            style: TextStyle(
+            AppLocalizations.of(context)!.roomThumbnailScanBadge,
+            style: const TextStyle(
               fontSize: 9.5,
               fontWeight: FontWeight.w700,
               color: Colors.white,

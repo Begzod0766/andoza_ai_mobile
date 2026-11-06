@@ -5379,6 +5379,12 @@ abstract class AppLocalizations {
   /// In uz, this message translates to:
   /// **'Hali eshik yoki deraza yo\'q'**
   String get scanReviewOpeningsEmpty;
+
+  /// Small badge on a room card placeholder marking a scanned room
+  ///
+  /// In uz, this message translates to:
+  /// **'SKAN'**
+  String get roomThumbnailScanBadge;
 }
 
 class _AppLocalizationsDelegate
