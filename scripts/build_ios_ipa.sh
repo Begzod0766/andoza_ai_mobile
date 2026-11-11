@@ -15,6 +15,8 @@
 # Notifications enabled on the App ID uz.andozaai.app in the developer portal.
 #
 # Output: build/ios/ipa-appstore/*.ipa (upload with Transporter or Xcode).
+# UPLOAD=1 ./scripts/build_ios_ipa.sh also sends the build to App Store Connect
+# through the Xcode account (no password or API key needed here).
 set -euo pipefail
 
 TEAM=L797T8GBY4
@@ -93,3 +95,10 @@ for k in "aps-environment" "com.apple.developer.applesignin"; do
   echo "$ENT" | grep -q "$k" || { echo "IPA is missing $k" >&2; exit 1; }
 done
 echo "OK: $IPA"
+
+if [ "${UPLOAD:-0}" = "1" ]; then
+  sed 's|<string>export</string>|<string>upload</string>|' "$WORK/export.plist" > "$WORK/upload.plist"
+  xcodebuild -exportArchive -archivePath "$ARCHIVE" -exportPath "$WORK/upload" \
+    -exportOptionsPlist "$WORK/upload.plist" -allowProvisioningUpdates
+  echo "Uploaded; App Store Connect processes it for ~15-30 min before TestFlight shows it."
+fi

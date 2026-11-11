@@ -228,8 +228,8 @@ What to look for in `xcodebuild.log`:
   signs the archived app with the team's Apple Development certificate plus the
   entitlements, then exports with Xcode's cloud-managed Apple Distribution certificate
   (`-allowProvisioningUpdates`). It checks that the IPA carries `aps-environment` and
-  `applesignin`. Output: `build/ios/ipa-appstore/*.ipa`, uploaded with Transporter or
-  Xcode. Once a device is registered, Xcode → Product → Archive works too.
+  `applesignin`. Output: `build/ios/ipa-appstore/*.ipa`; `UPLOAD=1` also sends it to App Store
+  Connect through the Xcode account (first upload: build 31, 2026-11-11). Once a device is registered, Xcode → Product → Archive works too.
 - Still open: an APNs key uploaded to Firebase (push), and the backend's
   `APPLE_CLIENT_IDS` containing `uz.andozaai.app`.
 
