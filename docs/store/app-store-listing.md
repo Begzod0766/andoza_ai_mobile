@@ -61,10 +61,12 @@ category words are indexed anyway):
 
 ## Screenshots
 
-6.9" iPhone set, 1320 × 2868 px, from the iOS simulator (iPhone 17 Pro scaled to
-the 6.9" size; the aspect ratio differs by 0.07 %), Russian UI, status bar 9:41.
+App Store Connect (2026-11) asks for one iPhone set, "iPhone with Dynamic Island
+(medium display)": 1206 × 2622 (or 1179 × 2556) px. A 6.9" 1320 × 2868 set was
+rejected as "invalid size". Ours are iPhone 17 Pro simulator shots at native size,
+Russian UI, status bar 9:41.
 JPEG (App Store rejects PNGs with an alpha channel). Files in
-`docs/store/screenshots/ios-6.9/`, in upload order:
+`docs/store/screenshots/iphone-6.3/`, in upload order:
 
 1. `01-studio.jpg` — 3D Studio, the bathroom sample
 2. `02-estimate.jpg` — estimate with the cost breakdown
