@@ -110,3 +110,13 @@ exists — shop and craftsman profiles are moderated, with report/block per guid
 Age rating questionnaire (saved by the owner 2026-11-11): only *User-generated
 content* = Yes, everything else No/None; computed 4+, manually raised (option A)
 because `/privacy` says the service is not meant for people under 16.
+
+## Pricing and availability (set 2026-11-11)
+
+- Price: free ($0.00, base country USA), all 175 storefronts priced.
+- Availability: 148 countries/regions — everything except the 27 EU member states,
+  until the owner files the DSA trader-status declaration (then add the EU back in
+  Pricing and Availability → Availability → Manage).
+- Not offered on Apple silicon Macs or Apple Vision Pro (iPhone only; LiDAR scan
+  needs an iPhone).
+- Distribution: public App Store.
