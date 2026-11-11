@@ -52,7 +52,7 @@ yo'q. Shuning uchun haqiqiy qurilmada server manzili **HTTPS** bo'lishi kerak.
 | Kod paketi | `com.tamir_uy.tamir_uy_mobile_flutter` (namespace) | — |
 | Nomi | Andoza AI | Andoza AI |
 | Minimal versiya | Android 7.0 (SDK 24) | iOS 15.0 |
-| Imzolash | `android/key.properties` (yo'q bo'lsa debug kalit) | Apple team `24GC58FD74`; CI'da qo'lda imzolash (`ios/ExportOptions.plist`) |
+| Imzolash | `android/key.properties` (yo'q bo'lsa debug kalit) | Apple team `L797T8GBY4`; lokal IPA `scripts/build_ios_ipa.sh`, CI'da qo'lda imzolash (`ios/ExportOptions.plist`) |
 
 Android'da `andozaai://` deep link'lari yoqilgan. Impeller o'chirilgan:
 emulyatorlarda u ilovani yiqitardi.

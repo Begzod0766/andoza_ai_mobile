@@ -215,13 +215,23 @@ What to look for in `xcodebuild.log`:
   Google Sign-In iOS OAuth client ("iOS upload", `632412937266-nb16…`) now carries this
   bundle id, so its client id is unchanged. The old Firebase iOS app is still listed
   and unused.
-- **`Runner/Runner.entitlements` is not wired yet.** It holds Sign in with Apple and
-  `aps-environment` (push), which the free personal team `24GC58FD74` cannot sign. Once
-  the paid Apple Developer team signs the app: enable *Sign in with Apple* and *Push
-  Notifications* on the App ID, set `CODE_SIGN_ENTITLEMENTS = Runner/Runner.entitlements`
-  on the Runner target (all three configurations), upload an APNs key to Firebase, and
-  set the backend's `APPLE_CLIENT_IDS` to the bundle id. Until then the Apple button
-  shows on iOS but its sheet fails.
+- **Paid team `L797T8GBY4`** (Individual, enrolled 2026-11-11) signs the app; the free
+  personal team `24GC58FD74` is gone from the project. `CODE_SIGN_ENTITLEMENTS =
+  Runner/Runner.entitlements` is set on the Runner target (Debug/Profile/Release), and
+  the App ID `uz.andozaai.app` has *Sign In with Apple* and *Push Notifications*
+  enabled in the portal. The file says `aps-environment = development`; the App Store
+  export turns it into `production`. The Share Extension needs no entitlements (it
+  opens the app through the `andozaai-share` URL scheme, no App Group).
+- **Local App Store IPA without an iPhone: `scripts/build_ios_ipa.sh`.** Plain
+  `flutter build ipa` fails while the team has no registered device, because automatic
+  signing archives with a development profile first. The script archives unsigned,
+  signs the archived app with the team's Apple Development certificate plus the
+  entitlements, then exports with Xcode's cloud-managed Apple Distribution certificate
+  (`-allowProvisioningUpdates`). It checks that the IPA carries `aps-environment` and
+  `applesignin`. Output: `build/ios/ipa-appstore/*.ipa`; `UPLOAD=1` also sends it to App Store
+  Connect through the Xcode account (first upload: build 31, 2026-11-11). Once a device is registered, Xcode → Product → Archive works too.
+- Still open: an APNs key uploaded to Firebase (push), and the backend's
+  `APPLE_CLIENT_IDS` containing `uz.andozaai.app`.
 
 ---
 
