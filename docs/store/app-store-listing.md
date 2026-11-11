@@ -77,3 +77,31 @@ JPEG (App Store rejects PNGs with an alpha channel). Files in
 Taken from a debug build with `debugShowCheckedModeBanner: false` set locally (not
 committed). Seen while shooting: prices in the shop show `so'm` in the Russian UI,
 and product names / room names stay in Uzbek (user data).
+
+## App Privacy (draft from the code, 2026-11-11)
+
+Source: `andozaai.uz/privacy`, `pubspec.yaml`, `lib/services/analytics_service.dart`,
+`Info.plist`, the frameworks inside the IPA.
+
+**Tracking: No.** No ATT prompt, no `NSUserTrackingUsageDescription`; nothing reads
+the advertising identifier (no `ASIdentifierManager` / `ATTrackingManager` in the
+binaries), no ads SDK. Firebase Analytics runs without IDFA.
+
+Collected data, all **linked to the user**, none used for tracking:
+
+| Apple category | Type | Why (Apple purpose) |
+|---|---|---|
+| Contact Info | Name (optional), Phone Number, Email Address (Apple/Google sign-in), Physical Address (delivery) | App Functionality |
+| User Content | Photos or Videos (wallpaper, product, work photos, LiDAR scans), Other User Content (projects, rooms, messages to shops/craftsmen) | App Functionality |
+| Purchases | Purchase History (orders) | App Functionality |
+| Identifiers | User ID (internal account id, also set in Firebase), Device ID (Firebase instance id) | App Functionality, Analytics |
+| Usage Data | Product Interaction (screens opened) | Analytics |
+| Diagnostics | Crash Data, Other Diagnostic Data (device type, app version) | App Functionality, Analytics |
+
+Not collected: location (no GPS; the OpenStreetMap tile request exposes the IP to
+OSM, which Apple does not count as the developer collecting it), contacts, health,
+financial info (payment method is a choice only), browsing history, search history.
+
+Age rating: expect **4+** (no violence, no mature content; user-generated content
+exists — shop and craftsman profiles are moderated, with report/block per guideline
+1.2).
