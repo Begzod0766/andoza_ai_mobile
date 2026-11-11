@@ -78,7 +78,7 @@ Taken from a debug build with `debugShowCheckedModeBanner: false` set locally (n
 committed). Seen while shooting: prices in the shop show `so'm` in the Russian UI,
 and product names / room names stay in Uzbek (user data).
 
-## App Privacy (draft from the code, 2026-11-11)
+## App Privacy (entered in App Store Connect 2026-11-11, publish pending)
 
 Source: `andozaai.uz/privacy`, `pubspec.yaml`, `lib/services/analytics_service.dart`,
 `Info.plist`, the frameworks inside the IPA.
@@ -96,7 +96,8 @@ Collected data, all **linked to the user**, none used for tracking:
 | Purchases | Purchase History (orders) | App Functionality |
 | Identifiers | User ID (internal account id, also set in Firebase), Device ID (Firebase instance id) | App Functionality, Analytics |
 | Usage Data | Product Interaction (screens opened) | Analytics |
-| Diagnostics | Crash Data, Other Diagnostic Data (device type, app version) | App Functionality, Analytics |
+| Diagnostics | Crash Data (App Functionality), Other Diagnostic Data — device type, app version (App Functionality, Analytics) | |
+| Environment | Environment Scanning (LiDAR / RoomPlan room scans uploaded as room geometry) | App Functionality |
 
 Not collected: location (no GPS; the OpenStreetMap tile request exposes the IP to
 OSM, which Apple does not count as the developer collecting it), contacts, health,
@@ -105,3 +106,7 @@ financial info (payment method is a choice only), browsing history, search histo
 Age rating: expect **4+** (no violence, no mature content; user-generated content
 exists — shop and craftsman profiles are moderated, with report/block per guideline
 1.2).
+
+Age rating questionnaire (saved by the owner 2026-11-11): only *User-generated
+content* = Yes, everything else No/None; computed 4+, manually raised (option A)
+because `/privacy` says the service is not meant for people under 16.
