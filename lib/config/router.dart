@@ -308,11 +308,6 @@ final routerProvider = Provider<GoRouter>((ref) {
               child: const U1MastersIntroScreen(),
             ),
           ),
-          GoRoute(
-            path: '/masters/u4',
-            builder: (context, state) =>
-                U4ReviewRatingScreen(master: state.extra as MockMaster?),
-          ),
           // Profile Routes (E5-E6, E11 — E4 lives at the shell's /profile
           // root, no separate /profile/e4 alias needed)
           GoRoute(
@@ -399,6 +394,14 @@ final routerProvider = Provider<GoRouter>((ref) {
         path: '/masters/u3',
         parentNavigatorKey: _rootNavigatorKey,
         builder: (context, state) => const U3RequestBookingScreen(),
+      ),
+      // Root navigator, like U3 it is pushed from: inside the shell it landed
+      // under U3 and a tap on a list card did nothing.
+      GoRoute(
+        path: '/masters/u4',
+        parentNavigatorKey: _rootNavigatorKey,
+        builder: (context, state) =>
+            U4ReviewRatingScreen(master: state.extra as MockMaster?),
       ),
       GoRoute(
         path: '/masters/u5',

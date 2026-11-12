@@ -21,6 +21,9 @@ void main() {
     '/shop/s6',
     '/shop/s7',
     '/masters/u3',
+    // The profile is pushed from U3, which sits on the root navigator: a
+    // shell-navigator U4 landed underneath it and the tap did nothing.
+    '/masters/u4',
     '/masters/u5',
     '/setup/dimensions',
     '/setup/wall-measurements',
