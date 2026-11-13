@@ -11,7 +11,7 @@ is what the recording actually shows.
 ```
 Hello, thank you for the review. Answers to the six points:
 
-1. SCREEN RECORDING (physical iPhone): https://drive.google.com/file/d/11sPGWGcnR-uddY3e4KeP625_D_60K1eB/view?usp=sharing
+1. SCREEN RECORDING (physical iPhone): https://drive.google.com/file/d/1JSAUdHaqPKkuo6UFQSxBXiQyMrimb1Jl/view?usp=sharing
 It starts at app launch and shows:
 0:00 launch, language switch, sign-out
 0:24 creating a new account with Sign in with Apple
