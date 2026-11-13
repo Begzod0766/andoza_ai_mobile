@@ -21,6 +21,7 @@ It starts at app launch and shows:
 4:10 a craftsman profile, sending a project to the craftsman, reporting the craftsman, the craftsmen map, blocking the craftsman
 4:50 adding the project's materials to the cart, checkout, My orders
 5:35 Profile with the Delete account button, then sign-out
+5:44 deleting an account: Profile > Delete account > confirm; the account is deleted and the app returns to the sign-in screen
 
 2. PURPOSE AND AUDIENCE
 Andoza AI helps homeowners in Uzbekistan plan a renovation before spending money. The user enters room dimensions (or scans the room with LiDAR on supported iPhones), designs it in a 3D Studio (floor, walls, wallpaper, tiles, ceiling, doors, windows, lights, furniture, plumbing) and gets an itemised estimate of materials and labour, which can be saved as a PDF. Users can then buy materials from local shops and contact local craftsmen (electricians, plumbers, tilers and others). Shop owners and craftsmen can register to list products or services; their profiles are reviewed by our moderators before they are published. The app is free; there are no in-app purchases or paid features.
@@ -71,16 +72,24 @@ If a throw-away account is used for steps 2 and 10, sign up with it at step 2, r
 
 ## C. The recording as uploaded (2026-11-13)
 
-`andoza-ai-obzor-skaner.mp4`, 5:44, 880 × 1920, recorded on an iPhone in English. It is the
-owner's 4:50 walkthrough (recorded 2026-11-12) with the LiDAR part of `IMG_9562.MP4`
-(2026-10-31, an iPhone with LiDAR) cut in after the "New project" sheet at 0:47, where the
-walkthrough itself goes on with "Draw it yourself". Joined with ffmpeg; nothing else edited.
+`andoza-ai-obzor-final.mp4`, 5:52, 880 × 1920, 48 fps, recorded on an iPhone in English. Made
+with ffmpeg from three recordings, in this order:
+1. the owner's 4:50 walkthrough (recorded 2026-11-12);
+2. the LiDAR part of `IMG_9562.MP4` (2026-10-31, an iPhone with LiDAR), cut in after the
+   "New project" sheet at 0:47, where the walkthrough itself goes on with "Draw it yourself";
+3. `IMG_9981.MP4` (2026-11-13, 8 s) appended at 5:44: Profile > Delete account > confirm with a
+   throw-away account, "Your account was deleted", sign-in screen. The first 0.6 s (Control
+   Center starting the recording) is cut off.
+
+Personal data is blurred:
+- the Apple ID name and e-mail in the Sign in with Apple sheet: 0:23.4–0:29.6, lower half of the
+  frame;
+- the phone number typed into "Send your project": 4:17.5–4:21.0, the phone field and the
+  keyboard's number suggestion.
+
 Shared on Google Drive as "anyone with the link".
 
 Compared with section B:
 - shown: launch, account creation (Sign in with Apple), LiDAR scan, 3D Studio, render, shop,
-  product report, craftsman report and block, cart and checkout;
-- not shown: the estimate PDF, the plumbing panel, and **account deletion is not carried out**:
-  the Delete account button is visible at 5:35, then the user signs out;
-- personal data visible in the recording: an Apple ID e-mail (Sign in with Apple sheet, 0:24)
-  and a phone number typed into "Send your project" (4:15). The link is public.
+  product report, craftsman report and block, cart and checkout, account deletion;
+- not shown: the estimate PDF and the plumbing panel.
