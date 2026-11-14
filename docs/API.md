@@ -45,7 +45,7 @@ Hammasi `/api/v1` ga nisbatan. Har bir mavzu uchun bitta repository fayli (`lib/
 | Buyurtmalar | `GET/POST /orders` | `orders_repository.dart` |
 | Oboylar | `GET /wallpapers`; `POST /wallpapers` (multipart) | `wallpaper_repository.dart` |
 | Biznes: rollar | `GET /account/roles` | `business_repository.dart` |
-| Biznes: do'kon | `GET/POST/PATCH /seller/store`, `POST /seller/store/resubmit`; `GET/POST /seller/furniture`, `PATCH/DELETE /seller/furniture/{id}`; `GET /seller/inquiries`, `PATCH /seller/inquiries/{id}`; `GET /seller/orders`, `PATCH /seller/orders/{id}/status`; `GET /seller/stats` | `business_repository.dart` |
+| Biznes: do'kon | `GET/POST/PATCH /seller/store`, `POST /seller/store/resubmit`; `GET/POST /seller/furniture`, `PATCH/DELETE /seller/furniture/{id}`; `GET/POST /seller/wallpapers`, `PATCH/DELETE /seller/wallpapers/{id}`; `GET /seller/inquiries`, `PATCH /seller/inquiries/{id}`; `GET /seller/orders`, `PATCH /seller/orders/{id}/status`; `GET /seller/stats` | `business_repository.dart` |
 | Biznes: rasmdan model | `POST /models/from-photo`; `GET /jobs/{id}`; `GET /models/from-photo/glb` | `business_repository.dart` |
 | Biznes: usta | `GET/POST/PATCH /usta/profile`, `POST /usta/profile/resubmit`; `GET/POST /usta/portfolio`, `DELETE /usta/portfolio/{id}`; `GET /ustalar/{id}/portfolio`; `GET /usta/leads`, `PATCH /usta/leads/{id}`; `POST /leads` | `business_repository.dart` |
 | Shikoyat | `POST /reports` (`target_type`: `usta` / `product` / `seller` / `portfolio_item` / `wallpaper`, `target_id`, `reason`: `spam` / `inappropriate` / `fraud` / `other`, `details?`). Ustani bloklash faqat qurilmada (`blocked_ustalar`, SharedPreferences) | `features/moderation/report_repository.dart` |
@@ -83,6 +83,17 @@ biriktiradi.
 tanlanmasa, model hamma uslubga mos. `POST /seller/furniture` (multipart) ularni
 vergul bilan bitta `styles` maydonida oladi; `PATCH /seller/furniture/{id}`
 `styles: [...]` ro'yxatini oladi: `[]` tozalaydi, maydon yo'q bo'lsa o'zgarmaydi.
+
+**Do'kon oboylari** (`/seller/wallpapers`): `POST` (multipart: `file`, `name` 1–120,
+`price_uzs` > 0, `width_cm` 30–150, `total_length_m` 1–50) oboyni `pending` qilib
+yaratadi; admin tasdiqlagach Studio'da ko'rinadi. `PATCH` (multipart) faqat
+yuborilgan maydonlarni o'zgartiradi; rasm (`file`) faqat `pending`/`rejected`
+oboyda almashadi (`approved`da 409). `rejected` oboy tahrirlansa `pending` bo'ladi.
+`DELETE`: `pending`/`rejected` haqiqatan o'chadi; `approved` esa qoladi va
+`rejected` + `moderation_note="Do'kon olib tashladi"` bo'ladi (`ShopWallpaper.isRemovedByShop`);
+ilova uni "Qaytarish" bilan `PATCH` (o'sha nom) orqali `approved`ga qaytaradi.
+Xatolar: 409 (takror rasm), 429 (kutayotgan oboylar > 50), `detail` matni foydalanuvchiga
+ko'rsatiladi (`mapErrorWithServerDetail`).
 
 ## Yangi endpoint qo'shish
 

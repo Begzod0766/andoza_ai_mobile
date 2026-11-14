@@ -3946,6 +3946,126 @@ abstract class AppLocalizations {
   /// **'Narx ko\'rsatilmagan'**
   String get shopProductNoPrice;
 
+  /// Tab in the shop's products screen: furniture list
+  ///
+  /// In uz, this message translates to:
+  /// **'Mebel'**
+  String get wallpaperTabFurniture;
+
+  /// Tab in the shop's products screen: wallpapers list
+  ///
+  /// In uz, this message translates to:
+  /// **'Oboylar'**
+  String get wallpaperTabWallpapers;
+
+  /// Empty state of the wallpapers tab
+  ///
+  /// In uz, this message translates to:
+  /// **'Hali oboy yo\'q. Rasm olib, birinchi oboyni qo\'shing.'**
+  String get wallpapersEmpty;
+
+  /// Title of the add-wallpaper screen; also the link text in the add-product warning
+  ///
+  /// In uz, this message translates to:
+  /// **'Oboy qo\'shish'**
+  String get wallpaperAddTitle;
+
+  /// Title of the edit-wallpaper screen
+  ///
+  /// In uz, this message translates to:
+  /// **'Oboyni tahrirlash'**
+  String get wallpaperEditTitle;
+
+  /// Hint above the wallpaper photo picker
+  ///
+  /// In uz, this message translates to:
+  /// **'Oboyning naqshi aniq ko\'rinadigan, tekis rasm. Bu rasm Studio\'da devorga yopishtiriladi.'**
+  String get wallpaperPhotoHint;
+
+  /// Snackbar after a wallpaper is created (it starts pending)
+  ///
+  /// In uz, this message translates to:
+  /// **'Admin tasdiqlagach Studio\'da ko\'rinadi.'**
+  String get wallpaperSavedPending;
+
+  /// Snackbar after a wallpaper is edited
+  ///
+  /// In uz, this message translates to:
+  /// **'Saqlandi'**
+  String get wallpaperUpdated;
+
+  /// Field label: wallpaper roll width in cm
+  ///
+  /// In uz, this message translates to:
+  /// **'Eni (sm)'**
+  String get wallpaperWidth;
+
+  /// Field label: wallpaper roll length in metres
+  ///
+  /// In uz, this message translates to:
+  /// **'Rulon uzunligi (m)'**
+  String get wallpaperLength;
+
+  /// Validation: width outside 30-150 cm
+  ///
+  /// In uz, this message translates to:
+  /// **'Eni 30 dan 150 sm gacha bo\'lsin'**
+  String get wallpaperWidthInvalid;
+
+  /// Validation: length outside 1-50 m
+  ///
+  /// In uz, this message translates to:
+  /// **'Uzunlik 1 dan 50 m gacha bo\'lsin'**
+  String get wallpaperLengthInvalid;
+
+  /// Validation: price not above 0
+  ///
+  /// In uz, this message translates to:
+  /// **'Narx 0 dan katta bo\'lsin'**
+  String get wallpaperPriceInvalid;
+
+  /// Shown when no photo is chosen yet
+  ///
+  /// In uz, this message translates to:
+  /// **'Oboy rasmini tanlang'**
+  String get wallpaperNeedPhoto;
+
+  /// Label on a wallpaper the shop removed (hidden but kept)
+  ///
+  /// In uz, this message translates to:
+  /// **'Olib tashlangan'**
+  String get wallpaperRemoved;
+
+  /// Button to bring back a wallpaper the shop removed
+  ///
+  /// In uz, this message translates to:
+  /// **'Qaytarish'**
+  String get wallpaperRestore;
+
+  /// Delete confirmation; must not promise permanent deletion
+  ///
+  /// In uz, this message translates to:
+  /// **'Oboy Studio\'dan olib tashlansinmi?'**
+  String get wallpaperDeleteConfirm;
+
+  /// Hint in the add-product screen pointing to the wallpaper form
+  ///
+  /// In uz, this message translates to:
+  /// **'Oboy qo\'shmoqchimisiz?'**
+  String get wallpaperAddWarning;
+
+  /// Generic failure when saving a wallpaper
+  ///
+  /// In uz, this message translates to:
+  /// **'Oboyni saqlab bo\'lmadi. Qayta urinib ko\'ring.'**
+  String get wallpaperFailed;
+
+  /// Wallpaper roll size line on a tile
+  ///
+  /// In uz, this message translates to:
+  /// **'{width} sm × {length} m'**
+  String wallpaperSize(String width, String length);
+
   /// No description provided for @addProductTitle.
   ///
   /// In uz, this message translates to:

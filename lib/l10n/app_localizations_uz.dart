@@ -2144,6 +2144,72 @@ class AppLocalizationsUz extends AppLocalizations {
   String get shopProductNoPrice => 'Narx ko\'rsatilmagan';
 
   @override
+  String get wallpaperTabFurniture => 'Mebel';
+
+  @override
+  String get wallpaperTabWallpapers => 'Oboylar';
+
+  @override
+  String get wallpapersEmpty =>
+      'Hali oboy yo\'q. Rasm olib, birinchi oboyni qo\'shing.';
+
+  @override
+  String get wallpaperAddTitle => 'Oboy qo\'shish';
+
+  @override
+  String get wallpaperEditTitle => 'Oboyni tahrirlash';
+
+  @override
+  String get wallpaperPhotoHint =>
+      'Oboyning naqshi aniq ko\'rinadigan, tekis rasm. Bu rasm Studio\'da devorga yopishtiriladi.';
+
+  @override
+  String get wallpaperSavedPending =>
+      'Admin tasdiqlagach Studio\'da ko\'rinadi.';
+
+  @override
+  String get wallpaperUpdated => 'Saqlandi';
+
+  @override
+  String get wallpaperWidth => 'Eni (sm)';
+
+  @override
+  String get wallpaperLength => 'Rulon uzunligi (m)';
+
+  @override
+  String get wallpaperWidthInvalid => 'Eni 30 dan 150 sm gacha bo\'lsin';
+
+  @override
+  String get wallpaperLengthInvalid => 'Uzunlik 1 dan 50 m gacha bo\'lsin';
+
+  @override
+  String get wallpaperPriceInvalid => 'Narx 0 dan katta bo\'lsin';
+
+  @override
+  String get wallpaperNeedPhoto => 'Oboy rasmini tanlang';
+
+  @override
+  String get wallpaperRemoved => 'Olib tashlangan';
+
+  @override
+  String get wallpaperRestore => 'Qaytarish';
+
+  @override
+  String get wallpaperDeleteConfirm => 'Oboy Studio\'dan olib tashlansinmi?';
+
+  @override
+  String get wallpaperAddWarning => 'Oboy qo\'shmoqchimisiz?';
+
+  @override
+  String get wallpaperFailed =>
+      'Oboyni saqlab bo\'lmadi. Qayta urinib ko\'ring.';
+
+  @override
+  String wallpaperSize(String width, String length) {
+    return '$width sm × $length m';
+  }
+
+  @override
   String get addProductTitle => 'Yangi mahsulot';
 
   @override

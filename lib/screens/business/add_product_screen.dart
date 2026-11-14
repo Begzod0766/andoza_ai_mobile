@@ -272,6 +272,16 @@ class _AddProductScreenState extends ConsumerState<AddProductScreen> {
       body: ListView(
         padding: const EdgeInsets.all(DesignTokens.screenPaddingHorizontal),
         children: [
+          Row(children: [
+            Expanded(
+              child: Text(l10n.wallpaperAddWarning,
+                  style: DesignTokens.body2.copyWith(color: DesignTokens.textGray)),
+            ),
+            TextButton(
+              onPressed: busy ? null : () => context.push('/business/add-wallpaper'),
+              child: Text(l10n.wallpaperAddTitle),
+            ),
+          ]),
           Text(l10n.addProductPhotoHint, style: DesignTokens.body2.copyWith(color: DesignTokens.textGray)),
           const SizedBox(height: DesignTokens.spacingSm),
           AspectRatio(

@@ -64,7 +64,7 @@ dialoglari ko'rsatilmaydi (`homeTourRunningProvider`). Fayllar: `home_tour_store
 
 ## Ekranlar va navigatsiya
 
-`lib/config/router.dart` da 62 ta yo'l. Ilova `/splash` dan ochiladi.
+`lib/config/router.dart` da 63 ta yo'l. Ilova `/splash` dan ochiladi.
 **Login qilmagan foydalanuvchi** `/login` ga yo'naltiriladi. Login qilgan
 foydalanuvchi `/login` ga kirsa, bosh sahifaga qaytariladi. `/splash` va
 `/login` dan boshqa hamma yo'llar login talab qiladi.
@@ -86,7 +86,7 @@ menyu uni davom ettirishni taklif qiladi.
 | Ustalar | `/masters/u1`, `/u3`, `/u4`, `/u5` | Xarita, ro'yxat, profil, ustaga smeta yuborish |
 | Profil | `/profile`, `/profile/settings`, `/onboarding/e7`, `/onboarding/e8` | Til, versiya, maxfiylik, hisobni o'chirish |
 | Mebel ustaxonasi | `/mebel` | WebView, pastda batafsil |
-| Biznes (do'kon yoki usta egasi) | `/business` va `/business/*` | Murojaatlar, buyurtmalar, statistika, portfolio, mahsulotlar, ariza |
+| Biznes (do'kon yoki usta egasi) | `/business` va `/business/*` | Murojaatlar, buyurtmalar, statistika, portfolio, mahsulotlar (Mebel / Oboylar tablari; `/business/products/new`, `/business/add-wallpaper` — oboy qo'shish va tahrirlash, `ShopWallpaper` `extra` bilan), ariza |
 
 ## 3D studiya (WebView)
 

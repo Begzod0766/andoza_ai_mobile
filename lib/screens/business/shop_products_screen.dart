@@ -6,6 +6,7 @@ import '../../config/design_tokens.dart';
 import '../../l10n/app_localizations.dart';
 import '../../models/business_profile.dart';
 import '../../providers/business_provider.dart';
+import '../../utils/error_mapper.dart';
 import 'business_labels.dart';
 import '../../widgets/common/app_image.dart';
 import 'style_chips.dart';
@@ -13,12 +14,28 @@ import 'style_chips.dart';
 /// "Mahsulotlarim": the shop's own 3D models in every moderation status, with
 /// the few things an owner may change on a phone — name, price, hiding an
 /// approved model from the catalog, deleting. New ones are made from a photo (AddProductScreen).
-class ShopProductsScreen extends ConsumerWidget {
+class ShopProductsScreen extends ConsumerStatefulWidget {
   const ShopProductsScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<ShopProductsScreen> createState() => _ShopProductsScreenState();
+}
+
+class _ShopProductsScreenState extends ConsumerState<ShopProductsScreen>
+    with SingleTickerProviderStateMixin {
+  late final TabController _tabs = TabController(length: 2, vsync: this)
+    ..addListener(() => setState(() {}));
+
+  @override
+  void dispose() {
+    _tabs.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    final wallpapers = _tabs.index == 1;
     return Scaffold(
       backgroundColor: DesignTokens.backgroundLight,
       appBar: AppBar(
@@ -30,16 +47,36 @@ class ShopProductsScreen extends ConsumerWidget {
           onPressed: () => context.canPop() ? context.pop() : context.go('/business'),
         ),
         title: Text(l10n.shopProductsTitle, style: DesignTokens.heading3),
+        bottom: TabBar(controller: _tabs, tabs: [
+          Tab(text: l10n.wallpaperTabFurniture),
+          Tab(text: l10n.wallpaperTabWallpapers),
+        ]),
       ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () async {
-          await context.push('/business/products/new');
-          ref.invalidate(myProductsProvider);
+          if (wallpapers) {
+            await context.push('/business/add-wallpaper');
+            ref.invalidate(shopWallpapersProvider);
+          } else {
+            await context.push('/business/products/new');
+            ref.invalidate(myProductsProvider);
+          }
         },
-        icon: const Icon(Icons.add_a_photo_outlined),
-        label: Text(l10n.addProductTitle),
+        icon: Icon(wallpapers ? Icons.wallpaper_outlined : Icons.add_a_photo_outlined),
+        label: Text(wallpapers ? l10n.wallpaperAddTitle : l10n.addProductTitle),
       ),
-      body: RefreshIndicator(
+      body: TabBarView(controller: _tabs, children: const [_FurnitureList(), _WallpaperList()]),
+    );
+  }
+}
+
+class _FurnitureList extends ConsumerWidget {
+  const _FurnitureList();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context)!;
+    return RefreshIndicator(
         onRefresh: () async => ref.invalidate(myProductsProvider),
         child: ref.watch(myProductsProvider).when(
               loading: () => const Center(child: CircularProgressIndicator()),
@@ -65,10 +102,185 @@ class ShopProductsScreen extends ConsumerWidget {
                       itemBuilder: (_, i) => _ProductTile(product: items[i]),
                     ),
             ),
+    );
+  }
+}
+
+class _WallpaperList extends ConsumerWidget {
+  const _WallpaperList();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context)!;
+    return RefreshIndicator(
+      onRefresh: () async => ref.invalidate(shopWallpapersProvider),
+      child: ref.watch(shopWallpapersProvider).when(
+            loading: () => const Center(child: CircularProgressIndicator()),
+            error: (_, _) => ListView(children: [
+              Padding(
+                padding: const EdgeInsets.all(DesignTokens.spacingLg),
+                child: Text(l10n.businessLoadFailed, textAlign: TextAlign.center),
+              ),
+            ]),
+            data: (items) => items.isEmpty
+                ? ListView(children: [
+                    Padding(
+                      padding: const EdgeInsets.all(DesignTokens.spacingLg),
+                      child: Text(l10n.wallpapersEmpty,
+                          textAlign: TextAlign.center,
+                          style: DesignTokens.body2.copyWith(color: DesignTokens.textGray)),
+                    ),
+                  ])
+                : ListView.separated(
+                    padding: const EdgeInsets.all(DesignTokens.screenPaddingHorizontal),
+                    itemCount: items.length,
+                    separatorBuilder: (_, _) => const SizedBox(height: DesignTokens.spacingSm),
+                    itemBuilder: (_, i) => _WallpaperTile(wallpaper: items[i]),
+                  ),
+          ),
+    );
+  }
+}
+
+class _WallpaperTile extends ConsumerWidget {
+  const _WallpaperTile({required this.wallpaper});
+
+  final ShopWallpaper wallpaper;
+
+  Future<void> _run(BuildContext context, WidgetRef ref, Future<void> Function() action) async {
+    final messenger = ScaffoldMessenger.of(context);
+    try {
+      await action();
+      ref.invalidate(shopWallpapersProvider);
+    } catch (e) {
+      messenger.showSnackBar(SnackBar(content: Text(mapErrorWithServerDetail(e))));
+    }
+  }
+
+  Future<void> _delete(BuildContext context, WidgetRef ref) async {
+    final l10n = AppLocalizations.of(context)!;
+    final repo = ref.read(businessRepositoryProvider);
+    final ok = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        content: Text(l10n.wallpaperDeleteConfirm),
+        actions: [
+          TextButton(
+              onPressed: () => Navigator.of(ctx).pop(false), child: Text(l10n.shopProductCancel)),
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(true),
+            style: TextButton.styleFrom(foregroundColor: DesignTokens.errorRed),
+            child: Text(l10n.shopProductDelete),
+          ),
+        ],
+      ),
+    );
+    if (ok == true && context.mounted) {
+      await _run(context, ref, () => repo.deleteWallpaper(wallpaper.id));
+    }
+  }
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context)!;
+    final repo = ref.read(businessRepositoryProvider);
+    final removed = wallpaper.isRemovedByShop;
+    final status = switch (wallpaper.status) {
+      'approved' => ModerationStatus.approved,
+      'rejected' => ModerationStatus.rejected,
+      _ => ModerationStatus.pending,
+    };
+    final chipColor = switch (status) {
+      ModerationStatus.approved => DesignTokens.successGreen,
+      ModerationStatus.rejected => DesignTokens.errorRed,
+      ModerationStatus.pending => DesignTokens.accentOrange,
+    };
+    final details = [
+      if (wallpaper.priceUzs != null) _uzs(wallpaper.priceUzs!),
+      if (wallpaper.widthCm != null && wallpaper.totalLengthM != null)
+        l10n.wallpaperSize(_num(wallpaper.widthCm!), _num(wallpaper.totalLengthM!)),
+    ].join(' · ');
+    return Material(
+      color: DesignTokens.white,
+      borderRadius: BorderRadius.circular(DesignTokens.radiusMd),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(DesignTokens.radiusMd),
+        onTap: removed
+            ? null
+            : () => context
+                .push('/business/add-wallpaper', extra: wallpaper)
+                .then((_) => ref.invalidate(shopWallpapersProvider)),
+        child: Padding(
+          padding: const EdgeInsets.all(DesignTokens.spacingSm),
+          child: Row(
+            children: [
+              ClipRRect(
+                borderRadius: BorderRadius.circular(DesignTokens.radiusSm),
+                child: SizedBox(
+                  width: 56,
+                  height: 56,
+                  child: AppImage(
+                    url: wallpaper.url,
+                    width: 56,
+                    height: 56,
+                    placeholder: const ColoredBox(color: DesignTokens.backgroundLight),
+                    errorWidget: const ColoredBox(
+                      color: DesignTokens.backgroundLight,
+                      child: Icon(Icons.wallpaper_outlined, color: DesignTokens.textMuted),
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(width: DesignTokens.spacingSm),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(wallpaper.name,
+                        maxLines: 1, overflow: TextOverflow.ellipsis, style: DesignTokens.subtitle2),
+                    if (details.isNotEmpty) ...[
+                      const SizedBox(height: 2),
+                      Text(details, style: DesignTokens.body2.copyWith(color: DesignTokens.textGray)),
+                    ],
+                    const SizedBox(height: 4),
+                    if (removed)
+                      Text(l10n.wallpaperRemoved,
+                          style: DesignTokens.caption.copyWith(
+                              color: DesignTokens.textGray, fontWeight: FontWeight.w700))
+                    else ...[
+                      Text(statusLabel(l10n, status),
+                          style: DesignTokens.caption
+                              .copyWith(color: chipColor, fontWeight: FontWeight.w700)),
+                      if (status == ModerationStatus.rejected &&
+                          (wallpaper.moderationNote ?? '').isNotEmpty)
+                        Text(l10n.businessRejectedReason(wallpaper.moderationNote!),
+                            style: DesignTokens.caption.copyWith(color: DesignTokens.errorText)),
+                    ],
+                  ],
+                ),
+              ),
+              if (removed)
+                TextButton(
+                  // Same name: the backend puts a shop-removed row back to approved.
+                  onPressed: () => _run(context, ref,
+                      () => repo.updateWallpaper(wallpaper.id, name: wallpaper.name)),
+                  child: Text(l10n.wallpaperRestore),
+                )
+              else
+                IconButton(
+                  tooltip: l10n.shopProductDelete,
+                  icon: const Icon(Icons.delete_outline, color: DesignTokens.errorRed),
+                  onPressed: () => _delete(context, ref),
+                ),
+            ],
+          ),
+        ),
       ),
     );
   }
 }
+
+String _num(double v) => v == v.roundToDouble() ? v.round().toString() : v.toString();
 
 class _ProductTile extends ConsumerWidget {
   const _ProductTile({required this.product});

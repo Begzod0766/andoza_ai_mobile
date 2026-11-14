@@ -37,6 +37,7 @@ import '../screens/electrical/d8_electrical_summary_screen.dart';
 import '../screens/electrical/d9_cost_estimate_screen.dart';
 import '../screens/electrical/d10_final_confirmation_screen.dart';
 import '../models/api/api.dart' show Furniture;
+import '../models/business_profile.dart' show ShopWallpaper;
 import '../models/estimate_model.dart';
 import '../screens/estimation/e1_estimation_intro_screen.dart';
 import '../screens/estimation/e2_material_costs_screen.dart';
@@ -46,6 +47,7 @@ import '../providers/business_provider.dart' show BusinessKind;
 import '../screens/business/business_apply_screen.dart';
 import '../screens/business/business_screen.dart';
 import '../screens/business/add_product_screen.dart';
+import '../screens/business/add_wallpaper_screen.dart';
 import '../screens/business/edit_shop_screen.dart';
 import '../screens/business/edit_usta_screen.dart';
 import '../screens/business/shop_inquiries_screen.dart';
@@ -464,6 +466,11 @@ final routerProvider = Provider<GoRouter>((ref) {
         path: '/business/products/new',
         parentNavigatorKey: _rootNavigatorKey,
         builder: (context, state) => const AddProductScreen(),
+      ),
+      GoRoute(
+        path: '/business/add-wallpaper',
+        parentNavigatorKey: _rootNavigatorKey,
+        builder: (context, state) => AddWallpaperScreen(wallpaper: state.extra as ShopWallpaper?),
       ),
       GoRoute(
         path: '/business/apply/:kind',

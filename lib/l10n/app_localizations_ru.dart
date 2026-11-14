@@ -2152,6 +2152,72 @@ class AppLocalizationsRu extends AppLocalizations {
   String get shopProductNoPrice => 'Цена не указана';
 
   @override
+  String get wallpaperTabFurniture => 'Мебель';
+
+  @override
+  String get wallpaperTabWallpapers => 'Обои';
+
+  @override
+  String get wallpapersEmpty =>
+      'Обоев пока нет. Сфотографируйте и добавьте первые.';
+
+  @override
+  String get wallpaperAddTitle => 'Добавить обои';
+
+  @override
+  String get wallpaperEditTitle => 'Изменить обои';
+
+  @override
+  String get wallpaperPhotoHint =>
+      'Ровное фото обоев, на котором хорошо виден узор. Оно будет наклеено на стену в Студии.';
+
+  @override
+  String get wallpaperSavedPending =>
+      'Появится в Студии после одобрения администратором.';
+
+  @override
+  String get wallpaperUpdated => 'Сохранено';
+
+  @override
+  String get wallpaperWidth => 'Ширина (см)';
+
+  @override
+  String get wallpaperLength => 'Длина рулона (м)';
+
+  @override
+  String get wallpaperWidthInvalid => 'Ширина должна быть от 30 до 150 см';
+
+  @override
+  String get wallpaperLengthInvalid => 'Длина должна быть от 1 до 50 м';
+
+  @override
+  String get wallpaperPriceInvalid => 'Цена должна быть больше 0';
+
+  @override
+  String get wallpaperNeedPhoto => 'Выберите фото обоев';
+
+  @override
+  String get wallpaperRemoved => 'Удалено';
+
+  @override
+  String get wallpaperRestore => 'Вернуть';
+
+  @override
+  String get wallpaperDeleteConfirm => 'Убрать обои из Студии?';
+
+  @override
+  String get wallpaperAddWarning => 'Хотите добавить обои?';
+
+  @override
+  String get wallpaperFailed =>
+      'Не удалось сохранить обои. Попробуйте ещё раз.';
+
+  @override
+  String wallpaperSize(String width, String length) {
+    return '$width см × $length м';
+  }
+
+  @override
   String get addProductTitle => 'Новый товар';
 
   @override
