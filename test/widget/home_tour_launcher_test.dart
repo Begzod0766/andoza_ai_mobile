@@ -117,6 +117,19 @@ void main() {
     expect(await _done(), isFalse);
   });
 
+  testWidgets('(i) replay finished from "?" marks the tour done', (t) async {
+    await _pump(t, done: false, startupDialog: true);
+    await _settle(t, ms: 2000);
+    expect(await _done(), isFalse);
+    await t.tap(find.byIcon(Icons.help_outline));
+    await t.pump();
+    await _settle(t);
+    await t.tap(find.text(_l(t).tourSkip));
+    await _settle(t);
+    await t.runAsync(() => Future<void>.delayed(const Duration(milliseconds: 50)));
+    expect(await t.runAsync(_done), isTrue);
+  });
+
   testWidgets('(h) help button is shown once and replays', (t) async {
     await _pump(t, done: true);
     expect(find.byType(HomeTourHelpButton), findsOneWidget);

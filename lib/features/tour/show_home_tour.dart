@@ -88,7 +88,8 @@ Future<void> showHomeTour(
       return true;
     },
   );
-  tour.show(context: context);
+  // Root overlay: the nav-bar targets live outside the shell navigator.
+  tour.show(context: context, rootOverlay: true);
 }
 
 class _TourCard extends StatelessWidget {

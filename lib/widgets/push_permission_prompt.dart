@@ -39,6 +39,8 @@ class _PushPermissionPromptState extends ConsumerState<PushPermissionPrompt> {
     if (!await shouldAskForPush(prefs)) return;
     if (await permission.isGranted()) return;
     if (!mounted) return;
+    // Late checks must not open the dialog over the running home tour.
+    if (ref.read(homeTourRunningProvider)) return;
 
     ref.read(startupDialogShownProvider.notifier).state = true;
     final l10n = AppLocalizations.of(context)!;

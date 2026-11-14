@@ -61,6 +61,7 @@ class _AppShellState extends ConsumerState<AppShell> {
     final flat = await PendingScanStore.hasPendingFlat();
     if (!flat && !await PendingScanStore.hasPending()) return;
     if (!mounted) return;
+    if (ref.read(homeTourRunningProvider)) return;
     ref.read(startupDialogShownProvider.notifier).state = true;
     final l10n = AppLocalizations.of(context)!;
     final resume = await showDialog<bool>(

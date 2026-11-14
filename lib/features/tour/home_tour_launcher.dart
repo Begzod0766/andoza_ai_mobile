@@ -79,26 +79,30 @@ class _HomeTourLauncherState extends ConsumerState<HomeTourLauncher> {
     if (isHomeTourDone(prefs)) return;
     if (ref.read(startupDialogShownProvider)) return;
     if (!_homeIsCurrent() || !_targetsPresent()) return;
-    _start(prefs);
+    _start();
   }
 
   void _replay() {
     if (!mounted || _running) return;
     if (!_homeIsCurrent() || !_targetsPresent()) return;
-    _start(null);
+    _start();
   }
 
-  void _start(SharedPreferences? prefsToMark) {
+  void _start() {
     _running = true;
+    final running = ref.read(homeTourRunningProvider.notifier);
+    running.state = true;
     showHomeTour(
       context,
       ref.read(homeTourKeysProvider),
       hasProjects: widget.hasProjects,
-      onFinish: () {
+      onFinish: () async {
         _running = false;
-        // A replay must not rewrite the flag; first-open marks it.
-        final prefs = prefsToMark;
-        if (prefs != null) markHomeTourDone(prefs);
+        running.state = false;
+        // Finished or skipped, first open or replay: the tour counts as seen.
+        try {
+          await markHomeTourDone(await SharedPreferences.getInstance());
+        } catch (_) {}
       },
     );
   }
