@@ -14,6 +14,7 @@ import '../../providers/locale_provider.dart';
 import '../../services/pdf_share_service.dart';
 import '../../widgets/common/error_view.dart';
 import 'studio_session.dart';
+import 'studio_tour_bridge.dart';
 import 'webview_download.dart';
 import 'webview_file_chooser.dart';
 
@@ -144,6 +145,8 @@ class _StudioWebViewScreenState extends ConsumerState<StudioWebViewScreen> {
   // Whether the page shown is the 3D studio itself (`/studio/...`), not the
   // smeta (`/smeta/...`), whose title sits where the back button would.
   bool _onStudioPage = true;
+  // The web tour is open: its blur covers the page, so our Back hides too.
+  bool _tourOpen = false;
   // The colour of the strip under the page, matched to the page's bottom.
   Color _bottomColor = _studioFloorColor;
   // Counts [_pageChanged] calls, so a slow one (it waits for the page to draw)
@@ -181,6 +184,16 @@ class _StudioWebViewScreenState extends ConsumerState<StudioWebViewScreen> {
       ..addJavaScriptChannel(
         webDownloadChannel,
         onMessageReceived: (m) => _shareDownload(m.message),
+      )
+      // The Studio tour's open/closed state: see studio_tour_bridge.dart.
+      ..addJavaScriptChannel(
+        studioTourChannel,
+        onMessageReceived: (m) {
+          final open = studioTourOpenFromMessage(m.message);
+          if (open != null && open != _tourOpen && mounted) {
+            setState(() => _tourOpen = open);
+          }
+        },
       )
       ..setNavigationDelegate(
         NavigationDelegate(
@@ -299,6 +312,9 @@ class _StudioWebViewScreenState extends ConsumerState<StudioWebViewScreen> {
     setState(() {
       _onStudioPage = onStudio;
       _bottomColor = color;
+      // The tour lives on the 3D page only; elsewhere it cannot be open.
+      // (Not reset on the 3D page: its `open` can arrive before pageFinished.)
+      if (!onStudio) _tourOpen = false;
     });
   }
 
@@ -439,6 +455,12 @@ class _StudioWebViewScreenState extends ConsumerState<StudioWebViewScreen> {
   /// skip it entirely.
   void _onBackPressed() {
     if (_exiting) return;
+    // System Back while the tour is open ends the tour, like its Skip.
+    if (_tourOpen) {
+      _controller?.runJavaScript(studioTourSkipJs).catchError((_) {});
+      setState(() => _tourOpen = false);
+      return;
+    }
     _exiting = true;
     _captureThumbnail();
     // Fire-and-forget capture needs a brief head start before the WebView
@@ -488,7 +510,8 @@ class _StudioWebViewScreenState extends ConsumerState<StudioWebViewScreen> {
                     // 40 pt, so it clears the toolbar's 3D/Smeta switch.
                     // Not over the smeta page, whose title is there; its
                     // 3D/Smeta switch leads back, and system back works.
-                    if (_onStudioPage || _error != null)
+                    // Hidden while the web tour is open (it blurs the page).
+                    if ((_onStudioPage && !_tourOpen) || _error != null)
                       Positioned(
                         top: DesignTokens.spacingSm,
                         left: DesignTokens.spacingXs,
@@ -535,6 +558,7 @@ class _StudioWebViewScreenState extends ConsumerState<StudioWebViewScreen> {
       _seeded = false;
       _studioReady = false;
       _exiting = false;
+      _tourOpen = false;
       _controller = null;
     });
     _init();
