@@ -40,12 +40,22 @@ Ilovada 3D paket yo'q: 3D ish to'liq veb-studiyada bajariladi. Shrift — Inter 
 | `repositories/` | Backend bilan ishlash (12 ta): har bir mavzu uchun bitta fayl. Qarang: [API.md](API.md). |
 | `services/` | `api_client.dart`, `secure_storage.dart`, `sse_client.dart`, `room_plan_handoff.dart`, `pdf_share_service.dart`, `lidar_service.dart` (eski, ishlatilmaydi). |
 | `features/room_scan/` | LiDAR skaner: native ko'prik, ma'lumotni o'girish, tugallanmagan skanerni saqlash. |
+| `features/tour/` | Uy ekrani turi (qarang: pastda). |
 | `geometry/` | "Xonani chizish" uchun ko'pburchak geometriyasi. |
 | `models/` | Ma'lumot modellari (freezed/json). |
 | `l10n/` | Tarjima fayllari (`app_uz.arb`, `app_ru.arb`, `app_en.arb`) va generatsiya qilingan `AppLocalizations`. |
 | `utils/`, `widgets/` | Yordamchi funksiyalar va umumiy widget'lar. |
 
 Native kod: `ios/Runner/RoomScan/` (RoomPlan skaner, Swift), `android/` (Kotlin).
+
+**Uy ekrani turi** (`features/tour/`): tur birinchi ochilishda bir marta ko'rsatiladi
+(`shared_preferences`, bayroq `tour.home.v1.done`). Uy sahifasidagi "?" tugmasi,
+Profil → Yordam va bo'sh uy sahifasidagi hikoya doiralari turni qayta boshlaydi.
+Tur `tutorial_coach_mark` paketida quriladi; startup dialoglarini kutadi
+(`startupDialogShownProvider`), tur ishlayotganda push va skaner dialoglari
+ko'rsatilmaydi (`homeTourRunningProvider`). Fayllar: `home_tour_store.dart`,
+`home_tour_steps.dart`, `home_tour_keys.dart`, `show_home_tour.dart`,
+`home_tour_launcher.dart`, `home_tour_help_button.dart`, `startup_dialogs.dart`.
 
 ## Ekranlar va navigatsiya
 
