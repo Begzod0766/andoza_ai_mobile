@@ -48,12 +48,17 @@ Ilovada 3D paket yo'q: 3D ish to'liq veb-studiyada bajariladi. Shrift — Inter 
 
 Native kod: `ios/Runner/RoomScan/` (RoomPlan skaner, Swift), `android/` (Kotlin).
 
-**Uy ekrani turi** (`features/tour/`): tur birinchi ochilishda bir marta ko'rsatiladi
-(`shared_preferences`, bayroq `tour.home.v1.done`). Uy sahifasidagi "?" tugmasi,
-Profil → Yordam va bo'sh uy sahifasidagi hikoya doiralari turni qayta boshlaydi.
-Tur `tutorial_coach_mark` paketida quriladi; startup dialoglarini kutadi
-(`startupDialogShownProvider`), tur ishlayotganda push va skaner dialoglari
-ko'rsatilmaydi (`homeTourRunningProvider`). Fayllar: `home_tour_store.dart`,
+**Uy ekrani turi** (`features/tour/`): tur birinchi ochilishda avtomatik ishga tushadi
+(`shared_preferences`, bayroq `tour.home.v1.done`). Bayroq har qanday tugatish yoki
+o'tkazib yuborishda (avtomatik yoki qayta boshlangan tur) o'rnatiladi. Uy sahifasidagi
+"?" tugmasi, Profil → Yordam va bo'sh uy sahifasidagi "Demo guide" va "Demo" doiralari
+turni qayta boshlaydi ("How it works" esa `/onboarding/e7` ga o'tadi). Tur
+`tutorial_coach_mark` paketida quriladi. Avtomatik boshlash ~1,5 soniya kechikadi, shu
+vaqt ichida startup tekshiruvlari (push so'rovi, tugallanmagan skanerni davom ettirish,
+biznesga yo'naltirish) tugaydi. Agar bu oynalardan biri shu ilova ishga tushishida
+ko'rsatilgan bo'lsa (`startupDialogShownProvider`), tur shu safar avtomatik
+boshlanmaydi va keyingi ochilishda taklif qilinadi. Tur ishlayotganda push va skaner
+dialoglari ko'rsatilmaydi (`homeTourRunningProvider`). Fayllar: `home_tour_store.dart`,
 `home_tour_steps.dart`, `home_tour_keys.dart`, `show_home_tour.dart`,
 `home_tour_launcher.dart`, `home_tour_help_button.dart`, `startup_dialogs.dart`.
 
