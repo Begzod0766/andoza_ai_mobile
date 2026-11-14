@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../config/design_tokens.dart';
 import '../features/room_scan/pending_scan_store.dart';
+import '../features/tour/startup_dialogs.dart';
 import '../providers/business_provider.dart';
 import '../l10n/app_localizations.dart';
 import 'room_setup/new_project_sheet.dart';
@@ -46,6 +47,7 @@ class _AppShellState extends ConsumerState<AppShell> {
       final kind = ref.read(pendingBusinessSetupProvider);
       if (kind != null) {
         ref.read(pendingBusinessSetupProvider.notifier).state = null;
+        ref.read(startupDialogShownProvider.notifier).state = true;
         context.push(kind == BusinessKind.usta ? '/business/apply/usta' : '/business/apply/shop');
         return;
       }
@@ -57,6 +59,7 @@ class _AppShellState extends ConsumerState<AppShell> {
     final flat = await PendingScanStore.hasPendingFlat();
     if (!flat && !await PendingScanStore.hasPending()) return;
     if (!mounted) return;
+    ref.read(startupDialogShownProvider.notifier).state = true;
     final l10n = AppLocalizations.of(context)!;
     final resume = await showDialog<bool>(
       context: context,

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../features/tour/startup_dialogs.dart';
 import '../l10n/app_localizations.dart';
 import '../services/firebase_setup.dart';
 import '../services/push_permission.dart';
@@ -39,6 +40,7 @@ class _PushPermissionPromptState extends ConsumerState<PushPermissionPrompt> {
     if (await permission.isGranted()) return;
     if (!mounted) return;
 
+    ref.read(startupDialogShownProvider.notifier).state = true;
     final l10n = AppLocalizations.of(context)!;
     final yes = await showDialog<bool>(
       context: context,
