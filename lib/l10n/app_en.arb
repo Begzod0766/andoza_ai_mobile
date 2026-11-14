@@ -2881,7 +2881,7 @@
   "@homeTourShopBody": {
     "description": "Home tour: body of the Shop step card"
   },
-  "homeTourMastersTitle": "Pros",
+  "homeTourMastersTitle": "Masters",
   "@homeTourMastersTitle": {
     "description": "Home tour: title of the Masters step card"
   },

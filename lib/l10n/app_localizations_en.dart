@@ -2959,7 +2959,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get homeTourShopBody => 'Materials and furniture from stores';
 
   @override
-  String get homeTourMastersTitle => 'Pros';
+  String get homeTourMastersTitle => 'Masters';
 
   @override
   String get homeTourMastersBody =>
