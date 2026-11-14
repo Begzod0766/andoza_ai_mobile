@@ -90,6 +90,26 @@ void main() {
     expect(find.text(l.homeTourNewProjectTitle), findsNothing);
   });
 
+  testWidgets('system back closes the tour like Skip and does not leave the app', (t) async {
+    var done = 0;
+    await _start(t, onFinish: () => done++);
+    final l = AppLocalizations.of(t.element(find.byType(Scaffold).first))!;
+    final handled = await t.binding.handlePopRoute();
+    await _settle(t);
+    expect(handled, isTrue);
+    expect(done, 1);
+    expect(find.text(l.homeTourNewProjectTitle), findsNothing);
+  });
+
+  testWidgets('back after the tour ended is no longer intercepted', (t) async {
+    await _start(t, onFinish: () {});
+    final l = AppLocalizations.of(t.element(find.byType(Scaffold).first))!;
+    await t.tap(find.text(l.tourSkip));
+    await _settle(t);
+    // A second back must fall through to the app (nothing handles it here).
+    expect(await t.binding.handlePopRoute(), isFalse);
+  });
+
   testWidgets('finishing the last step calls onFinish once', (t) async {
     var done = 0;
     await _start(t, onFinish: () => done++);

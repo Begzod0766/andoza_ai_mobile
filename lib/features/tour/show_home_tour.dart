@@ -36,14 +36,25 @@ void showHomeTour(
     return;
   }
 
+  late final TutorialCoachMark tour;
+  // Android's system Back would otherwise reach the router, which has nothing
+  // to pop on Home, and close the app. While the tour shows, Back = Skip.
+  final back = _BackSkips(
+    // The overlay can vanish without onFinish (the app tree replaced, e.g.
+    // on logout); then Back must go back to the app.
+    isActive: () => tour.isShowing && tour.widgetKey.currentContext != null,
+    onBack: () => tour.skip(),
+  );
+  WidgetsBinding.instance.addObserver(back);
+
   var finished = false;
   void finishOnce() {
     if (finished) return;
     finished = true;
+    WidgetsBinding.instance.removeObserver(back);
     onFinish();
   }
 
-  late final TutorialCoachMark tour;
   final targets = <TargetFocus>[
     for (var i = 0; i < steps.length; i++)
       TargetFocus(
@@ -91,6 +102,22 @@ void showHomeTour(
   );
   // Root overlay: the nav-bar targets live outside the shell navigator.
   tour.show(context: context, rootOverlay: true);
+}
+
+class _BackSkips with WidgetsBindingObserver {
+  _BackSkips({required this.isActive, required this.onBack});
+  final bool Function() isActive;
+  final VoidCallback onBack;
+
+  @override
+  Future<bool> didPopRoute() async {
+    if (!isActive()) {
+      WidgetsBinding.instance.removeObserver(this);
+      return false;
+    }
+    onBack();
+    return true;
+  }
 }
 
 class _TourCard extends StatelessWidget {
