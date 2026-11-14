@@ -3198,5 +3198,81 @@
   "roomThumbnailScanBadge": "SKAN",
   "@roomThumbnailScanBadge": {
     "description": "Small badge on a room card placeholder marking a scanned room"
+  },
+  "homeTourNewProjectTitle": "Yangi loyiha",
+  "@homeTourNewProjectTitle": {
+    "description": "Home tour: title of the NewProject step card"
+  },
+  "homeTourNewProjectBody": "Xonani LiDAR bilan skanerlang yoki o'lchamini o'zingiz kiriting",
+  "@homeTourNewProjectBody": {
+    "description": "Home tour: body of the NewProject step card"
+  },
+  "homeTourResumeTitle": "Davom etish",
+  "@homeTourResumeTitle": {
+    "description": "Home tour: title of the Resume step card"
+  },
+  "homeTourResumeBody": "3D Studio'ni ochadi: pol, devor, mebel, santexnika va boshqalarni shu yerda tanlaysiz",
+  "@homeTourResumeBody": {
+    "description": "Home tour: body of the Resume step card"
+  },
+  "homeTourEstimateTitle": "Smeta",
+  "@homeTourEstimateTitle": {
+    "description": "Home tour: title of the Estimate step card"
+  },
+  "homeTourEstimateBody": "Ta'mir taxminan qanchaga tushishi. Batafsil smeta Studio'da",
+  "@homeTourEstimateBody": {
+    "description": "Home tour: body of the Estimate step card"
+  },
+  "homeTourShopTitle": "Do'kon",
+  "@homeTourShopTitle": {
+    "description": "Home tour: title of the Shop step card"
+  },
+  "homeTourShopBody": "Materiallar va mebel, do'konlardan",
+  "@homeTourShopBody": {
+    "description": "Home tour: body of the Shop step card"
+  },
+  "homeTourMastersTitle": "Ustalar",
+  "@homeTourMastersTitle": {
+    "description": "Home tour: title of the Masters step card"
+  },
+  "homeTourMastersBody": "Elektrik, santexnik, plitkachi va boshqa ustalar, xaritada va ro'yxatda",
+  "@homeTourMastersBody": {
+    "description": "Home tour: body of the Masters step card"
+  },
+  "homeTourHelpTitle": "Qo'llanma",
+  "@homeTourHelpTitle": {
+    "description": "Home tour: title of the Help step card"
+  },
+  "homeTourHelpBody": "Bu qo'llanmani istalgan payt shu yerdan qayta ko'ring",
+  "@homeTourHelpBody": {
+    "description": "Home tour: body of the Help step card"
+  },
+  "tourNext": "Keyingi",
+  "@tourNext": {
+    "description": "Tour card: advance button"
+  },
+  "tourSkip": "O'tkazib yuborish",
+  "@tourSkip": {
+    "description": "Tour card: skip button"
+  },
+  "tourDone": "Tushunarli",
+  "@tourDone": {
+    "description": "Tour card: final-step button"
+  },
+  "tourHelpTooltip": "Qo'llanma",
+  "@tourHelpTooltip": {
+    "description": "Tooltip of the home app-bar button that replays the tour"
+  },
+  "tourStepOf": "{current}/{total}",
+  "@tourStepOf": {
+    "description": "Tour card: step counter, e.g. 1/5",
+    "placeholders": {
+      "current": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
   }
 }

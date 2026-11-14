@@ -2930,4 +2930,61 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get roomThumbnailScanBadge => 'SCAN';
+
+  @override
+  String get homeTourNewProjectTitle => 'New project';
+
+  @override
+  String get homeTourNewProjectBody =>
+      'Scan the room with LiDAR or enter its size yourself';
+
+  @override
+  String get homeTourResumeTitle => 'Continue';
+
+  @override
+  String get homeTourResumeBody =>
+      'Opens 3D Studio: pick floor, walls, furniture, plumbing and more right there';
+
+  @override
+  String get homeTourEstimateTitle => 'Estimate';
+
+  @override
+  String get homeTourEstimateBody =>
+      'Roughly what the renovation will cost. The detailed estimate is in Studio';
+
+  @override
+  String get homeTourShopTitle => 'Shop';
+
+  @override
+  String get homeTourShopBody => 'Materials and furniture from stores';
+
+  @override
+  String get homeTourMastersTitle => 'Pros';
+
+  @override
+  String get homeTourMastersBody =>
+      'Electricians, plumbers, tilers and other pros, on the map and in a list';
+
+  @override
+  String get homeTourHelpTitle => 'Guide';
+
+  @override
+  String get homeTourHelpBody => 'Replay this guide any time from here';
+
+  @override
+  String get tourNext => 'Next';
+
+  @override
+  String get tourSkip => 'Skip';
+
+  @override
+  String get tourDone => 'Got it';
+
+  @override
+  String get tourHelpTooltip => 'Guide';
+
+  @override
+  String tourStepOf(int current, int total) {
+    return '$current/$total';
+  }
 }

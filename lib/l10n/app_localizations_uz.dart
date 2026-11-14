@@ -2928,4 +2928,62 @@ class AppLocalizationsUz extends AppLocalizations {
 
   @override
   String get roomThumbnailScanBadge => 'SKAN';
+
+  @override
+  String get homeTourNewProjectTitle => 'Yangi loyiha';
+
+  @override
+  String get homeTourNewProjectBody =>
+      'Xonani LiDAR bilan skanerlang yoki o\'lchamini o\'zingiz kiriting';
+
+  @override
+  String get homeTourResumeTitle => 'Davom etish';
+
+  @override
+  String get homeTourResumeBody =>
+      '3D Studio\'ni ochadi: pol, devor, mebel, santexnika va boshqalarni shu yerda tanlaysiz';
+
+  @override
+  String get homeTourEstimateTitle => 'Smeta';
+
+  @override
+  String get homeTourEstimateBody =>
+      'Ta\'mir taxminan qanchaga tushishi. Batafsil smeta Studio\'da';
+
+  @override
+  String get homeTourShopTitle => 'Do\'kon';
+
+  @override
+  String get homeTourShopBody => 'Materiallar va mebel, do\'konlardan';
+
+  @override
+  String get homeTourMastersTitle => 'Ustalar';
+
+  @override
+  String get homeTourMastersBody =>
+      'Elektrik, santexnik, plitkachi va boshqa ustalar, xaritada va ro\'yxatda';
+
+  @override
+  String get homeTourHelpTitle => 'Qo\'llanma';
+
+  @override
+  String get homeTourHelpBody =>
+      'Bu qo\'llanmani istalgan payt shu yerdan qayta ko\'ring';
+
+  @override
+  String get tourNext => 'Keyingi';
+
+  @override
+  String get tourSkip => 'O\'tkazib yuborish';
+
+  @override
+  String get tourDone => 'Tushunarli';
+
+  @override
+  String get tourHelpTooltip => 'Qo\'llanma';
+
+  @override
+  String tourStepOf(int current, int total) {
+    return '$current/$total';
+  }
 }

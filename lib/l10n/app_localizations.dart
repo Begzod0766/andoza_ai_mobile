@@ -5385,6 +5385,108 @@ abstract class AppLocalizations {
   /// In uz, this message translates to:
   /// **'SKAN'**
   String get roomThumbnailScanBadge;
+
+  /// Home tour: title of the NewProject step card
+  ///
+  /// In uz, this message translates to:
+  /// **'Yangi loyiha'**
+  String get homeTourNewProjectTitle;
+
+  /// Home tour: body of the NewProject step card
+  ///
+  /// In uz, this message translates to:
+  /// **'Xonani LiDAR bilan skanerlang yoki o\'lchamini o\'zingiz kiriting'**
+  String get homeTourNewProjectBody;
+
+  /// Home tour: title of the Resume step card
+  ///
+  /// In uz, this message translates to:
+  /// **'Davom etish'**
+  String get homeTourResumeTitle;
+
+  /// Home tour: body of the Resume step card
+  ///
+  /// In uz, this message translates to:
+  /// **'3D Studio\'ni ochadi: pol, devor, mebel, santexnika va boshqalarni shu yerda tanlaysiz'**
+  String get homeTourResumeBody;
+
+  /// Home tour: title of the Estimate step card
+  ///
+  /// In uz, this message translates to:
+  /// **'Smeta'**
+  String get homeTourEstimateTitle;
+
+  /// Home tour: body of the Estimate step card
+  ///
+  /// In uz, this message translates to:
+  /// **'Ta\'mir taxminan qanchaga tushishi. Batafsil smeta Studio\'da'**
+  String get homeTourEstimateBody;
+
+  /// Home tour: title of the Shop step card
+  ///
+  /// In uz, this message translates to:
+  /// **'Do\'kon'**
+  String get homeTourShopTitle;
+
+  /// Home tour: body of the Shop step card
+  ///
+  /// In uz, this message translates to:
+  /// **'Materiallar va mebel, do\'konlardan'**
+  String get homeTourShopBody;
+
+  /// Home tour: title of the Masters step card
+  ///
+  /// In uz, this message translates to:
+  /// **'Ustalar'**
+  String get homeTourMastersTitle;
+
+  /// Home tour: body of the Masters step card
+  ///
+  /// In uz, this message translates to:
+  /// **'Elektrik, santexnik, plitkachi va boshqa ustalar, xaritada va ro\'yxatda'**
+  String get homeTourMastersBody;
+
+  /// Home tour: title of the Help step card
+  ///
+  /// In uz, this message translates to:
+  /// **'Qo\'llanma'**
+  String get homeTourHelpTitle;
+
+  /// Home tour: body of the Help step card
+  ///
+  /// In uz, this message translates to:
+  /// **'Bu qo\'llanmani istalgan payt shu yerdan qayta ko\'ring'**
+  String get homeTourHelpBody;
+
+  /// Tour card: advance button
+  ///
+  /// In uz, this message translates to:
+  /// **'Keyingi'**
+  String get tourNext;
+
+  /// Tour card: skip button
+  ///
+  /// In uz, this message translates to:
+  /// **'O\'tkazib yuborish'**
+  String get tourSkip;
+
+  /// Tour card: final-step button
+  ///
+  /// In uz, this message translates to:
+  /// **'Tushunarli'**
+  String get tourDone;
+
+  /// Tooltip of the home app-bar button that replays the tour
+  ///
+  /// In uz, this message translates to:
+  /// **'Qo\'llanma'**
+  String get tourHelpTooltip;
+
+  /// Tour card: step counter, e.g. 1/5
+  ///
+  /// In uz, this message translates to:
+  /// **'{current}/{total}'**
+  String tourStepOf(int current, int total);
 }
 
 class _AppLocalizationsDelegate

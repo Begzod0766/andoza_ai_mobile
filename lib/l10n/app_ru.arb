@@ -2848,5 +2848,81 @@
   "roomThumbnailScanBadge": "СКАН",
   "@roomThumbnailScanBadge": {
     "description": "Small badge on a room card placeholder marking a scanned room"
+  },
+  "homeTourNewProjectTitle": "Новый проект",
+  "@homeTourNewProjectTitle": {
+    "description": "Home tour: title of the NewProject step card"
+  },
+  "homeTourNewProjectBody": "Отсканируйте комнату с помощью LiDAR или введите размеры вручную",
+  "@homeTourNewProjectBody": {
+    "description": "Home tour: body of the NewProject step card"
+  },
+  "homeTourResumeTitle": "Продолжить",
+  "@homeTourResumeTitle": {
+    "description": "Home tour: title of the Resume step card"
+  },
+  "homeTourResumeBody": "Открывает 3D Studio: здесь вы выбираете пол, стены, мебель, сантехнику и многое другое",
+  "@homeTourResumeBody": {
+    "description": "Home tour: body of the Resume step card"
+  },
+  "homeTourEstimateTitle": "Смета",
+  "@homeTourEstimateTitle": {
+    "description": "Home tour: title of the Estimate step card"
+  },
+  "homeTourEstimateBody": "Примерная стоимость ремонта. Подробная смета в Studio",
+  "@homeTourEstimateBody": {
+    "description": "Home tour: body of the Estimate step card"
+  },
+  "homeTourShopTitle": "Магазин",
+  "@homeTourShopTitle": {
+    "description": "Home tour: title of the Shop step card"
+  },
+  "homeTourShopBody": "Материалы и мебель из магазинов",
+  "@homeTourShopBody": {
+    "description": "Home tour: body of the Shop step card"
+  },
+  "homeTourMastersTitle": "Мастера",
+  "@homeTourMastersTitle": {
+    "description": "Home tour: title of the Masters step card"
+  },
+  "homeTourMastersBody": "Электрики, сантехники, плиточники и другие мастера, на карте и в списке",
+  "@homeTourMastersBody": {
+    "description": "Home tour: body of the Masters step card"
+  },
+  "homeTourHelpTitle": "Руководство",
+  "@homeTourHelpTitle": {
+    "description": "Home tour: title of the Help step card"
+  },
+  "homeTourHelpBody": "Пересматривайте это руководство в любое время здесь",
+  "@homeTourHelpBody": {
+    "description": "Home tour: body of the Help step card"
+  },
+  "tourNext": "Далее",
+  "@tourNext": {
+    "description": "Tour card: advance button"
+  },
+  "tourSkip": "Пропустить",
+  "@tourSkip": {
+    "description": "Tour card: skip button"
+  },
+  "tourDone": "Понятно",
+  "@tourDone": {
+    "description": "Tour card: final-step button"
+  },
+  "tourHelpTooltip": "Руководство",
+  "@tourHelpTooltip": {
+    "description": "Tooltip of the home app-bar button that replays the tour"
+  },
+  "tourStepOf": "{current}/{total}",
+  "@tourStepOf": {
+    "description": "Tour card: step counter, e.g. 1/5",
+    "placeholders": {
+      "current": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
   }
 }

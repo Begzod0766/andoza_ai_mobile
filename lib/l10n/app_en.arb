@@ -2848,5 +2848,81 @@
   "roomThumbnailScanBadge": "SCAN",
   "@roomThumbnailScanBadge": {
     "description": "Small badge on a room card placeholder marking a scanned room"
+  },
+  "homeTourNewProjectTitle": "New project",
+  "@homeTourNewProjectTitle": {
+    "description": "Home tour: title of the NewProject step card"
+  },
+  "homeTourNewProjectBody": "Scan the room with LiDAR or enter its size yourself",
+  "@homeTourNewProjectBody": {
+    "description": "Home tour: body of the NewProject step card"
+  },
+  "homeTourResumeTitle": "Continue",
+  "@homeTourResumeTitle": {
+    "description": "Home tour: title of the Resume step card"
+  },
+  "homeTourResumeBody": "Opens 3D Studio: pick floor, walls, furniture, plumbing and more right there",
+  "@homeTourResumeBody": {
+    "description": "Home tour: body of the Resume step card"
+  },
+  "homeTourEstimateTitle": "Estimate",
+  "@homeTourEstimateTitle": {
+    "description": "Home tour: title of the Estimate step card"
+  },
+  "homeTourEstimateBody": "Roughly what the renovation will cost. The detailed estimate is in Studio",
+  "@homeTourEstimateBody": {
+    "description": "Home tour: body of the Estimate step card"
+  },
+  "homeTourShopTitle": "Shop",
+  "@homeTourShopTitle": {
+    "description": "Home tour: title of the Shop step card"
+  },
+  "homeTourShopBody": "Materials and furniture from stores",
+  "@homeTourShopBody": {
+    "description": "Home tour: body of the Shop step card"
+  },
+  "homeTourMastersTitle": "Pros",
+  "@homeTourMastersTitle": {
+    "description": "Home tour: title of the Masters step card"
+  },
+  "homeTourMastersBody": "Electricians, plumbers, tilers and other pros, on the map and in a list",
+  "@homeTourMastersBody": {
+    "description": "Home tour: body of the Masters step card"
+  },
+  "homeTourHelpTitle": "Guide",
+  "@homeTourHelpTitle": {
+    "description": "Home tour: title of the Help step card"
+  },
+  "homeTourHelpBody": "Replay this guide any time from here",
+  "@homeTourHelpBody": {
+    "description": "Home tour: body of the Help step card"
+  },
+  "tourNext": "Next",
+  "@tourNext": {
+    "description": "Tour card: advance button"
+  },
+  "tourSkip": "Skip",
+  "@tourSkip": {
+    "description": "Tour card: skip button"
+  },
+  "tourDone": "Got it",
+  "@tourDone": {
+    "description": "Tour card: final-step button"
+  },
+  "tourHelpTooltip": "Guide",
+  "@tourHelpTooltip": {
+    "description": "Tooltip of the home app-bar button that replays the tour"
+  },
+  "tourStepOf": "{current}/{total}",
+  "@tourStepOf": {
+    "description": "Tour card: step counter, e.g. 1/5",
+    "placeholders": {
+      "current": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
   }
 }
