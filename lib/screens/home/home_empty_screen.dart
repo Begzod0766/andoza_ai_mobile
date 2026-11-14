@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../config/design_tokens.dart';
 import '../../features/tour/home_tour_help_button.dart';
+import '../../features/tour/home_tour_launcher.dart';
 import '../../l10n/app_localizations.dart';
 import '../../widgets/empty_state_pattern.dart';
 import '../room_setup/new_project_sheet.dart';
@@ -147,11 +149,11 @@ class _ConicRingPainter extends CustomPainter {
 /// Empty-state body content (A1), shared between the standalone
 /// [HomeEmptyScreen] route and [HomeWithProjectsScreen] (which supplies its
 /// own AppBar/nav and swaps this in when the project list is empty).
-class HomeEmptyBody extends StatelessWidget {
+class HomeEmptyBody extends ConsumerWidget {
   const HomeEmptyBody({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context)!;
     return SafeArea(
       child: SingleChildScrollView(
@@ -183,7 +185,7 @@ class HomeEmptyBody extends StatelessWidget {
                     icon: Icons.play_circle_outline,
                     label: l10n.homeStoryDemoGuide,
                     seen: true,
-                    onTap: () => context.push('/onboarding/e8'),
+                    onTap: () => ref.read(homeTourRequestProvider.notifier).state++,
                   ),
                 ),
                 Expanded(
@@ -191,7 +193,7 @@ class HomeEmptyBody extends StatelessWidget {
                     icon: Icons.auto_awesome,
                     label: l10n.homeStoryDemo,
                     seen: false,
-                    onTap: () => context.push('/onboarding/e8'),
+                    onTap: () => ref.read(homeTourRequestProvider.notifier).state++,
                   ),
                 ),
               ],

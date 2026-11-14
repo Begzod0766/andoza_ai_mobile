@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import '../../utils/phone.dart';
 import '../../config/design_tokens.dart';
 import '../../l10n/app_localizations.dart';
+import '../../features/tour/home_tour_launcher.dart';
 import '../../providers/auth_provider.dart';
 import '../../providers/business_provider.dart';
 import '../../providers/estimate_provider.dart';
@@ -165,7 +166,14 @@ class E4ProfileSettingsScreen extends ConsumerWidget {
           _MenuTile(
             icon: Icons.help_outline,
             label: l10n.profileMenuHelp,
-            onTap: () => context.push('/onboarding/e8'),
+            onTap: () {
+              context.go('/');
+              // The home screen mounts on the next frame and its launcher
+              // only reacts to changes after mounting, so bump the request
+              // once the route has been built.
+              final tour = ref.read(homeTourRequestProvider.notifier);
+              WidgetsBinding.instance.addPostFrameCallback((_) => tour.state++);
+            },
           ),
           const SizedBox(height: DesignTokens.spacingSm),
           _MenuTile(
