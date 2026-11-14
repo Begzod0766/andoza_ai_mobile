@@ -54,8 +54,8 @@ Future<void> showHomeTour(
         enableTargetTab: true,
         contents: [
           TargetContent(
-            // Nav-bar targets sit at the bottom: the card goes above them.
-            align: (steps[i] == HomeTourTarget.shop || steps[i] == HomeTourTarget.masters)
+            // Targets in the lower half of the screen get the card above.
+            align: _inLowerHalf(keys.of(steps[i]))
                 ? ContentAlign.top
                 : ContentAlign.bottom,
             builder: (ctx, controller) {
@@ -144,4 +144,13 @@ class _TourCard extends StatelessWidget {
       ),
     );
   }
+}
+
+bool _inLowerHalf(GlobalKey key) {
+  final ro = key.currentContext?.findRenderObject();
+  if (ro is! RenderBox || !ro.attached || !ro.hasSize) return false;
+  final centre = ro.localToGlobal(ro.size.center(Offset.zero));
+  final view = View.of(key.currentContext!);
+  final screenHeight = view.physicalSize.height / view.devicePixelRatio;
+  return centre.dy > screenHeight / 2;
 }

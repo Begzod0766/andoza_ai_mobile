@@ -106,4 +106,41 @@ void main() {
     await _start(t, locale: const Locale('ru'), onFinish: () {});
     expect(find.text('Новый проект'), findsOneWidget);
   });
+
+  testWidgets('card for a target at the screen bottom stays on screen', (t) async {
+    final keys = HomeTourKeys();
+    await t.pumpWidget(MaterialApp(
+      localizationsDelegates: AppLocalizations.localizationsDelegates,
+      supportedLocales: AppLocalizations.supportedLocales,
+      locale: const Locale('uz'),
+      home: Builder(
+        builder: (ctx) => Scaffold(
+          body: Stack(children: [
+            Center(
+              child: TextButton(
+                onPressed: () => showHomeTour(ctx, keys, hasProjects: false, onFinish: () {}),
+                child: const Text('go'),
+              ),
+            ),
+            Align(
+              alignment: Alignment.bottomCenter,
+              child: SizedBox(key: keys.of(HomeTourTarget.newProject), width: 60, height: 60),
+            ),
+            Align(
+              alignment: Alignment.topRight,
+              child: SizedBox(key: keys.of(HomeTourTarget.help), width: 40, height: 40),
+            ),
+          ]),
+        ),
+      ),
+    ));
+    await t.tap(find.text('go'));
+    await t.pump();
+    await _settle(t);
+    final l = AppLocalizations.of(t.element(find.byType(Scaffold).first))!;
+    final title = find.text(l.homeTourNewProjectTitle);
+    expect(title, findsOneWidget);
+    expect(t.getBottomLeft(title).dy, lessThanOrEqualTo(t.view.physicalSize.height / t.view.devicePixelRatio));
+    expect(t.getBottomLeft(find.text(l.tourNext)).dy, lessThan(t.getTopLeft(find.byKey(keys.of(HomeTourTarget.newProject))).dy));
+  });
 }
