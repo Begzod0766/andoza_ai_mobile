@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../../config/design_tokens.dart';
+import '../../features/tour/home_tour_help_button.dart';
 import '../../l10n/app_localizations.dart';
 import '../../widgets/empty_state_pattern.dart';
 import '../room_setup/new_project_sheet.dart';
@@ -163,6 +164,7 @@ class HomeEmptyBody extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            const Align(alignment: Alignment.centerRight, child: HomeTourHelpButton()),
             // Three story-circle onboarding shortcuts.
             // Top-aligned so a one-line label doesn't drop its circle lower.
             Row(
