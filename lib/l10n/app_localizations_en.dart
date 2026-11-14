@@ -2147,6 +2147,72 @@ class AppLocalizationsEn extends AppLocalizations {
   String get shopProductNoPrice => 'No price set';
 
   @override
+  String get wallpaperTabFurniture => 'Furniture';
+
+  @override
+  String get wallpaperTabWallpapers => 'Wallpapers';
+
+  @override
+  String get wallpapersEmpty =>
+      'No wallpapers yet. Take a photo and add your first one.';
+
+  @override
+  String get wallpaperAddTitle => 'Add wallpaper';
+
+  @override
+  String get wallpaperEditTitle => 'Edit wallpaper';
+
+  @override
+  String get wallpaperPhotoHint =>
+      'A flat photo where the wallpaper pattern is clearly visible. It is applied to the wall in the Studio.';
+
+  @override
+  String get wallpaperSavedPending =>
+      'It will appear in the Studio once an admin approves it.';
+
+  @override
+  String get wallpaperUpdated => 'Saved';
+
+  @override
+  String get wallpaperWidth => 'Width (cm)';
+
+  @override
+  String get wallpaperLength => 'Roll length (m)';
+
+  @override
+  String get wallpaperWidthInvalid => 'Width must be 30 to 150 cm';
+
+  @override
+  String get wallpaperLengthInvalid => 'Length must be 1 to 50 m';
+
+  @override
+  String get wallpaperPriceInvalid => 'Price must be greater than 0';
+
+  @override
+  String get wallpaperNeedPhoto => 'Choose a wallpaper photo';
+
+  @override
+  String get wallpaperRemoved => 'Removed';
+
+  @override
+  String get wallpaperRestore => 'Restore';
+
+  @override
+  String get wallpaperDeleteConfirm => 'Remove this wallpaper from the Studio?';
+
+  @override
+  String get wallpaperAddWarning => 'Want to add wallpaper?';
+
+  @override
+  String get wallpaperFailed =>
+      'Could not save the wallpaper. Please try again.';
+
+  @override
+  String wallpaperSize(String width, String length) {
+    return '$width cm × $length m';
+  }
+
+  @override
   String get addProductTitle => 'New product';
 
   @override

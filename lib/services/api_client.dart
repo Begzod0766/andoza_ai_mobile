@@ -320,11 +320,12 @@ class ApiClient {
   }
 
   /// Like [uploadFile] but for several files in one `multipart/form-data`
-  /// request; each entry is `(fieldName, bytes, filename, contentType)`.
+  /// request (POST unless [method] says otherwise, e.g. PATCH); each entry is `(fieldName, bytes, filename, contentType)`.
   Future<T> uploadFiles<T>(
     String path, {
     required List<(String, List<int>, String, String)> files,
     Map<String, String> fields = const {},
+    String method = 'POST',
     required T Function(dynamic) fromJson,
   }) async {
     try {
@@ -333,10 +334,10 @@ class ApiClient {
         for (final f in files)
           f.$1: MultipartFile.fromBytes(f.$2, filename: f.$3, contentType: DioMediaType.parse(f.$4)),
       });
-      final response = await _dio.post<dynamic>(
+      final response = await _dio.request<dynamic>(
         path,
         data: formData,
-        options: Options(contentType: 'multipart/form-data'),
+        options: Options(method: method, contentType: 'multipart/form-data'),
       );
       return fromJson(response.data);
     } on DioException catch (e) {

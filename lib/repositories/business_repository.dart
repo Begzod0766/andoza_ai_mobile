@@ -161,6 +161,65 @@ class BusinessRepository {
 
   Future<void> deleteProduct(String id) => _client.delete('/seller/furniture/$id');
 
+  // --- Shop wallpapers -----------------------------------------------------
+
+  Future<List<ShopWallpaper>> fetchWallpapers() => _client.get<List<ShopWallpaper>>(
+        '/seller/wallpapers',
+        fromJson: (j) => [
+          for (final i in j as List<dynamic>) ShopWallpaper.fromJson(i as Map<String, dynamic>),
+        ],
+      );
+
+  Future<ShopWallpaper> addWallpaper({
+    required List<int> bytes,
+    required String filename,
+    required String contentType,
+    required String name,
+    required int priceUzs,
+    required double widthCm,
+    required double totalLengthM,
+  }) =>
+      _client.uploadFiles<ShopWallpaper>(
+        '/seller/wallpapers',
+        files: [('file', bytes, filename, contentType)],
+        fields: {
+          'name': name,
+          'price_uzs': priceUzs.toString(),
+          'width_cm': widthCm.toString(),
+          'total_length_m': totalLengthM.toString(),
+        },
+        fromJson: (j) => ShopWallpaper.fromJson(j as Map<String, dynamic>),
+      );
+
+  /// Changes only what is passed; the image is replaced only when [bytes] is
+  /// given (the server refuses that on an approved wallpaper).
+  Future<ShopWallpaper> updateWallpaper(
+    String id, {
+    List<int>? bytes,
+    String? filename,
+    String? contentType,
+    String? name,
+    int? priceUzs,
+    double? widthCm,
+    double? totalLengthM,
+  }) =>
+      _client.uploadFiles<ShopWallpaper>(
+        '/seller/wallpapers/$id',
+        method: 'PATCH',
+        files: [
+          if (bytes != null) ('file', bytes, filename ?? 'wallpaper.jpg', contentType ?? 'image/jpeg'),
+        ],
+        fields: {
+          'name': ?name,
+          'price_uzs': ?priceUzs?.toString(),
+          'width_cm': ?widthCm?.toString(),
+          'total_length_m': ?totalLengthM?.toString(),
+        },
+        fromJson: (j) => ShopWallpaper.fromJson(j as Map<String, dynamic>),
+      );
+
+  Future<void> deleteWallpaper(String id) => _client.delete('/seller/wallpapers/$id');
+
   // --- Usta ---------------------------------------------------------------
 
   Future<UstaProfile?> fetchUsta() => _client.get<UstaProfile?>(

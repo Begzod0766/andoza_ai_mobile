@@ -201,6 +201,51 @@ class ShopProduct {
       );
 }
 
+/// A wallpaper (oboy) a shop added to the Studio library (`/seller/wallpapers`).
+class ShopWallpaper {
+  const ShopWallpaper({
+    required this.id,
+    required this.name,
+    required this.url,
+    required this.status,
+    required this.createdAt,
+    this.priceUzs,
+    this.widthCm,
+    this.totalLengthM,
+    this.moderationNote,
+  });
+
+  /// The note the backend sets when the shop removes an approved wallpaper:
+  /// the row stays (old rooms keep their price) as `rejected`.
+  static const removedByShopNote = "Do'kon olib tashladi";
+
+  final String id;
+  final String name;
+  final String url;
+  final int? priceUzs;
+  final double? widthCm;
+  final double? totalLengthM;
+
+  /// `pending`, `approved` or `rejected`.
+  final String status;
+  final String? moderationNote;
+  final DateTime createdAt;
+
+  bool get isRemovedByShop => status == 'rejected' && moderationNote == removedByShopNote;
+
+  factory ShopWallpaper.fromJson(Map<String, dynamic> json) => ShopWallpaper(
+        id: json['id'] as String,
+        name: json['name'] as String,
+        url: json['url'] as String,
+        priceUzs: (json['price_uzs'] as num?)?.toInt(),
+        widthCm: (json['width_cm'] as num?)?.toDouble(),
+        totalLengthM: (json['total_length_m'] as num?)?.toDouble(),
+        status: json['status'] as String,
+        moderationNote: json['moderation_note'] as String?,
+        createdAt: DateTime.parse(json['created_at'] as String),
+      );
+}
+
 /// The furniture styles the API accepts, in its own order
 /// (`FURNITURE_STYLES` in the backend's `app/schemas/admin_catalog.py`).
 const furnitureStyles = [
