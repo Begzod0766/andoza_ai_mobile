@@ -57,6 +57,7 @@ Future<void> _start(WidgetTester t, {Locale locale = const Locale('uz'), VoidCal
 }
 
 void main() {
+  _offscreenTests();
   testWidgets('shows only rendered steps, Next advances', (t) async {
     var done = 0;
     await _start(t, onFinish: () => done++);
@@ -142,5 +143,47 @@ void main() {
     expect(title, findsOneWidget);
     expect(t.getBottomLeft(title).dy, lessThanOrEqualTo(t.view.physicalSize.height / t.view.devicePixelRatio));
     expect(t.getBottomLeft(find.text(l.tourNext)).dy, lessThan(t.getTopLeft(find.byKey(keys.of(HomeTourTarget.newProject))).dy));
+  });
+}
+
+void _offscreenTests() {
+  Future<void> pumpTall(WidgetTester t, HomeTourKeys keys, {required bool resumeBelowFold}) async {
+    t.view.physicalSize = const Size(874, 402);
+    t.view.devicePixelRatio = 1;
+    addTearDown(t.view.reset);
+    await t.pumpWidget(MaterialApp(
+      localizationsDelegates: AppLocalizations.localizationsDelegates,
+      supportedLocales: AppLocalizations.supportedLocales,
+      locale: const Locale('uz'),
+      home: Builder(
+        builder: (ctx) => Scaffold(
+          body: SingleChildScrollView(
+            child: Column(children: [
+              SizedBox(key: keys.of(HomeTourTarget.newProject), width: 120, height: 60),
+              SizedBox(height: resumeBelowFold ? 600 : 100),
+              SizedBox(key: keys.of(HomeTourTarget.resume), width: 120, height: 60),
+              TextButton(
+                onPressed: () => showHomeTour(ctx, keys, hasProjects: true, onFinish: () {}),
+                child: const Text('go'),
+              ),
+            ]),
+          ),
+        ),
+      ),
+    ));
+  }
+
+  testWidgets('target below the fold is skipped on a short landscape screen', (t) async {
+    final keys = HomeTourKeys();
+    await pumpTall(t, keys, resumeBelowFold: true);
+    final steps = presentTargets(homeTourSteps(hasProjects: true), keys);
+    expect(steps, [HomeTourTarget.newProject]);
+  });
+
+  testWidgets('fully visible target is kept on a short screen', (t) async {
+    final keys = HomeTourKeys();
+    await pumpTall(t, keys, resumeBelowFold: false);
+    final steps = presentTargets(homeTourSteps(hasProjects: true), keys);
+    expect(steps, [HomeTourTarget.newProject, HomeTourTarget.resume]);
   });
 }

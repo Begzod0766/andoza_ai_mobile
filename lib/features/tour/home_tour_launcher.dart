@@ -92,19 +92,24 @@ class _HomeTourLauncherState extends ConsumerState<HomeTourLauncher> {
     _running = true;
     final running = ref.read(homeTourRunningProvider.notifier);
     running.state = true;
-    showHomeTour(
-      context,
-      ref.read(homeTourKeysProvider),
-      hasProjects: widget.hasProjects,
-      onFinish: () async {
-        _running = false;
-        running.state = false;
-        // Finished or skipped, first open or replay: the tour counts as seen.
-        try {
-          await markHomeTourDone(await SharedPreferences.getInstance());
-        } catch (_) {}
-      },
-    );
+    try {
+      showHomeTour(
+        context,
+        ref.read(homeTourKeysProvider),
+        hasProjects: widget.hasProjects,
+        onFinish: () async {
+          _running = false;
+          running.state = false;
+          // Finished or skipped, first open or replay: the tour counts as seen.
+          try {
+            await markHomeTourDone(await SharedPreferences.getInstance());
+          } catch (_) {}
+        },
+      );
+    } catch (_) {
+      _running = false;
+      running.state = false;
+    }
   }
 
   @override

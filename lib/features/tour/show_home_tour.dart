@@ -18,16 +18,17 @@ import 'home_tour_steps.dart';
     };
 
 /// Shows the blurred coach-mark tour over the visible targets. [onFinish] runs
-/// exactly once, whether the tour is completed or skipped.
+/// exactly once, whether the tour is completed or skipped. Returns right after
+/// the overlay is shown, not when the tour ends; use [onFinish] for that.
 ///
 /// The package's overlay sits above the app and absorbs taps, so tapping the
 /// highlighted target advances the tour and never reaches the widget below.
-Future<void> showHomeTour(
+void showHomeTour(
   BuildContext context,
   HomeTourKeys keys, {
   required bool hasProjects,
   required VoidCallback onFinish,
-}) async {
+}) {
   final l = AppLocalizations.of(context)!;
   final steps = presentTargets(homeTourSteps(hasProjects: hasProjects), keys);
   if (steps.isEmpty) {

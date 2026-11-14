@@ -146,9 +146,8 @@ class _ConicRingPainter extends CustomPainter {
       oldDelegate.progress != progress;
 }
 
-/// Empty-state body content (A1), shared between the standalone
-/// [HomeEmptyScreen] route and [HomeWithProjectsScreen] (which supplies its
-/// own AppBar/nav and swaps this in when the project list is empty).
+/// Empty-state body content (A1), used by [HomeWithProjectsScreen], which
+/// supplies its own AppBar/nav and swaps this in when the project list is empty.
 class HomeEmptyBody extends ConsumerWidget {
   const HomeEmptyBody({super.key});
 
