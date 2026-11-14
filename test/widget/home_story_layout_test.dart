@@ -23,9 +23,13 @@ Future<void> _pump(WidgetTester tester, double scale) async {
 void main() {
   testWidgets('the three story circles line up', (tester) async {
     await _pump(tester, 1.0);
-    final tops = [Icons.help_outline, Icons.play_circle_outline, Icons.auto_awesome]
-        .map((i) => tester.getRect(find.byIcon(i)).top)
-        .toSet();
+    // The tour's "?" button shares Icons.help_outline and comes first in the
+    // tree; the story circle is the last match.
+    final tops = [
+      find.byIcon(Icons.help_outline).last,
+      find.byIcon(Icons.play_circle_outline),
+      find.byIcon(Icons.auto_awesome),
+    ].map((f) => tester.getRect(f).top).toSet();
     expect(tops, hasLength(1));
   });
 

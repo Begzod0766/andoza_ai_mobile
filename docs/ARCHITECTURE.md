@@ -40,12 +40,27 @@ Ilovada 3D paket yo'q: 3D ish to'liq veb-studiyada bajariladi. Shrift — Inter 
 | `repositories/` | Backend bilan ishlash (12 ta): har bir mavzu uchun bitta fayl. Qarang: [API.md](API.md). |
 | `services/` | `api_client.dart`, `secure_storage.dart`, `sse_client.dart`, `room_plan_handoff.dart`, `pdf_share_service.dart`, `lidar_service.dart` (eski, ishlatilmaydi). |
 | `features/room_scan/` | LiDAR skaner: native ko'prik, ma'lumotni o'girish, tugallanmagan skanerni saqlash. |
+| `features/tour/` | Uy ekrani turi (qarang: pastda). |
 | `geometry/` | "Xonani chizish" uchun ko'pburchak geometriyasi. |
 | `models/` | Ma'lumot modellari (freezed/json). |
 | `l10n/` | Tarjima fayllari (`app_uz.arb`, `app_ru.arb`, `app_en.arb`) va generatsiya qilingan `AppLocalizations`. |
 | `utils/`, `widgets/` | Yordamchi funksiyalar va umumiy widget'lar. |
 
 Native kod: `ios/Runner/RoomScan/` (RoomPlan skaner, Swift), `android/` (Kotlin).
+
+**Uy ekrani turi** (`features/tour/`): tur birinchi ochilishda avtomatik ishga tushadi
+(`shared_preferences`, bayroq `tour.home.v1.done`). Bayroq har qanday tugatish yoki
+o'tkazib yuborishda (avtomatik yoki qayta boshlangan tur) o'rnatiladi. Uy sahifasidagi
+"?" tugmasi, Profil → Yordam va bo'sh uy sahifasidagi "Demo guide" va "Demo" doiralari
+turni qayta boshlaydi ("How it works" esa `/onboarding/e7` ga o'tadi). Tur
+`tutorial_coach_mark` paketida quriladi. Avtomatik boshlash ~1,5 soniya kechikadi, shu
+vaqt ichida startup tekshiruvlari (push so'rovi, tugallanmagan skanerni davom ettirish,
+biznesga yo'naltirish) tugaydi. Agar bu oynalardan biri shu ilova ishga tushishida
+ko'rsatilgan bo'lsa (`startupDialogShownProvider`), tur shu safar avtomatik
+boshlanmaydi va keyingi ochilishda taklif qilinadi. Tur ishlayotganda push va skaner
+dialoglari ko'rsatilmaydi (`homeTourRunningProvider`). Fayllar: `home_tour_store.dart`,
+`home_tour_steps.dart`, `home_tour_keys.dart`, `show_home_tour.dart`,
+`home_tour_launcher.dart`, `home_tour_help_button.dart`, `startup_dialogs.dart`.
 
 ## Ekranlar va navigatsiya
 

@@ -2,6 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../projects/project_menu.dart';
+import '../../features/tour/home_tour_help_button.dart';
+import '../../features/tour/home_tour_keys.dart';
+import '../../features/tour/home_tour_launcher.dart';
+import '../../features/tour/home_tour_steps.dart';
 import '../../config/design_tokens.dart';
 import '../../l10n/app_localizations.dart';
 import '../../models/design_selection_model.dart';
@@ -49,19 +53,25 @@ class HomeWithProjectsScreen extends ConsumerWidget {
         // Pull down to pick up projects made elsewhere (web, another phone).
         Future<void> refresh() => ref.refresh(apartmentsProvider.future);
         if (projects.isEmpty) {
-          return RefreshIndicator(onRefresh: refresh, child: const HomeEmptyBody());
+          return HomeTourLauncher(
+            hasProjects: false,
+            child: RefreshIndicator(onRefresh: refresh, child: const HomeEmptyBody()),
+          );
         }
 
-        return SafeArea(
-          child: RefreshIndicator(
-            onRefresh: refresh,
-            child: SingleChildScrollView(
-              physics: const AlwaysScrollableScrollPhysics(),
-              padding: const EdgeInsets.symmetric(
-                horizontal: DesignTokens.screenPaddingHorizontal,
-                vertical: DesignTokens.spacingLg,
+        return HomeTourLauncher(
+          hasProjects: true,
+          child: SafeArea(
+            child: RefreshIndicator(
+              onRefresh: refresh,
+              child: SingleChildScrollView(
+                physics: const AlwaysScrollableScrollPhysics(),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: DesignTokens.screenPaddingHorizontal,
+                  vertical: DesignTokens.spacingLg,
+                ),
+                child: _ProjectList(projects: projects),
               ),
-              child: _ProjectList(projects: projects),
             ),
           ),
         );
@@ -247,11 +257,13 @@ class _ProjectListState extends State<_ProjectList> {
               selected: _filter == _ProjectFilter.finished,
               onTap: () => _setFilter(_ProjectFilter.finished),
             ),
+            const Spacer(),
+            const HomeTourHelpButton(),
           ],
         ),
         const SizedBox(height: DesignTokens.spacingMd),
-        for (final project in visible) ...[
-          _ProjectCard(project: project, active: true),
+        for (final (i, project) in visible.indexed) ...[
+          _ProjectCard(project: project, active: true, first: i == 0),
           const SizedBox(height: DesignTokens.spacingMd),
         ],
         if (hasMore)
@@ -317,7 +329,7 @@ class _FilterChip extends StatelessWidget {
 }
 
 class _ProjectCard extends ConsumerWidget {
-  const _ProjectCard({required this.project, required this.active});
+  const _ProjectCard({required this.project, required this.active, this.first = false});
 
   final ProjectItem project;
 
@@ -325,6 +337,9 @@ class _ProjectCard extends ConsumerWidget {
   /// fetch (see [_EstimateChip]) so only the visible card triggers a network
   /// call, not every project up front.
   final bool active;
+
+  /// First card on screen: carries the home tour's resume/estimate keys.
+  final bool first;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -437,7 +452,11 @@ class _ProjectCard extends ConsumerWidget {
               ),
               const SizedBox(width: DesignTokens.spacingSm),
               Expanded(
-                child: _EstimateChip(project: project, active: active),
+                child: _EstimateChip(
+                  key: first ? ref.read(homeTourKeysProvider).of(HomeTourTarget.estimate) : null,
+                  project: project,
+                  active: active,
+                ),
               ),
             ],
           ),
@@ -497,6 +516,7 @@ class _ProjectCard extends ConsumerWidget {
           SizedBox(
             width: double.infinity,
             child: ElevatedButton(
+              key: first ? ref.read(homeTourKeysProvider).of(HomeTourTarget.resume) : null,
               // "Davom etish" continues the project in the 3D Studio: open the
               // studio for this apartment's most-recently-edited room. Falls
               // back to the native design flow if the project has no rooms yet.
@@ -572,7 +592,7 @@ class _StatChip extends StatelessWidget {
 /// estimate_api_provider.dart). Non-active cards, and projects with no room
 /// yet, just show a dash.
 class _EstimateChip extends ConsumerWidget {
-  const _EstimateChip({required this.project, required this.active});
+  const _EstimateChip({super.key, required this.project, required this.active});
 
   final ProjectItem project;
   final bool active;

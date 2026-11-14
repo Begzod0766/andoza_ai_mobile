@@ -3,6 +3,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../config/design_tokens.dart';
 import '../features/room_scan/pending_scan_store.dart';
+import '../features/tour/home_tour_keys.dart';
+import '../features/tour/home_tour_steps.dart';
+import '../features/tour/startup_dialogs.dart';
 import '../providers/business_provider.dart';
 import '../l10n/app_localizations.dart';
 import 'room_setup/new_project_sheet.dart';
@@ -46,6 +49,7 @@ class _AppShellState extends ConsumerState<AppShell> {
       final kind = ref.read(pendingBusinessSetupProvider);
       if (kind != null) {
         ref.read(pendingBusinessSetupProvider.notifier).state = null;
+        ref.read(startupDialogShownProvider.notifier).state = true;
         context.push(kind == BusinessKind.usta ? '/business/apply/usta' : '/business/apply/shop');
         return;
       }
@@ -57,6 +61,8 @@ class _AppShellState extends ConsumerState<AppShell> {
     final flat = await PendingScanStore.hasPendingFlat();
     if (!flat && !await PendingScanStore.hasPending()) return;
     if (!mounted) return;
+    if (ref.read(homeTourRunningProvider)) return;
+    ref.read(startupDialogShownProvider.notifier).state = true;
     final l10n = AppLocalizations.of(context)!;
     final resume = await showDialog<bool>(
       context: context,
@@ -108,15 +114,19 @@ class _AppShellState extends ConsumerState<AppShell> {
 
     return Scaffold(
       body: widget.child,
-      bottomNavigationBar: _BottomNavWithFab(location: location),
+      bottomNavigationBar: _BottomNavWithFab(
+        location: location,
+        tourKeys: ref.watch(homeTourKeysProvider),
+      ),
     );
   }
 }
 
 class _BottomNavWithFab extends StatelessWidget {
-  const _BottomNavWithFab({required this.location});
+  const _BottomNavWithFab({required this.location, required this.tourKeys});
 
   final String location;
+  final HomeTourKeys tourKeys;
 
   static const _tabs = [
     _NavTab(
@@ -186,7 +196,13 @@ class _BottomNavWithFab extends StatelessWidget {
   Widget _navItem(BuildContext context, _NavTab tab) {
     final l10n = AppLocalizations.of(context)!;
     final isCurrent = _isCurrent(tab);
+    final tourKey = switch (tab.route) {
+      '/shop/s1' => tourKeys.of(HomeTourTarget.shop),
+      '/masters/u1' => tourKeys.of(HomeTourTarget.masters),
+      _ => null,
+    };
     return Semantics(
+      key: tourKey,
       button: true,
       selected: isCurrent,
       // The tab's one accessible name; the visible text below is excluded
@@ -237,6 +253,7 @@ class _BottomNavWithFab extends StatelessWidget {
 
   Widget _fabItem(BuildContext context) {
     return Semantics(
+      key: tourKeys.of(HomeTourTarget.newProject),
       button: true,
       label: AppLocalizations.of(context)!.navAddProject,
       child: InkWell(

@@ -2930,4 +2930,62 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get roomThumbnailScanBadge => 'СКАН';
+
+  @override
+  String get homeTourNewProjectTitle => 'Новый проект';
+
+  @override
+  String get homeTourNewProjectBody =>
+      'Отсканируйте комнату с помощью LiDAR или введите размеры вручную';
+
+  @override
+  String get homeTourResumeTitle => 'Продолжить';
+
+  @override
+  String get homeTourResumeBody =>
+      'Открывает 3D Studio: здесь вы выбираете пол, стены, мебель, сантехнику и многое другое';
+
+  @override
+  String get homeTourEstimateTitle => 'Смета';
+
+  @override
+  String get homeTourEstimateBody =>
+      'Примерная стоимость ремонта. Подробная смета в Studio';
+
+  @override
+  String get homeTourShopTitle => 'Магазин';
+
+  @override
+  String get homeTourShopBody => 'Материалы и мебель из магазинов';
+
+  @override
+  String get homeTourMastersTitle => 'Мастера';
+
+  @override
+  String get homeTourMastersBody =>
+      'Электрики, сантехники, плиточники и другие мастера, на карте и в списке';
+
+  @override
+  String get homeTourHelpTitle => 'Руководство';
+
+  @override
+  String get homeTourHelpBody =>
+      'Пересматривайте это руководство в любое время здесь';
+
+  @override
+  String get tourNext => 'Далее';
+
+  @override
+  String get tourSkip => 'Пропустить';
+
+  @override
+  String get tourDone => 'Понятно';
+
+  @override
+  String get tourHelpTooltip => 'Руководство';
+
+  @override
+  String tourStepOf(int current, int total) {
+    return '$current/$total';
+  }
 }
