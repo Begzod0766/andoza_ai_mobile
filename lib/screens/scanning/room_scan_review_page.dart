@@ -17,6 +17,7 @@ import '../../geometry/room_geometry.dart';
 import '../../models/room_plan.dart';
 import '../../services/room_plan_handoff.dart';
 import 'scan_openings_editor.dart';
+import '../../widgets/room/room_type_picker.dart';
 import '../../utils/error_mapper.dart';
 
 /// Nav payload for [RoomScanReviewPage] (passed via go_router `extra`).
@@ -70,6 +71,7 @@ class _RoomScanReviewPageState extends ConsumerState<RoomScanReviewPage> {
       ceilingHeightM: _ceiling,
       source: _plan.source,
       name: _plan.name,
+      roomType: _plan.roomType,
     );
     try {
       final roomId = await handoffRoomPlan(ref, plan);
@@ -183,6 +185,22 @@ class _RoomScanReviewPageState extends ConsumerState<RoomScanReviewPage> {
 
             // Doors and windows: fix what the scan got wrong or missed.
             ScanOpeningsEditor(plan: _plan, onChanged: (p) => setState(() => _plan = p)),
+            const SizedBox(height: DesignTokens.spacingLg),
+
+            // Room type: sent with the room; a scan's walls stay as measured.
+            Text(l10n.scanReviewRoomType, style: DesignTokens.subtitle2),
+            const SizedBox(height: DesignTokens.spacingSm),
+            RoomTypePicker(
+              value: _plan.roomType,
+              onChanged: (t) => setState(() => _plan = RoomPlan(
+                    corners: _plan.corners,
+                    walls: _plan.walls,
+                    ceilingHeightM: _plan.ceilingHeightM,
+                    source: _plan.source,
+                    name: _plan.name,
+                    roomType: t,
+                  )),
+            ),
             const SizedBox(height: DesignTokens.spacingLg),
 
             // Ceiling height override.

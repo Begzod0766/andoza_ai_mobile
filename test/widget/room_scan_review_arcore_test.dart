@@ -85,7 +85,9 @@ void main() {
   testWidgets('review saves without a LiDAR scan payload', (tester) async {
     final svc = await pump(tester);
     final cont = find.text('Davom etish');
-    await tester.scrollUntilVisible(cont, 300);
+    await tester.scrollUntilVisible(cont, 300, scrollable: find.byType(Scrollable).first);
+    await tester.ensureVisible(cont);
+    await tester.pumpAndSettle();
     await tester.runAsync(() async {
       await tester.tap(cont);
       await Future<void>.delayed(const Duration(milliseconds: 500));

@@ -131,5 +131,6 @@ RoomCreate roomPlanToPolygonRoomCreate(RoomPlan plan, {String name = 'Xona'}) {
     name: name.isEmpty ? 'Xona' : name,
     ceilingH: ceiling,
     geometry: RoomGeometryCreate(walls: walls, vertices: vertices),
+    roomType: plan.roomType,
   );
 }

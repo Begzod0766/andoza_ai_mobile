@@ -20,6 +20,7 @@ RoomPlan withWallOpenings(RoomPlan plan, int wall, List<RoomOpening> openings) =
       ceilingHeightM: plan.ceilingHeightM,
       source: plan.source,
       name: plan.name,
+      roomType: plan.roomType,
     );
 
 /// Scan review: the plan's doors and windows, each editable or removable in

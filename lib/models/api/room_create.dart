@@ -79,6 +79,8 @@ abstract class RoomCreate with _$RoomCreate {
     required String name,
     @JsonKey(name: 'ceiling_h') required double ceilingH,
     required RoomGeometryCreate geometry,
+    /// `hammom`, `oshxona`, … (backend `RoomType`); omitted when not picked.
+    @JsonKey(name: 'room_type', includeIfNull: false) String? roomType,
   }) = _RoomCreate;
 
   factory RoomCreate.fromJson(Map<String, dynamic> json) =>

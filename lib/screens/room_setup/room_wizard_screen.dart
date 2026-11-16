@@ -10,7 +10,9 @@ import '../../models/room_plan.dart';
 import '../../providers/design_provider.dart';
 import '../../providers/room_persistence_provider.dart';
 import '../../providers/room_provider.dart';
+import '../../utils/room_type_size.dart';
 import '../../widgets/room/isometric_room_view.dart';
+import '../../widgets/room/room_type_picker.dart';
 import '../home/home_empty_screen.dart';
 import 'door_window_modal.dart';
 import 'wall_measurements_screen.dart';
@@ -28,7 +30,7 @@ class RoomWizardScreen extends ConsumerStatefulWidget {
 }
 
 class _RoomWizardScreenState extends ConsumerState<RoomWizardScreen> {
-  // Step 0 = ceiling, steps 1..4 = walls A–D, step 5 = summary.
+  // Step 0 = room type + ceiling, steps 1..4 = walls A–D, step 5 = summary.
   int _step = 0;
   bool _openingStudio = false;
   final _ceilingController = TextEditingController();
@@ -49,13 +51,16 @@ class _RoomWizardScreenState extends ConsumerState<RoomWizardScreen> {
   // Openings per wall, indexed 0=A, 1=B, 2=C, 3=D.
   final List<List<RoomOpening>> _openings = [[], [], [], []];
 
+  /// The picked room type (`hammom`, …), or null. Sent with the room.
+  String? _roomType;
+
   @override
   void initState() {
     super.initState();
     // Seeded defaults (the historical wallMeasurementsProvider A/B seed). The
     // wizard owns its geometry outright now and no longer reads that provider.
-    _length = 4.5; // walls A/C span
-    _width = 3.2; // walls B/D span
+    _length = kNoTypeSizeM.length; // walls A/C span
+    _width = kNoTypeSizeM.width; // walls B/D span
     _height = 2.8;
     _ceilingController.text = _height.toStringAsFixed(2);
   }
@@ -76,6 +81,7 @@ class _RoomWizardScreenState extends ConsumerState<RoomWizardScreen> {
         ceilingHeightM: _height,
         source: RoomSource.wizard,
         name: _roomName,
+        roomType: _roomType,
         wallOpenings: _openings,
       );
 
@@ -147,6 +153,26 @@ class _RoomWizardScreenState extends ConsumerState<RoomWizardScreen> {
         _length = v;
       } else {
         _width = v;
+      }
+    });
+  }
+
+  /// Picks the room type. An untouched room (no doors/windows, still at the
+  /// previous type's size) takes the new type's usual size, like the web
+  /// wizard; walls the user has set are never overwritten.
+  void _setRoomType(String? type) {
+    final size = sizeForRoomType(
+      length: _length,
+      width: _width,
+      hasOpenings: _openings.any((o) => o.isNotEmpty),
+      prev: _roomType,
+      next: type,
+    );
+    setState(() {
+      _roomType = type;
+      if (size != null) {
+        _length = size.length;
+        _width = size.width;
       }
     });
   }
@@ -232,6 +258,8 @@ class _RoomWizardScreenState extends ConsumerState<RoomWizardScreen> {
                   const EdgeInsets.all(DesignTokens.screenPaddingHorizontal),
               child: _step == 0
                   ? _CeilingStep(
+                      roomType: _roomType,
+                      onRoomType: _setRoomType,
                       controller: _ceilingController,
                       presets: _ceilingPresets,
                       current: _height,
@@ -401,6 +429,8 @@ class _RoomWizardScreenState extends ConsumerState<RoomWizardScreen> {
 
 class _CeilingStep extends StatelessWidget {
   const _CeilingStep({
+    required this.roomType,
+    required this.onRoomType,
     required this.controller,
     required this.presets,
     required this.current,
@@ -409,6 +439,8 @@ class _CeilingStep extends StatelessWidget {
     this.error,
   });
 
+  final String? roomType;
+  final ValueChanged<String?> onRoomType;
   final TextEditingController controller;
   final List<double> presets;
   final double current;
@@ -422,6 +454,15 @@ class _CeilingStep extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
+        Text(l10n.wizardRoomTypeQuestion, style: DesignTokens.heading2),
+        const SizedBox(height: DesignTokens.spacingXs),
+        Text(
+          l10n.wizardRoomTypeHint,
+          style: DesignTokens.body2.copyWith(color: DesignTokens.textGray),
+        ),
+        const SizedBox(height: DesignTokens.spacingMd),
+        RoomTypePicker(value: roomType, onChanged: onRoomType),
+        const SizedBox(height: DesignTokens.spacingXl),
         Text(l10n.wizardCeilingQuestion, style: DesignTokens.heading2),
         const SizedBox(height: DesignTokens.spacingXs),
         Text(

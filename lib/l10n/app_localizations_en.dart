@@ -2310,6 +2310,22 @@ class AppLocalizationsEn extends AppLocalizations {
   String get roomBalkon => 'Balcony';
 
   @override
+  String get roomBolalar => 'Kids\' room';
+
+  @override
+  String get roomKabinet => 'Study';
+
+  @override
+  String get wizardRoomTypeQuestion => 'What room is it?';
+
+  @override
+  String get wizardRoomTypeHint =>
+      'Pick a type and the walls start at that room\'s usual size';
+
+  @override
+  String get scanReviewRoomType => 'Room type';
+
+  @override
   String get placementPol => 'Floor';
 
   @override

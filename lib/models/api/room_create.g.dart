@@ -74,6 +74,7 @@ _RoomCreate _$RoomCreateFromJson(Map<String, dynamic> json) => _RoomCreate(
   geometry: RoomGeometryCreate.fromJson(
     json['geometry'] as Map<String, dynamic>,
   ),
+  roomType: json['room_type'] as String?,
 );
 
 Map<String, dynamic> _$RoomCreateToJson(_RoomCreate instance) =>
@@ -81,4 +82,5 @@ Map<String, dynamic> _$RoomCreateToJson(_RoomCreate instance) =>
       'name': instance.name,
       'ceiling_h': instance.ceilingH,
       'geometry': instance.geometry,
+      'room_type': ?instance.roomType,
     };

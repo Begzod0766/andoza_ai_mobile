@@ -175,4 +175,58 @@ void main() {
     expect(find.byType(IsometricRoomView), findsNothing);
     expect(find.byType(TextField), findsOneWidget);
   });
+
+  Future<ProviderContainer> finish(WidgetTester tester) async {
+    for (var i = 0; i < 5; i++) {
+      await tester.tap(find.text('Keyingi'));
+      await tester.pumpAndSettle();
+    }
+    await tester.tap(find.text('Smeta ko\'rish'));
+    await tester.pumpAndSettle();
+    return ProviderScope.containerOf(tester.element(find.text('E1')));
+  }
+
+  Future<void> open(WidgetTester tester) async {
+    await _enlarge(tester);
+    await tester.pumpWidget(
+      ProviderScope(
+        child: MaterialApp.router(
+          routerConfig: _router(),
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
+          locale: const Locale('uz'),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+  }
+
+  testWidgets('picking Hammom starts the room at 2.5 × 2 m and keeps the type',
+      (tester) async {
+    await open(tester);
+    expect(find.text('Qanday xona?'), findsOneWidget);
+    await tester.tap(find.byKey(const ValueKey('roomType_hammom')));
+    await tester.pumpAndSettle();
+
+    final plan = (await finish(tester)).read(activeRoomPlanProvider)!;
+    expect(plan.roomType, 'hammom');
+    expect(plan.boundingSize.length, closeTo(2.5, 1e-9)); // walls A/C
+    expect(plan.boundingSize.width, closeTo(2.0, 1e-9)); // walls B/D
+  });
+
+  testWidgets('switching type follows, and un-picking returns to 4.5 × 3.2',
+      (tester) async {
+    await open(tester);
+    await tester.tap(find.byKey(const ValueKey('roomType_hammom')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const ValueKey('roomType_oshxona')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const ValueKey('roomType_oshxona')));
+    await tester.pumpAndSettle();
+
+    final plan = (await finish(tester)).read(activeRoomPlanProvider)!;
+    expect(plan.roomType, isNull);
+    expect(plan.boundingSize.length, closeTo(4.5, 1e-9));
+    expect(plan.boundingSize.width, closeTo(3.2, 1e-9));
+  });
 }
