@@ -70,12 +70,18 @@ class RoomPlan {
   /// Human-readable room name, carried through to the legacy [rm.Room].
   final String name;
 
+  /// The backend room type (`hammom`, `oshxona`, … — see `kRoomTypes`), or
+  /// null when the user did not pick one. Sent as `room_type` on create so the
+  /// Studio does not have to guess the type from the name.
+  final String? roomType;
+
   const RoomPlan({
     required this.corners,
     required this.walls,
     required this.ceilingHeightM,
     required this.source,
     this.name = 'Xona',
+    this.roomType,
   });
 
   /// Build a plain axis-aligned rectangle plan from a [width] (walls B/D span)
@@ -94,6 +100,7 @@ class RoomPlan {
     required double ceilingHeightM,
     required RoomSource source,
     String name = 'Xona',
+    String? roomType,
     List<List<RoomOpening>>? wallOpenings,
   }) {
     final corners = <Vec2>[
@@ -117,6 +124,7 @@ class RoomPlan {
       ceilingHeightM: ceilingHeightM,
       source: source,
       name: name,
+      roomType: roomType,
     );
   }
 

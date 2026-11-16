@@ -171,4 +171,23 @@ void main() {
     expect(saved.walls[0].openings.single.width, closeTo(0.90, 1e-9));
     expect(find.text('studio room-9'), findsOneWidget);
   });
+
+  testWidgets('a picked room type is saved with the scan, walls as measured', (tester) async {
+    final container = await _pump(tester);
+    await _tapVisible(tester, find.byKey(const ValueKey('roomType_hammom')));
+
+    final continueButton = find.text('Davom etish');
+    await tester.scrollUntilVisible(continueButton, 300, scrollable: find.byType(Scrollable).first);
+    await tester.pumpAndSettle();
+    await tester.runAsync(() async {
+      await tester.tap(continueButton);
+      await Future<void>.delayed(const Duration(milliseconds: 500));
+    });
+    await tester.pumpAndSettle();
+
+    final saved = container.read(activeRoomPlanProvider)!;
+    expect(saved.roomType, 'hammom');
+    expect([for (final w in saved.walls) w.lengthM], [for (final w in _plan().walls) w.lengthM]);
+    expect(saved.walls[0].openings.single.type, 'door');
+  });
 }

@@ -2,6 +2,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:riverpod/riverpod.dart';
 import 'package:tamir_uy_mobile_flutter/models/api/api.dart';
 import 'package:tamir_uy_mobile_flutter/models/room_model.dart';
+import 'package:tamir_uy_mobile_flutter/models/room_plan.dart';
 import 'package:tamir_uy_mobile_flutter/providers/apartment_provider.dart';
 import 'package:tamir_uy_mobile_flutter/providers/room_persistence_provider.dart';
 import 'package:tamir_uy_mobile_flutter/providers/room_provider.dart';
@@ -14,6 +15,7 @@ import 'package:tamir_uy_mobile_flutter/repositories/apartment_repository.dart';
 class _FakeApartments implements ApartmentRepository {
   final created = <String>[];
   final roomsIn = <String>[];
+  final bodies = <RoomCreate>[];
   bool failNextRoom = false;
 
   @override
@@ -35,6 +37,7 @@ class _FakeApartments implements ApartmentRepository {
       throw Exception('offline');
     }
     roomsIn.add(apartmentId);
+    bodies.add(body);
     return RoomOut(id: 'room-${roomsIn.length}', apartmentId: apartmentId, name: body.name, updatedAt: DateTime(2026));
   }
 
@@ -99,5 +102,37 @@ void main() {
     await p.ensurePersisted(override: _body);
     expect(repo.created, ['apt-1']);
     expect(repo.roomsIn, ['apt-1', 'newest']);
+  });
+
+  test('the picked room type of the plan is sent with the room', () async {
+    final p = c.read(roomPersistenceProvider.notifier)..startNewProject();
+    c.read(activeRoomPlanProvider.notifier).setPlan(
+          RoomPlan.rectangle(
+            width: 2.0,
+            length: 2.5,
+            ceilingHeightM: 2.7,
+            source: RoomSource.wizard,
+            roomType: 'hammom',
+          ),
+          legacyRoomId: 'local-typed',
+        );
+    await p.ensurePersisted();
+    expect(repo.bodies.single.roomType, 'hammom');
+    expect(repo.bodies.single.toJson()['room_type'], 'hammom');
+  });
+
+  test('no type picked: room_type is not sent', () async {
+    final p = c.read(roomPersistenceProvider.notifier)..startNewProject();
+    c.read(activeRoomPlanProvider.notifier).setPlan(
+          RoomPlan.rectangle(
+            width: 3.2,
+            length: 4.5,
+            ceilingHeightM: 2.8,
+            source: RoomSource.wizard,
+          ),
+          legacyRoomId: 'local-untyped',
+        );
+    await p.ensurePersisted();
+    expect(repo.bodies.single.toJson().containsKey('room_type'), isFalse);
   });
 }

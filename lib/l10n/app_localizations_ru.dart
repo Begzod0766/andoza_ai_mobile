@@ -2313,6 +2313,22 @@ class AppLocalizationsRu extends AppLocalizations {
   String get roomBalkon => 'Балкон';
 
   @override
+  String get roomBolalar => 'Детская';
+
+  @override
+  String get roomKabinet => 'Кабинет';
+
+  @override
+  String get wizardRoomTypeQuestion => 'Какая комната?';
+
+  @override
+  String get wizardRoomTypeHint =>
+      'Если выбрать тип, стены начнутся с обычного размера такой комнаты';
+
+  @override
+  String get scanReviewRoomType => 'Тип комнаты';
+
+  @override
   String get placementPol => 'На полу';
 
   @override

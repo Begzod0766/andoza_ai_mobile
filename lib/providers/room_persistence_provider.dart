@@ -90,10 +90,13 @@ class RoomPersistenceNotifier
             : (await aptRepo.createApartment(name: 'Mening uyim')).id;
       }
 
-      final room = await aptRepo.createRoom(
-        apartmentId,
-        override ?? roomToRoomCreate(clientRoom),
-      );
+      // The legacy client room carries no type; the plan it was made from does.
+      var body = override ?? roomToRoomCreate(clientRoom);
+      final roomType = _ref.read(activeRoomPlanProvider)?.roomType;
+      if (body.roomType == null && roomType != null) {
+        body = body.copyWith(roomType: roomType);
+      }
+      final room = await aptRepo.createRoom(apartmentId, body);
 
       // Record the captured starting condition so the delta excludes stages
       // the room already has (the "tejaldingiz" mechanic).

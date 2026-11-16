@@ -867,7 +867,8 @@ as List<List<double>>?,
 /// @nodoc
 mixin _$RoomCreate {
 
- String get name;@JsonKey(name: 'ceiling_h') double get ceilingH; RoomGeometryCreate get geometry;
+ String get name;@JsonKey(name: 'ceiling_h') double get ceilingH; RoomGeometryCreate get geometry;/// `hammom`, `oshxona`, … (backend `RoomType`); omitted when not picked.
+@JsonKey(name: 'room_type', includeIfNull: false) String? get roomType;
 /// Create a copy of RoomCreate
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -881,20 +882,20 @@ $RoomCreateCopyWith<RoomCreate> get copyWith => _$RoomCreateCopyWithImpl<RoomCre
 @override
 bool operator ==(Object other) {
   final _this = this as RoomCreate;
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is RoomCreate&&(identical(other.name, _this.name) || other.name == _this.name)&&(identical(other.ceilingH, _this.ceilingH) || other.ceilingH == _this.ceilingH)&&(identical(other.geometry, _this.geometry) || other.geometry == _this.geometry));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is RoomCreate&&(identical(other.name, _this.name) || other.name == _this.name)&&(identical(other.ceilingH, _this.ceilingH) || other.ceilingH == _this.ceilingH)&&(identical(other.geometry, _this.geometry) || other.geometry == _this.geometry)&&(identical(other.roomType, _this.roomType) || other.roomType == _this.roomType));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
 int get hashCode {
   final _this = this as RoomCreate;
-  return Object.hash(runtimeType,_this.name,_this.ceilingH,_this.geometry);
+  return Object.hash(runtimeType,_this.name,_this.ceilingH,_this.geometry,_this.roomType);
 }
 
 @override
 String toString() {
   final _this = this as RoomCreate;
-  return 'RoomCreate(name: ${_this.name}, ceilingH: ${_this.ceilingH}, geometry: ${_this.geometry})';
+  return 'RoomCreate(name: ${_this.name}, ceilingH: ${_this.ceilingH}, geometry: ${_this.geometry}, roomType: ${_this.roomType})';
 }
 
 
@@ -905,7 +906,7 @@ abstract mixin class $RoomCreateCopyWith<$Res>  {
   factory $RoomCreateCopyWith(RoomCreate value, $Res Function(RoomCreate) _then) = _$RoomCreateCopyWithImpl;
 @useResult
 $Res call({
- String name,@JsonKey(name: 'ceiling_h') double ceilingH, RoomGeometryCreate geometry
+ String name,@JsonKey(name: 'ceiling_h') double ceilingH, RoomGeometryCreate geometry,@JsonKey(name: 'room_type', includeIfNull: false) String? roomType
 });
 
 
@@ -922,12 +923,13 @@ class _$RoomCreateCopyWithImpl<$Res>
 
 /// Create a copy of RoomCreate
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? name = null,Object? ceilingH = null,Object? geometry = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? name = null,Object? ceilingH = null,Object? geometry = null,Object? roomType = freezed,}) {
   return _then(RoomCreate(
 name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
 as String,ceilingH: null == ceilingH ? _self.ceilingH : ceilingH // ignore: cast_nullable_to_non_nullable
 as double,geometry: null == geometry ? _self.geometry : geometry // ignore: cast_nullable_to_non_nullable
-as RoomGeometryCreate,
+as RoomGeometryCreate,roomType: freezed == roomType ? _self.roomType : roomType // ignore: cast_nullable_to_non_nullable
+as String?,
   ));
 }
 /// Create a copy of RoomCreate
@@ -1021,10 +1023,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String name, @JsonKey(name: 'ceiling_h')  double ceilingH,  RoomGeometryCreate geometry)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String name, @JsonKey(name: 'ceiling_h')  double ceilingH,  RoomGeometryCreate geometry, @JsonKey(name: 'room_type', includeIfNull: false)  String? roomType)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _RoomCreate() when $default != null:
-return $default(_that.name,_that.ceilingH,_that.geometry);case _:
+return $default(_that.name,_that.ceilingH,_that.geometry,_that.roomType);case _:
   return orElse();
 
 }
@@ -1042,10 +1044,10 @@ return $default(_that.name,_that.ceilingH,_that.geometry);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String name, @JsonKey(name: 'ceiling_h')  double ceilingH,  RoomGeometryCreate geometry)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String name, @JsonKey(name: 'ceiling_h')  double ceilingH,  RoomGeometryCreate geometry, @JsonKey(name: 'room_type', includeIfNull: false)  String? roomType)  $default,) {final _that = this;
 switch (_that) {
 case _RoomCreate():
-return $default(_that.name,_that.ceilingH,_that.geometry);case _:
+return $default(_that.name,_that.ceilingH,_that.geometry,_that.roomType);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -1062,10 +1064,10 @@ return $default(_that.name,_that.ceilingH,_that.geometry);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String name, @JsonKey(name: 'ceiling_h')  double ceilingH,  RoomGeometryCreate geometry)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String name, @JsonKey(name: 'ceiling_h')  double ceilingH,  RoomGeometryCreate geometry, @JsonKey(name: 'room_type', includeIfNull: false)  String? roomType)?  $default,) {final _that = this;
 switch (_that) {
 case _RoomCreate() when $default != null:
-return $default(_that.name,_that.ceilingH,_that.geometry);case _:
+return $default(_that.name,_that.ceilingH,_that.geometry,_that.roomType);case _:
   return null;
 
 }
@@ -1077,12 +1079,14 @@ return $default(_that.name,_that.ceilingH,_that.geometry);case _:
 @JsonSerializable()
 
 class _RoomCreate implements RoomCreate {
-  const _RoomCreate({required this.name, @JsonKey(name: 'ceiling_h') required this.ceilingH, required this.geometry});
+  const _RoomCreate({required this.name, @JsonKey(name: 'ceiling_h') required this.ceilingH, required this.geometry, @JsonKey(name: 'room_type', includeIfNull: false) this.roomType});
   factory _RoomCreate.fromJson(Map<String, dynamic> json) => _$RoomCreateFromJson(json);
 
 @override final  String name;
 @override@JsonKey(name: 'ceiling_h') final  double ceilingH;
 @override final  RoomGeometryCreate geometry;
+/// `hammom`, `oshxona`, … (backend `RoomType`); omitted when not picked.
+@override@JsonKey(name: 'room_type', includeIfNull: false) final  String? roomType;
 
 /// Create a copy of RoomCreate
 /// with the given fields replaced by the non-null parameter values.
@@ -1097,18 +1101,18 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-    return identical(this, other) || (other.runtimeType == runtimeType&&other is _RoomCreate&&(identical(other.name, name) || other.name == name)&&(identical(other.ceilingH, ceilingH) || other.ceilingH == ceilingH)&&(identical(other.geometry, geometry) || other.geometry == geometry));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is _RoomCreate&&(identical(other.name, name) || other.name == name)&&(identical(other.ceilingH, ceilingH) || other.ceilingH == ceilingH)&&(identical(other.geometry, geometry) || other.geometry == geometry)&&(identical(other.roomType, roomType) || other.roomType == roomType));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
 int get hashCode {
-    return Object.hash(runtimeType,name,ceilingH,geometry);
+    return Object.hash(runtimeType,name,ceilingH,geometry,roomType);
 }
 
 @override
 String toString() {
-    return 'RoomCreate(name: $name, ceilingH: $ceilingH, geometry: $geometry)';
+    return 'RoomCreate(name: $name, ceilingH: $ceilingH, geometry: $geometry, roomType: $roomType)';
 }
 
 
@@ -1119,7 +1123,7 @@ abstract mixin class _$RoomCreateCopyWith<$Res> implements $RoomCreateCopyWith<$
   factory _$RoomCreateCopyWith(_RoomCreate value, $Res Function(_RoomCreate) _then) = __$RoomCreateCopyWithImpl;
 @override @useResult
 $Res call({
- String name,@JsonKey(name: 'ceiling_h') double ceilingH, RoomGeometryCreate geometry
+ String name,@JsonKey(name: 'ceiling_h') double ceilingH, RoomGeometryCreate geometry,@JsonKey(name: 'room_type', includeIfNull: false) String? roomType
 });
 
 
@@ -1136,12 +1140,13 @@ class __$RoomCreateCopyWithImpl<$Res>
 
 /// Create a copy of RoomCreate
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? name = null,Object? ceilingH = null,Object? geometry = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? name = null,Object? ceilingH = null,Object? geometry = null,Object? roomType = freezed,}) {
   return _then(_RoomCreate(
 name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
 as String,ceilingH: null == ceilingH ? _self.ceilingH : ceilingH // ignore: cast_nullable_to_non_nullable
 as double,geometry: null == geometry ? _self.geometry : geometry // ignore: cast_nullable_to_non_nullable
-as RoomGeometryCreate,
+as RoomGeometryCreate,roomType: freezed == roomType ? _self.roomType : roomType // ignore: cast_nullable_to_non_nullable
+as String?,
   ));
 }
 

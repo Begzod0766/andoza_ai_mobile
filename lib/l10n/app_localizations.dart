@@ -4246,6 +4246,36 @@ abstract class AppLocalizations {
   /// **'Balkon'**
   String get roomBalkon;
 
+  /// Room type: children's room
+  ///
+  /// In uz, this message translates to:
+  /// **'Bolalar xonasi'**
+  String get roomBolalar;
+
+  /// Room type: study / home office
+  ///
+  /// In uz, this message translates to:
+  /// **'Kabinet'**
+  String get roomKabinet;
+
+  /// Wizard first step: room type question
+  ///
+  /// In uz, this message translates to:
+  /// **'Qanday xona?'**
+  String get wizardRoomTypeQuestion;
+
+  /// Wizard: explains that picking a type sets the usual wall size
+  ///
+  /// In uz, this message translates to:
+  /// **'Turi tanlansa, devorlar shu xonaning odatiy o\'lchamidan boshlanadi'**
+  String get wizardRoomTypeHint;
+
+  /// Scan review: room type picker label
+  ///
+  /// In uz, this message translates to:
+  /// **'Xona turi'**
+  String get scanReviewRoomType;
+
   /// No description provided for @placementPol.
   ///
   /// In uz, this message translates to:

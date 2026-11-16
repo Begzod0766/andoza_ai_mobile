@@ -2306,6 +2306,22 @@ class AppLocalizationsUz extends AppLocalizations {
   String get roomBalkon => 'Balkon';
 
   @override
+  String get roomBolalar => 'Bolalar xonasi';
+
+  @override
+  String get roomKabinet => 'Kabinet';
+
+  @override
+  String get wizardRoomTypeQuestion => 'Qanday xona?';
+
+  @override
+  String get wizardRoomTypeHint =>
+      'Turi tanlansa, devorlar shu xonaning odatiy o\'lchamidan boshlanadi';
+
+  @override
+  String get scanReviewRoomType => 'Xona turi';
+
+  @override
   String get placementPol => 'Polda';
 
   @override
