@@ -1,4 +1,5 @@
 
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -13,6 +14,7 @@ import '../../providers/auth_provider.dart';
 import '../../providers/locale_provider.dart';
 import '../../services/pdf_share_service.dart';
 import '../../widgets/common/error_view.dart';
+import 'studio_freshness.dart';
 import 'studio_session.dart';
 import 'studio_tour_bridge.dart';
 import 'webview_download.dart';
@@ -127,7 +129,24 @@ Color? parseCssRgb(String css) {
   );
 }
 
-class _StudioWebViewScreenState extends ConsumerState<StudioWebViewScreen> {
+/// Fetches the studio's current `index.html` (public, no auth), or null on any
+/// failure. A variable so tests can stand in for the network.
+Future<String?> Function(String url) fetchStudioIndexHtml = (url) async {
+  try {
+    final res = await Dio(BaseOptions(
+      connectTimeout: const Duration(seconds: 5),
+      receiveTimeout: const Duration(seconds: 5),
+      responseType: ResponseType.plain,
+      headers: {'Cache-Control': 'no-cache'},
+    )).get<String>(url);
+    return res.data;
+  } catch (_) {
+    return null;
+  }
+};
+
+class _StudioWebViewScreenState extends ConsumerState<StudioWebViewScreen>
+    with WidgetsBindingObserver {
   // Nullable + built synchronously in _init before any await, so build() never
   // reads it uninitialised (a late field would throw LateInitializationError on
   // the first frame, before the async cookie/setup completes).
@@ -162,7 +181,52 @@ class _StudioWebViewScreenState extends ConsumerState<StudioWebViewScreen> {
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     _init();
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) _reloadIfStale();
+  }
+
+  // True while a freshness check runs, so quick resume/pause cycles do not
+  // stack up requests.
+  bool _checkingFresh = false;
+
+  /// Back from the background: if a deploy happened while the Studio sat open,
+  /// the page still runs the old build (see studio_freshness.dart). Compare it
+  /// with the server's current entry script and reload the page when it is
+  /// older. The Studio saves edits as they happen, so the reload keeps them.
+  Future<void> _reloadIfStale() async {
+    final controller = _controller;
+    if (controller == null || !_studioReady || _checkingFresh) return;
+    _checkingFresh = true;
+    try {
+      String? loaded;
+      try {
+        loaded = (await controller.runJavaScriptReturningResult(
+          studioLoadedEntryJs,
+        ))
+            .toString();
+      } catch (_) {
+        return;
+      }
+      final html = await fetchStudioIndexHtml('${AppConfig.studioBaseUrl}/');
+      if (!mounted || controller != _controller) return;
+      if (studioIsStale(loaded: loaded, serverHtml: html)) {
+        debugPrint('StudioWebView: new web build deployed, reloading the page');
+        await controller.reload();
+      }
+    } finally {
+      _checkingFresh = false;
+    }
   }
 
   void _init() {
