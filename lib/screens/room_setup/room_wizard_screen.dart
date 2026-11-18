@@ -86,8 +86,9 @@ class _RoomWizardScreenState extends ConsumerState<RoomWizardScreen> {
         wallOpenings: _openings,
       );
 
+  /// The picked type names the room («Ванная»); without one, the old default.
   String get _roomName =>
-      AppLocalizations.of(context)!.roomSetupDefaultProjectName;
+      wizardRoomName(AppLocalizations.of(context)!, _roomType);
 
   /// The length of the plan edge for wall [index] (A/C = length, B/D = width).
   double _wallLengthFor(int index) =>

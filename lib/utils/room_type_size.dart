@@ -64,3 +64,11 @@ String roomTypeLabel(AppLocalizations l10n, String type) => switch (type) {
       'balkon' => l10n.roomBalkon,
       _ => type,
     };
+
+/// The name the wizard gives a new room: its type's label when one is picked
+/// («Ванная», «Кухня»), else the old default (mobile QA 2026-11-18: every room
+/// was «Ремонт гостиной», a bathroom too).
+String wizardRoomName(AppLocalizations l10n, String? roomType) =>
+    roomType == null
+        ? l10n.roomSetupDefaultProjectName
+        : roomTypeLabel(l10n, roomType);
