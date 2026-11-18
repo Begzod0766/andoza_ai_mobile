@@ -3225,6 +3225,14 @@
   "@openingDelete": {
     "description": "door/window sheet: remove the opening"
   },
+  "openingSizeCm": "{width}×{height} sm",
+  "@openingSizeCm": {
+    "description": "door/window row: the opening's width × height in centimetres, e.g. 70×200 sm",
+    "placeholders": {
+      "width": {"type": "String"},
+      "height": {"type": "String"}
+    }
+  },
   "openingOffsetCm": "Chapdan (sm)",
   "@openingOffsetCm": {
     "description": "door/window sheet: distance from the wall start to the opening's left edge, centimetres"

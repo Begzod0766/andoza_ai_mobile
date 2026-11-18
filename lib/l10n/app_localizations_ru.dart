@@ -2996,6 +2996,11 @@ class AppLocalizationsRu extends AppLocalizations {
   String get openingDelete => 'Удалить';
 
   @override
+  String openingSizeCm(String width, String height) {
+    return '$width×$height см';
+  }
+
+  @override
   String get openingOffsetCm => 'Слева (см)';
 
   @override

@@ -247,7 +247,10 @@ class _WallMeasurementsScreenState
                             ),
                             const SizedBox(width: DesignTokens.spacingSm),
                             Text(
-                              '${(opening.width * 100).toStringAsFixed(0)}×${(opening.height * 100).toStringAsFixed(0)} sm',
+                              l10n.openingSizeCm(
+                      (opening.width * 100).toStringAsFixed(0),
+                      (opening.height * 100).toStringAsFixed(0),
+                    ),
                               style: DesignTokens.caption,
                             ),
                             const Spacer(),

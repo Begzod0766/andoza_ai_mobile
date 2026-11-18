@@ -2851,6 +2851,7 @@
   "@openingDelete": {
     "description": "door/window sheet: remove the opening"
   },
+  "openingSizeCm": "{width}×{height} см",
   "openingOffsetCm": "Слева (см)",
   "@openingOffsetCm": {
     "description": "door/window sheet: distance from the wall start to the opening's left edge, centimetres"

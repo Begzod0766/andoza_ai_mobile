@@ -5500,6 +5500,12 @@ abstract class AppLocalizations {
   /// **'O\'chirish'**
   String get openingDelete;
 
+  /// door/window row: the opening's width × height in centimetres, e.g. 70×200 sm
+  ///
+  /// In uz, this message translates to:
+  /// **'{width}×{height} sm'**
+  String openingSizeCm(String width, String height);
+
   /// door/window sheet: distance from the wall start to the opening's left edge, centimetres
   ///
   /// In uz, this message translates to:
