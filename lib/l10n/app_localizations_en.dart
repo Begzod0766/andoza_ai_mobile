@@ -2996,6 +2996,11 @@ class AppLocalizationsEn extends AppLocalizations {
   String get openingDelete => 'Delete';
 
   @override
+  String openingSizeCm(String width, String height) {
+    return '$width×$height cm';
+  }
+
+  @override
   String get openingOffsetCm => 'From the left (cm)';
 
   @override

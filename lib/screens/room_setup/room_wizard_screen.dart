@@ -587,7 +587,10 @@ class _WallStep extends StatelessWidget {
                   ),
                   const SizedBox(width: DesignTokens.spacingSm),
                   Text(
-                    '${(o.width * 100).toStringAsFixed(0)}×${(o.height * 100).toStringAsFixed(0)} sm',
+                    l10n.openingSizeCm(
+                      (o.width * 100).toStringAsFixed(0),
+                      (o.height * 100).toStringAsFixed(0),
+                    ),
                     style: DesignTokens.caption,
                   ),
                 ],

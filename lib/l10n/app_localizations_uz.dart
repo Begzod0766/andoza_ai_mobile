@@ -2994,6 +2994,11 @@ class AppLocalizationsUz extends AppLocalizations {
   String get openingDelete => 'O\'chirish';
 
   @override
+  String openingSizeCm(String width, String height) {
+    return '$width×$height sm';
+  }
+
+  @override
   String get openingOffsetCm => 'Chapdan (sm)';
 
   @override
