@@ -1,5 +1,6 @@
 
 import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -104,6 +105,24 @@ String studioRoomPath(
 /// studio opens on the finished room (mobile QA 2026-11-18, andoza_ai#318).
 String newRoomStudioPhase(String? roomType) =>
     roomType == 'hammom' || roomType == 'oshxona' ? 'quvurlar' : 'suvoq';
+
+/// [url] as the debug log shows it: room ids become `:id`, and only the
+/// stage and the app's own flags keep their values (`?phase=`, `?app=`,
+/// `?lang=`, `?focus=`); a pin or furniture id shows as `…`. Used to see
+/// where the Studio WebView went when a room opens at the wrong stage
+/// (mobile QA 2026-11-18). Never logs bodies, tokens or cookies.
+String studioLogUrl(String? url) {
+  final uri = Uri.tryParse(url ?? '');
+  if (uri == null || uri.path.isEmpty) return '?';
+  final path = uri.pathSegments
+      .map((s) => RegExp(r'^[0-9a-fA-F-]{8,}$').hasMatch(s) ? ':id' : s)
+      .join('/');
+  const shown = {'phase', 'app', 'lang', 'focus'};
+  final query = uri.queryParameters.entries
+      .map((e) => '${e.key}=${shown.contains(e.key) ? e.value : '…'}')
+      .join('&');
+  return '/$path${query.isEmpty ? '' : '?$query'}';
+}
 
 /// The web page to open for [path]. `app=1` tells the page it is inside the
 /// app, so it hides its own back button — this screen draws one over the page.
@@ -311,6 +330,9 @@ class _StudioWebViewScreenState extends ConsumerState<StudioWebViewScreen>
           // fire a navigation request, they only change the URL. Catch them
           // here so leaving the studio still returns the user to the native app.
           onUrlChange: (change) {
+            if (kDebugMode) {
+              debugPrint('StudioWebView: at ${studioLogUrl(change.url)}');
+            }
             if (_studioReady && _hasLeftStudio(change.url)) {
               _returnToApp();
               return;
@@ -320,12 +342,18 @@ class _StudioWebViewScreenState extends ConsumerState<StudioWebViewScreen>
             if (_studioReady) _pageChanged(change.url);
           },
           onPageFinished: (url) async {
+            if (kDebugMode) {
+              debugPrint('StudioWebView: loaded ${studioLogUrl(url)}');
+            }
             // On the first load of the origin, seed the auth flag then navigate
             // to the studio route (now past the RequireAuth guard).
             if (!_seeded) {
               _seeded = true;
               // The field is assigned before any page load fires this callback.
               await _controller!.runJavaScript(studioAuthSeedJs(auth.user));
+              if (kDebugMode) {
+                debugPrint('StudioWebView: open ${studioLogUrl(_targetUrl)}');
+              }
               await _controller!.loadRequest(Uri.parse(_targetUrl));
               return;
             }
