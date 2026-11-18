@@ -514,6 +514,8 @@ final routerProvider = Provider<GoRouter>((ref) {
           aiPin: state.uri.queryParameters['ai_pin'],
           // `?place=<furniture id>`: put a shop's model into the room.
           place: state.uri.queryParameters['place'],
+          // `?phase=<stage>`: a new room opens at its first stage (wizard).
+          phase: state.uri.queryParameters['phase'],
         ),
       ),
       // "Share → Andoza AI" from the Pinterest app: pick the room, then the

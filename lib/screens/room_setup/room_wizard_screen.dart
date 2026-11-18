@@ -11,6 +11,7 @@ import '../../providers/design_provider.dart';
 import '../../providers/room_persistence_provider.dart';
 import '../../providers/room_provider.dart';
 import '../../utils/room_type_size.dart';
+import '../studio/studio_webview_screen.dart';
 import '../../widgets/room/isometric_room_view.dart';
 import '../../widgets/room/room_type_picker.dart';
 import '../home/home_empty_screen.dart';
@@ -380,7 +381,13 @@ class _RoomWizardScreenState extends ConsumerState<RoomWizardScreen> {
       final persisted = ref.read(roomPersistenceProvider).valueOrNull;
       if (!mounted) return;
       if (persisted != null) {
-        context.go('/studio/${persisted.roomId}');
+        // A new bathroom or kitchen opens at Quvurlar, like the web wizard.
+        context.go(
+          studioRoomPath(
+            persisted.roomId,
+            phase: newRoomStudioPhase(_roomType),
+          ),
+        );
       } else {
         _showSaveFailed();
       }

@@ -55,9 +55,16 @@ class StudioWebViewScreen extends ConsumerStatefulWidget {
     bool focus = false,
     String? aiPin,
     String? place,
+    String? phase,
     Key? key,
   }) : this(
-         path: studioRoomPath(roomId, focus: focus, aiPin: aiPin, place: place),
+         path: studioRoomPath(
+           roomId,
+           focus: focus,
+           aiPin: aiPin,
+           place: place,
+           phase: phase,
+         ),
          key: key,
        );
 
@@ -70,23 +77,33 @@ class StudioWebViewScreen extends ConsumerStatefulWidget {
 }
 
 /// The studio path for a room: `?focus=1` opens it alone, `?ai_pin=` opens
-/// the AI designer with a Pinterest pin, `?place=` puts a shop's furniture in.
+/// the AI designer with a Pinterest pin, `?place=` puts a shop's furniture in,
+/// `?phase=` opens it at that stage (a new room: [newRoomStudioPhase]).
 String studioRoomPath(
   String roomId, {
   bool focus = false,
   String? aiPin,
   String? place,
+  String? phase,
 }) {
   final query = {
     if (focus) 'focus': '1',
     'ai_pin': ?aiPin,
     'place': ?place,
+    'phase': ?phase,
   };
   return Uri(
     path: '/studio/$roomId',
     queryParameters: query.isEmpty ? null : query,
   ).toString();
 }
+
+/// The stage the studio opens a brand-new room at, as the web wizard does
+/// (andoza_ai `newRoomStudioPath`): a bathroom or a kitchen at Quvurlar, the
+/// pipes laid before the plaster; every other room at Suvoq. Without it the
+/// studio opens on the finished room (mobile QA 2026-11-18, andoza_ai#318).
+String newRoomStudioPhase(String? roomType) =>
+    roomType == 'hammom' || roomType == 'oshxona' ? 'quvurlar' : 'suvoq';
 
 /// The web page to open for [path]. `app=1` tells the page it is inside the
 /// app, so it hides its own back button — this screen draws one over the page.
