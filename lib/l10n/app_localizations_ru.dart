@@ -530,8 +530,7 @@ class AppLocalizationsRu extends AppLocalizations {
   String get newProjectArScanTitle => 'Измерить камерой';
 
   @override
-  String get newProjectArScanDesc =>
-      'Отметьте углы пола камерой телефона и получите план комнаты';
+  String get newProjectArScanCaption => 'Отметьте углы пола камерой';
 
   @override
   String get arScanFindFloor =>
@@ -1398,15 +1397,13 @@ class AppLocalizationsRu extends AppLocalizations {
   String get newProjectWizardTitle => '3D Мастер';
 
   @override
-  String get newProjectWizardDesc =>
-      'Введите размеры комнаты в интерактивном 3D-виде';
+  String get newProjectWizardCaption => 'Введите размеры комнаты';
 
   @override
   String get newProjectLidarTitle => 'LiDAR сканер';
 
   @override
-  String get newProjectLidarDesc =>
-      'Отсканируйте комнату с помощью LiDAR и получите готовую 3D-модель';
+  String get newProjectLidarCaption => 'Отсканируйте комнату с LiDAR';
 
   @override
   String get newProjectPhotoTitle => '360° Фотоскан';
@@ -1419,8 +1416,7 @@ class AppLocalizationsRu extends AppLocalizations {
   String get newProjectDrawTitle => 'Нарисуйте сами';
 
   @override
-  String get newProjectDrawDesc =>
-      'Нарисуйте комнату пальцем — размеры рассчитаются автоматически по рисунку';
+  String get newProjectDrawCaption => 'Нарисуйте комнату пальцем';
 
   @override
   String get summarySavedTitle => 'Размеры сохранены!';

@@ -659,7 +659,7 @@
   "unsavedChangesStay": "Stay",
   "roomSaveFailed": "The room wasn't saved to the server. Check your connection and try again.",
   "newProjectArScanTitle": "Measure with camera",
-  "newProjectArScanDesc": "Mark the floor corners with your phone camera to get the room plan",
+  "newProjectArScanCaption": "Mark floor corners with the camera",
   "arScanFindFloor": "Point the phone at the floor and move it slowly",
   "arScanCornersHint": "Aim at the next corner and add it",
   "arScanAddCorner": "Add corner",
@@ -1722,17 +1722,17 @@
   "@newProjectWizardTitle": {
     "description": "New-project entry: 3D wizard title."
   },
-  "newProjectWizardDesc": "Enter room dimensions in an interactive 3D view",
-  "@newProjectWizardDesc": {
-    "description": "New-project entry: 3D wizard description."
+  "newProjectWizardCaption": "Enter the room size",
+  "@newProjectWizardCaption": {
+    "description": "New-project card: 3D wizard caption (3-5 words, read by screen readers too)."
   },
   "newProjectLidarTitle": "LiDAR scanner",
   "@newProjectLidarTitle": {
     "description": "New-project entry and scan screen app bar: LiDAR scanner title."
   },
-  "newProjectLidarDesc": "Scan the room with LiDAR and get an automatic 3D model",
-  "@newProjectLidarDesc": {
-    "description": "New-project entry: LiDAR scanner description."
+  "newProjectLidarCaption": "Scan the room with LiDAR",
+  "@newProjectLidarCaption": {
+    "description": "New-project card: LiDAR scanner caption (3-5 words, read by screen readers too)."
   },
   "newProjectPhotoTitle": "360° Photo scan",
   "@newProjectPhotoTitle": {
@@ -1746,9 +1746,9 @@
   "@newProjectDrawTitle": {
     "description": "New-project entry and unsupported-LiDAR fallback: draw-it-yourself title."
   },
-  "newProjectDrawDesc": "Draw the room with your finger — dimensions are calculated automatically from your drawing",
-  "@newProjectDrawDesc": {
-    "description": "New-project entry: draw-it-yourself description."
+  "newProjectDrawCaption": "Draw the room with a finger",
+  "@newProjectDrawCaption": {
+    "description": "New-project card: draw-it-yourself caption (3-5 words, read by screen readers too)."
   },
   "summarySavedTitle": "Dimensions saved!",
   "@summarySavedTitle": {

@@ -132,7 +132,8 @@ void main() {
     debugDefaultTargetPlatformOverride = TargetPlatform.android;
     try {
       await pumpLocalized(tester, const Scaffold(body: NewProjectSheet()));
-      await tester.pumpAndSettle();
+      // The cards loop, so the sheet never settles: one frame is enough.
+      await tester.pump();
       expect(find.text(l10n.newProjectArScanTitle), findsOneWidget);
       expect(find.text(l10n.newProjectLidarTitle), findsNothing);
     } finally {

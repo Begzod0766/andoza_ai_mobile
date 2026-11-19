@@ -1054,11 +1054,11 @@ abstract class AppLocalizations {
   /// **'Kamera bilan o\'lchash'**
   String get newProjectArScanTitle;
 
-  /// Android ARCore floor-plan scanner
+  /// New-project card on Android: camera (ARCore) measure caption (3-5 words, read by screen readers too).
   ///
   /// In uz, this message translates to:
-  /// **'Telefon kamerasi bilan pol burchaklarini belgilab, xona rejasini oling'**
-  String get newProjectArScanDesc;
+  /// **'Pol burchaklarini kamera bilan belgilang'**
+  String get newProjectArScanCaption;
 
   /// Android ARCore floor-plan scanner
   ///
@@ -2596,11 +2596,11 @@ abstract class AppLocalizations {
   /// **'3D Master'**
   String get newProjectWizardTitle;
 
-  /// New-project entry: 3D wizard description.
+  /// New-project card: 3D wizard caption (3-5 words, read by screen readers too).
   ///
   /// In uz, this message translates to:
-  /// **'Interaktiv 3D ko\'rinishda xona o\'lchamlarini kiriting'**
-  String get newProjectWizardDesc;
+  /// **'Xona o\'lchamlarini kiriting'**
+  String get newProjectWizardCaption;
 
   /// New-project entry and scan screen app bar: LiDAR scanner title.
   ///
@@ -2608,11 +2608,11 @@ abstract class AppLocalizations {
   /// **'LiDAR skaner'**
   String get newProjectLidarTitle;
 
-  /// New-project entry: LiDAR scanner description.
+  /// New-project card: LiDAR scanner caption (3-5 words, read by screen readers too).
   ///
   /// In uz, this message translates to:
-  /// **'Xonani LiDAR yordamida skanerlang va avtomatik 3D model oling'**
-  String get newProjectLidarDesc;
+  /// **'Xonani LiDAR bilan skanerlang'**
+  String get newProjectLidarCaption;
 
   /// New-project entry and unsupported-LiDAR fallback: 360° photo scan title.
   ///
@@ -2632,11 +2632,11 @@ abstract class AppLocalizations {
   /// **'O\'zingiz chizing'**
   String get newProjectDrawTitle;
 
-  /// New-project entry: draw-it-yourself description.
+  /// New-project card: draw-it-yourself caption (3-5 words, read by screen readers too).
   ///
   /// In uz, this message translates to:
-  /// **'Xonani barmog\'ingiz bilan chizing — o\'lchamlar chizganingizga qarab o\'zi hisoblanadi'**
-  String get newProjectDrawDesc;
+  /// **'Xonani barmoq bilan chizing'**
+  String get newProjectDrawCaption;
 
   /// Room summary / wizard summary celebratory heading ('Dimensions saved!').
   ///

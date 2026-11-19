@@ -1,11 +1,15 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+
 import '../../config/design_tokens.dart';
 import '../../features/new_project/new_project_sheet_state.dart';
 import '../../l10n/app_localizations.dart';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+
 import '../../providers/room_persistence_provider.dart';
+import '../../widgets/new_project/new_project_animations.dart';
 
 /// Opens the A3 "+" sheet — the one entry point for every caller. The sheet
 /// lives in `AppShell`'s body above the menu (`NewProjectSheetLayer`) and the
@@ -19,10 +23,10 @@ void showNewProjectSheet(BuildContext context) {
 }
 
 /// Closes the sheet before a card's flow is pushed over the shell.
-void _closeSheet(BuildContext context) =>
-    ProviderScope.containerOf(context, listen: false)
-        .read(newProjectSheetOpenProvider.notifier)
-        .state = false;
+void _closeSheet(BuildContext context) => ProviderScope.containerOf(
+  context,
+  listen: false,
+).read(newProjectSheetOpenProvider.notifier).state = false;
 
 /// A3: "+" sheet — the three entry paths into a new project's measurement
 /// flow, full height above the bottom menu.
@@ -75,10 +79,14 @@ class NewProjectSheet extends StatelessWidget {
                     key: handleKey,
                     width: 44,
                     height: 5,
-                    margin: const EdgeInsets.only(bottom: DesignTokens.spacingLg),
+                    margin: const EdgeInsets.only(
+                      bottom: DesignTokens.spacingLg,
+                    ),
                     decoration: BoxDecoration(
                       color: DesignTokens.borderGray,
-                      borderRadius: BorderRadius.circular(DesignTokens.radiusFull),
+                      borderRadius: BorderRadius.circular(
+                        DesignTokens.radiusFull,
+                      ),
                     ),
                   ),
                 ),
@@ -86,7 +94,9 @@ class NewProjectSheet extends StatelessWidget {
                 const SizedBox(height: DesignTokens.spacingXs),
                 Text(
                   l10n.newProjectSubtitle,
-                  style: DesignTokens.body2.copyWith(color: DesignTokens.textGray),
+                  style: DesignTokens.body2.copyWith(
+                    color: DesignTokens.textGray,
+                  ),
                 ),
                 const SizedBox(height: DesignTokens.spacingLg),
               ],
@@ -96,51 +106,53 @@ class NewProjectSheet extends StatelessWidget {
             child: SingleChildScrollView(
               child: Column(
                 children: [
-          _EntryOption(
-            iconBackground: const Color(0xFFEDE7FB),
-            icon: Icons.view_in_ar,
-            iconColor: DesignTokens.primaryBlue,
-            title: l10n.newProjectWizardTitle,
-            description: l10n.newProjectWizardDesc,
-            onTap: () {
-              ProviderScope.containerOf(context)
-                  .read(roomPersistenceProvider.notifier)
-                  .startNewProject();
-              _closeSheet(context);
-              context.push('/wizard');
-            },
-          ),
-          const SizedBox(height: DesignTokens.spacingMd),
-          _EntryOption(
-            iconBackground: DesignTokens.borderGrayAlt,
-            icon: Icons.radar,
-            iconColor: DesignTokens.primaryBlue,
-            // Android measures with the camera (ARCore); iPhones scan with LiDAR.
-            title: _isAndroid ? l10n.newProjectArScanTitle : l10n.newProjectLidarTitle,
-            description: _isAndroid ? l10n.newProjectArScanDesc : l10n.newProjectLidarDesc,
-            onTap: () {
-              ProviderScope.containerOf(context)
-                  .read(roomPersistenceProvider.notifier)
-                  .continueCurrentProject();
-              _closeSheet(context);
-              context.push('/scanning/roomplan');
-            },
-          ),
-          const SizedBox(height: DesignTokens.spacingMd),
-          _EntryOption(
-            iconBackground: const Color(0xFFEAF7F0),
-            icon: Icons.draw_outlined,
-            iconColor: DesignTokens.successGreen,
-            title: l10n.newProjectDrawTitle,
-            description: l10n.newProjectDrawDesc,
-            onTap: () {
-              ProviderScope.containerOf(context)
-                  .read(roomPersistenceProvider.notifier)
-                  .startNewProject();
-              _closeSheet(context);
-              context.push('/setup/draw');
-            },
-          ),
+                  _AnimatedCard(
+                    animation: const WizardBoxAnimation(),
+                    tint: DesignTokens.primaryBlue,
+                    title: l10n.newProjectWizardTitle,
+                    caption: l10n.newProjectWizardCaption,
+                    onTap: () {
+                      ProviderScope.containerOf(context)
+                          .read(roomPersistenceProvider.notifier)
+                          .startNewProject();
+                      _closeSheet(context);
+                      context.push('/wizard');
+                    },
+                  ),
+                  const SizedBox(height: DesignTokens.spacingMd),
+                  _AnimatedCard(
+                    animation: const LidarScanAnimation(),
+                    tint: DesignTokens.primaryBlue,
+                    // Android measures with the camera (ARCore); iPhones scan
+                    // with LiDAR.
+                    title: _isAndroid
+                        ? l10n.newProjectArScanTitle
+                        : l10n.newProjectLidarTitle,
+                    caption: _isAndroid
+                        ? l10n.newProjectArScanCaption
+                        : l10n.newProjectLidarCaption,
+                    onTap: () {
+                      ProviderScope.containerOf(context)
+                          .read(roomPersistenceProvider.notifier)
+                          .continueCurrentProject();
+                      _closeSheet(context);
+                      context.push('/scanning/roomplan');
+                    },
+                  ),
+                  const SizedBox(height: DesignTokens.spacingMd),
+                  _AnimatedCard(
+                    animation: const DrawRoomAnimation(),
+                    tint: DesignTokens.successGreen,
+                    title: l10n.newProjectDrawTitle,
+                    caption: l10n.newProjectDrawCaption,
+                    onTap: () {
+                      ProviderScope.containerOf(context)
+                          .read(roomPersistenceProvider.notifier)
+                          .startNewProject();
+                      _closeSheet(context);
+                      context.push('/setup/draw');
+                    },
+                  ),
                 ],
               ),
             ),
@@ -151,64 +163,97 @@ class NewProjectSheet extends StatelessWidget {
   }
 }
 
-class _EntryOption extends StatelessWidget {
-  const _EntryOption({
-    required this.iconBackground,
-    required this.icon,
-    required this.iconColor,
+/// One entry path: the looping illustration on top, then the title and a
+/// short caption. Read as one button ("title, caption"); the illustration is
+/// decoration and carries no semantics.
+class _AnimatedCard extends StatelessWidget {
+  const _AnimatedCard({
+    required this.animation,
+    required this.tint,
     required this.title,
-    required this.description,
+    required this.caption,
     required this.onTap,
   });
 
-  final Color iconBackground;
-  final IconData icon;
-  final Color iconColor;
+  final Widget animation;
+  final Color tint;
   final String title;
-  final String description;
+  final String caption;
   final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(DesignTokens.radiusXl),
-      child: Container(
-        padding: const EdgeInsets.all(DesignTokens.spacingMd),
-        decoration: BoxDecoration(
-          color: const Color(0xFFF7F8FA),
-          borderRadius: BorderRadius.circular(DesignTokens.radiusXl),
-          border: Border.all(color: const Color(0xFFEDEFF3)),
-        ),
-        child: Row(
-          children: [
-            Container(
-              width: 56,
-              height: 56,
+    final radius = BorderRadius.circular(DesignTokens.radiusXl);
+    return MergeSemantics(
+      child: Semantics(
+        button: true,
+        child: Material(
+          color: DesignTokens.white,
+          borderRadius: radius,
+          child: InkWell(
+            onTap: onTap,
+            borderRadius: radius,
+            child: Ink(
               decoration: BoxDecoration(
-                color: iconBackground,
-                borderRadius: BorderRadius.circular(DesignTokens.radiusLg),
+                borderRadius: radius,
+                border: Border.all(color: DesignTokens.borderGray),
               ),
-              child: Icon(icon, color: iconColor, size: DesignTokens.iconMd),
-            ),
-            const SizedBox(width: DesignTokens.spacingMd),
-            Expanded(
               child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  Text(title, style: DesignTokens.subtitle2),
-                  const SizedBox(height: DesignTokens.spacingXs),
-                  Text(
-                    description,
-                    style: DesignTokens.caption.copyWith(
-                      color: DesignTokens.textGray,
+                  ExcludeSemantics(
+                    child: Container(
+                      height: 118,
+                      margin: const EdgeInsets.all(DesignTokens.spacingSm),
+                      decoration: BoxDecoration(
+                        color: tint.withValues(alpha: 0.06),
+                        borderRadius: BorderRadius.circular(
+                          DesignTokens.radiusLg,
+                        ),
+                      ),
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(
+                          DesignTokens.radiusLg,
+                        ),
+                        child: animation,
+                      ),
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(
+                      DesignTokens.spacingMd,
+                      DesignTokens.spacingXs,
+                      DesignTokens.spacingMd,
+                      DesignTokens.spacingMd,
+                    ),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(title, style: DesignTokens.subtitle2),
+                              const SizedBox(height: 2),
+                              Text(
+                                caption,
+                                style: DesignTokens.caption.copyWith(
+                                  color: DesignTokens.textGray,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        const Icon(
+                          Icons.chevron_right,
+                          color: DesignTokens.textMuted,
+                        ),
+                      ],
                     ),
                   ),
                 ],
               ),
             ),
-            const Icon(Icons.chevron_right, color: DesignTokens.textMuted),
-          ],
+          ),
         ),
       ),
     );

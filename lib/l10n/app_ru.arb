@@ -659,7 +659,7 @@
   "unsavedChangesStay": "Остаться",
   "roomSaveFailed": "Комната не сохранилась на сервере. Проверьте интернет и попробуйте ещё раз.",
   "newProjectArScanTitle": "Измерить камерой",
-  "newProjectArScanDesc": "Отметьте углы пола камерой телефона и получите план комнаты",
+  "newProjectArScanCaption": "Отметьте углы пола камерой",
   "arScanFindFloor": "Наведите телефон на пол и медленно поводите им",
   "arScanCornersHint": "Наведите прицел на следующий угол и добавьте его",
   "arScanAddCorner": "Добавить угол",
@@ -1722,17 +1722,17 @@
   "@newProjectWizardTitle": {
     "description": "New-project entry: 3D wizard title."
   },
-  "newProjectWizardDesc": "Введите размеры комнаты в интерактивном 3D-виде",
-  "@newProjectWizardDesc": {
-    "description": "New-project entry: 3D wizard description."
+  "newProjectWizardCaption": "Введите размеры комнаты",
+  "@newProjectWizardCaption": {
+    "description": "New-project card: 3D wizard caption (3-5 words, read by screen readers too)."
   },
   "newProjectLidarTitle": "LiDAR сканер",
   "@newProjectLidarTitle": {
     "description": "New-project entry and scan screen app bar: LiDAR scanner title."
   },
-  "newProjectLidarDesc": "Отсканируйте комнату с помощью LiDAR и получите готовую 3D-модель",
-  "@newProjectLidarDesc": {
-    "description": "New-project entry: LiDAR scanner description."
+  "newProjectLidarCaption": "Отсканируйте комнату с LiDAR",
+  "@newProjectLidarCaption": {
+    "description": "New-project card: LiDAR scanner caption (3-5 words, read by screen readers too)."
   },
   "newProjectPhotoTitle": "360° Фотоскан",
   "@newProjectPhotoTitle": {
@@ -1746,9 +1746,9 @@
   "@newProjectDrawTitle": {
     "description": "New-project entry and unsupported-LiDAR fallback: draw-it-yourself title."
   },
-  "newProjectDrawDesc": "Нарисуйте комнату пальцем — размеры рассчитаются автоматически по рисунку",
-  "@newProjectDrawDesc": {
-    "description": "New-project entry: draw-it-yourself description."
+  "newProjectDrawCaption": "Нарисуйте комнату пальцем",
+  "@newProjectDrawCaption": {
+    "description": "New-project card: draw-it-yourself caption (3-5 words, read by screen readers too)."
   },
   "summarySavedTitle": "Размеры сохранены!",
   "@summarySavedTitle": {
