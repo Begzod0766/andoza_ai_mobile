@@ -2,28 +2,46 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../../config/design_tokens.dart';
+import '../../features/new_project/new_project_sheet_state.dart';
 import '../../l10n/app_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../providers/room_persistence_provider.dart';
 
-/// Shows the A3 "+" bottom sheet, dimming the screen behind it per spec.
-Future<void> showNewProjectSheet(BuildContext context) {
-  return showModalBottomSheet<void>(
-    context: context,
-    isScrollControlled: true,
-    backgroundColor: Colors.transparent,
-    barrierColor: const Color(0x801E2439),
-    builder: (_) => const NewProjectSheet(),
-  );
+/// Opens the A3 "+" sheet — the one entry point for every caller. The sheet
+/// lives in `AppShell`'s body above the menu (`NewProjectSheetLayer`) and the
+/// menu's circle moves to "+". A caller outside the shell (a root-navigator
+/// screen such as `/setup/summary` or `/onboarding/e8`) is taken to the shell
+/// first, since the sheet only exists there.
+void showNewProjectSheet(BuildContext context) {
+  final container = ProviderScope.containerOf(context, listen: false);
+  if (!AppShellScope.isInside(context)) GoRouter.of(context).go('/');
+  container.read(newProjectSheetOpenProvider.notifier).state = true;
 }
 
-/// A3: "+" bottom sheet — the three entry paths into a new project's
-/// measurement flow. Presented as a modal bottom sheet over the dimmed
-/// home screen (per spec: "Home dimmed behind (blur + scrim)").
+/// Closes the sheet before a card's flow is pushed over the shell.
+void _closeSheet(BuildContext context) =>
+    ProviderScope.containerOf(context, listen: false)
+        .read(newProjectSheetOpenProvider.notifier)
+        .state = false;
+
+/// A3: "+" sheet — the three entry paths into a new project's measurement
+/// flow, full height above the bottom menu.
 bool get _isAndroid => defaultTargetPlatform == TargetPlatform.android;
 
 class NewProjectSheet extends StatelessWidget {
-  const NewProjectSheet({super.key});
+  const NewProjectSheet({
+    this.onHeaderDragUpdate,
+    this.onHeaderDragEnd,
+    super.key,
+  });
+
+  /// Vertical drags on the header (handle + title) — the host uses them to
+  /// swipe the sheet down.
+  final GestureDragUpdateCallback? onHeaderDragUpdate;
+  final GestureDragEndCallback? onHeaderDragEnd;
+
+  /// The drag handle at the top of the sheet.
+  static const handleKey = Key('newProjectSheetHandle');
 
   @override
   Widget build(BuildContext context) {
@@ -43,27 +61,41 @@ class NewProjectSheet extends StatelessWidget {
         ),
       ),
       child: Column(
-        mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Center(
-            child: Container(
-              width: 44,
-              height: 5,
-              margin: const EdgeInsets.only(bottom: DesignTokens.spacingLg),
-              decoration: BoxDecoration(
-                color: DesignTokens.borderGray,
-                borderRadius: BorderRadius.circular(DesignTokens.radiusFull),
-              ),
+          GestureDetector(
+            behavior: HitTestBehavior.opaque,
+            onVerticalDragUpdate: onHeaderDragUpdate,
+            onVerticalDragEnd: onHeaderDragEnd,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Center(
+                  child: Container(
+                    key: handleKey,
+                    width: 44,
+                    height: 5,
+                    margin: const EdgeInsets.only(bottom: DesignTokens.spacingLg),
+                    decoration: BoxDecoration(
+                      color: DesignTokens.borderGray,
+                      borderRadius: BorderRadius.circular(DesignTokens.radiusFull),
+                    ),
+                  ),
+                ),
+                Text(l10n.newProjectTitle, style: DesignTokens.heading3),
+                const SizedBox(height: DesignTokens.spacingXs),
+                Text(
+                  l10n.newProjectSubtitle,
+                  style: DesignTokens.body2.copyWith(color: DesignTokens.textGray),
+                ),
+                const SizedBox(height: DesignTokens.spacingLg),
+              ],
             ),
           ),
-          Text(l10n.newProjectTitle, style: DesignTokens.heading3),
-          const SizedBox(height: DesignTokens.spacingXs),
-          Text(
-            l10n.newProjectSubtitle,
-            style: DesignTokens.body2.copyWith(color: DesignTokens.textGray),
-          ),
-          const SizedBox(height: DesignTokens.spacingLg),
+          Expanded(
+            child: SingleChildScrollView(
+              child: Column(
+                children: [
           _EntryOption(
             iconBackground: const Color(0xFFEDE7FB),
             icon: Icons.view_in_ar,
@@ -74,7 +106,7 @@ class NewProjectSheet extends StatelessWidget {
               ProviderScope.containerOf(context)
                   .read(roomPersistenceProvider.notifier)
                   .startNewProject();
-              Navigator.of(context).pop();
+              _closeSheet(context);
               context.push('/wizard');
             },
           ),
@@ -90,7 +122,7 @@ class NewProjectSheet extends StatelessWidget {
               ProviderScope.containerOf(context)
                   .read(roomPersistenceProvider.notifier)
                   .continueCurrentProject();
-              Navigator.of(context).pop();
+              _closeSheet(context);
               context.push('/scanning/roomplan');
             },
           ),
@@ -105,9 +137,13 @@ class NewProjectSheet extends StatelessWidget {
               ProviderScope.containerOf(context)
                   .read(roomPersistenceProvider.notifier)
                   .startNewProject();
-              Navigator.of(context).pop();
+              _closeSheet(context);
               context.push('/setup/draw');
             },
+          ),
+                ],
+              ),
+            ),
           ),
         ],
       ),

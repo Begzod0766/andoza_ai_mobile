@@ -8,7 +8,9 @@ import '../features/tour/startup_dialogs.dart';
 import '../providers/business_provider.dart';
 import '../l10n/app_localizations.dart';
 import '../widgets/nav/magic_nav_bar.dart';
+import '../features/new_project/new_project_sheet_state.dart';
 import 'room_setup/new_project_sheet.dart';
+import 'room_setup/new_project_sheet_layer.dart';
 import 'scanning/flat_scan_review_page.dart';
 import 'scanning/room_scan_review_page.dart';
 
@@ -122,37 +124,61 @@ class _AppShellState extends ConsumerState<AppShell> {
       return Scaffold(body: widget.child);
     }
 
-    return Scaffold(
-      body: widget.child,
-      bottomNavigationBar: _ShellNavBar(
-        location: location,
-        tourKeys: ref.watch(homeTourKeysProvider),
+    final sheetOpen = ref.watch(newProjectSheetOpenProvider);
+    // No extendBody (see CLAUDE.md): the new-project sheet is stacked in the
+    // body, above the menu, so the menu stays visible and tappable.
+    return AppShellScope(
+      child: Scaffold(
+        body: Stack(
+          children: [
+            Positioned.fill(child: widget.child),
+            const Positioned.fill(child: NewProjectSheetLayer()),
+          ],
+        ),
+        bottomNavigationBar: _ShellNavBar(
+          location: location,
+          sheetOpen: sheetOpen,
+          tourKeys: ref.watch(homeTourKeysProvider),
+        ),
       ),
     );
   }
 }
 
-class _ShellNavBar extends StatelessWidget {
-  const _ShellNavBar({required this.location, required this.tourKeys});
+class _ShellNavBar extends ConsumerWidget {
+  const _ShellNavBar({
+    required this.location,
+    required this.sheetOpen,
+    required this.tourKeys,
+  });
 
   final String location;
+  final bool sheetOpen;
   final HomeTourKeys tourKeys;
 
   /// Tab routes by slot; slot 2 is the "+" (new project), not a route.
   static const _routes = ['/', '/shop/s1', null, '/masters/u1', '/profile'];
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context)!;
     return MagicNavBar(
-      selectedIndex: AppShell.tabIndexFor(location),
+      // While the sheet is open the circle sits on "+"; closing it brings the
+      // circle back to the tab of the current route.
+      selectedIndex: sheetOpen ? 2 : AppShell.tabIndexFor(location),
+      raisedBackground: sheetOpen,
       onTap: (i) {
         final route = _routes[i];
         if (route == null) {
-          showNewProjectSheet(context);
-        } else {
-          context.go(route);
+          if (sheetOpen) {
+            ref.read(newProjectSheetOpenProvider.notifier).state = false;
+          } else {
+            showNewProjectSheet(context);
+          }
+          return;
         }
+        ref.read(newProjectSheetOpenProvider.notifier).state = false;
+        context.go(route);
       },
       items: [
         MagicNavItem(icon: Icons.home_outlined, activeIcon: Icons.home, label: l10n.navHome),
