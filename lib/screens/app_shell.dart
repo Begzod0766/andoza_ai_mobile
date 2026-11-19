@@ -1,30 +1,40 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import '../config/design_tokens.dart';
 import '../features/room_scan/pending_scan_store.dart';
 import '../features/tour/home_tour_keys.dart';
 import '../features/tour/home_tour_steps.dart';
 import '../features/tour/startup_dialogs.dart';
 import '../providers/business_provider.dart';
 import '../l10n/app_localizations.dart';
+import '../widgets/nav/magic_nav_bar.dart';
 import 'room_setup/new_project_sheet.dart';
 import 'scanning/flat_scan_review_page.dart';
 import 'scanning/room_scan_review_page.dart';
 
-/// Shared app shell: the bottom navigation bar (Uy / Do'kon / Ustalar /
-/// Profil) with a center orange "+" that opens the new-project sheet (A3) —
-/// per spec, this is a shared nav-level element, not something any
-/// individual screen renders itself. A plain flat bar: an earlier version
-/// bumped the active tab and the "+" above the bar in raised circles with a
-/// notch cut into the bar — reverted per explicit feedback that it read as
-/// heavy/cluttered. The active tab is now just a rounded highlight filling
-/// its own slot, in place, and the "+" is a same-height, same-row button
-/// like the other four.
+/// Shared app shell: the bottom menu (Uy / Do'kon / "+" / Ustalar / Profil) —
+/// a shared nav-level element, not something any individual screen renders
+/// itself. [MagicNavBar] draws five equal slots; the active one's icon sits
+/// in a blue circle raised over a notch and slides to the tapped slot (owner
+/// design of 2026-11-20, replacing the flat bar with a separate "+" button).
+/// The "+" slot opens the new-project sheet (A3).
 class AppShell extends ConsumerStatefulWidget {
   const AppShell({required this.child, super.key});
 
   final Widget child;
+
+  /// The menu slot a shell [location] belongs to: Uy 0, Do'kon 1, Ustalar 3,
+  /// Profil 4 (slot 2 is the "+"); null for a route that is no tab.
+  static int? tabIndexFor(String location) {
+    if (location == '/') return 0;
+    final head = location.split('/').take(2).join('/');
+    return switch (head) {
+      '/shop' => 1,
+      '/masters' => 3,
+      '/profile' => 4,
+      _ => null,
+    };
+  }
 
   @override
   ConsumerState<AppShell> createState() => _AppShellState();
@@ -114,7 +124,7 @@ class _AppShellState extends ConsumerState<AppShell> {
 
     return Scaffold(
       body: widget.child,
-      bottomNavigationBar: _BottomNavWithFab(
+      bottomNavigationBar: _ShellNavBar(
         location: location,
         tourKeys: ref.watch(homeTourKeysProvider),
       ),
@@ -122,167 +132,50 @@ class _AppShellState extends ConsumerState<AppShell> {
   }
 }
 
-class _BottomNavWithFab extends StatelessWidget {
-  const _BottomNavWithFab({required this.location, required this.tourKeys});
+class _ShellNavBar extends StatelessWidget {
+  const _ShellNavBar({required this.location, required this.tourKeys});
 
   final String location;
   final HomeTourKeys tourKeys;
 
-  static const _tabs = [
-    _NavTab(
-      icon: Icons.home_outlined,
-      activeIcon: Icons.home,
-      route: '/',
-    ),
-    _NavTab(
-      icon: Icons.storefront_outlined,
-      activeIcon: Icons.storefront,
-      route: '/shop/s1',
-    ),
-    _NavTab(
-      icon: Icons.groups_outlined,
-      activeIcon: Icons.groups,
-      route: '/masters/u1',
-    ),
-    _NavTab(
-      icon: Icons.person_outline,
-      activeIcon: Icons.person,
-      route: '/profile',
-    ),
-  ];
-
-  /// Resolves a tab's localized name from its route — shown under the icon
-  /// and used as the tab's Semantics name.
-  static String _labelFor(AppLocalizations l10n, String route) => switch (route) {
-        '/shop/s1' => l10n.navShop,
-        '/masters/u1' => l10n.navMasters,
-        '/profile' => l10n.navProfile,
-        _ => l10n.navHome,
-      };
-
-  bool _isCurrent(_NavTab tab) {
-    if (tab.route == '/') return location == '/';
-    return location.startsWith(tab.route.split('/').take(2).join('/'));
-  }
+  /// Tab routes by slot; slot 2 is the "+" (new project), not a route.
+  static const _routes = ['/', '/shop/s1', null, '/masters/u1', '/profile'];
 
   @override
   Widget build(BuildContext context) {
-    return DecoratedBox(
-      decoration: const BoxDecoration(
-        color: DesignTokens.white,
-        border: Border(
-          top: BorderSide(color: Color(0xFFF0F1F4), width: 1),
-        ),
-        boxShadow: [DesignTokens.shadowNavBar],
-      ),
-      child: SafeArea(
-        top: false,
-        child: SizedBox(
-          height: 64,
-          child: Row(
-            children: [
-              Expanded(child: _navItem(context, _tabs[0])),
-              Expanded(child: _navItem(context, _tabs[1])),
-              Expanded(child: _fabItem(context)),
-              Expanded(child: _navItem(context, _tabs[2])),
-              Expanded(child: _navItem(context, _tabs[3])),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _navItem(BuildContext context, _NavTab tab) {
     final l10n = AppLocalizations.of(context)!;
-    final isCurrent = _isCurrent(tab);
-    final tourKey = switch (tab.route) {
-      '/shop/s1' => tourKeys.of(HomeTourTarget.shop),
-      '/masters/u1' => tourKeys.of(HomeTourTarget.masters),
-      _ => null,
-    };
-    return Semantics(
-      key: tourKey,
-      button: true,
-      selected: isCurrent,
-      // The tab's one accessible name; the visible text below is excluded
-      // so screen readers don't read it twice.
-      label: _labelFor(l10n, tab.route),
-      child: InkWell(
-        onTap: () => context.go(tab.route),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            AnimatedContainer(
-              duration: const Duration(milliseconds: 150),
-              width: 52,
-              height: 32,
-              alignment: Alignment.center,
-              decoration: BoxDecoration(
-                color: isCurrent ? DesignTokens.primaryBlue : Colors.transparent,
-                borderRadius: BorderRadius.circular(DesignTokens.radiusMd),
-              ),
-              child: Icon(
-                isCurrent ? tab.activeIcon : tab.icon,
-                color: isCurrent ? DesignTokens.white : DesignTokens.textMuted,
-                size: 22,
-              ),
-            ),
-            const SizedBox(height: 2),
-            // First-time users shouldn't have to guess the tabs. Capped so a
-            // large system font can't push the label out of the 64 px bar.
-            ExcludeSemantics(
-              child: Text(
-                _labelFor(l10n, tab.route),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                textScaler: MediaQuery.textScalerOf(context).clamp(maxScaleFactor: 1.2),
-                style: DesignTokens.caption.copyWith(
-                  fontSize: 11,
-                  height: 1.2,
-                  color: isCurrent ? DesignTokens.primaryBlue : DesignTokens.textGray,
-                  fontWeight: isCurrent ? FontWeight.w600 : FontWeight.w400,
-                ),
-              ),
-            ),
-          ],
+    return MagicNavBar(
+      selectedIndex: AppShell.tabIndexFor(location),
+      onTap: (i) {
+        final route = _routes[i];
+        if (route == null) {
+          showNewProjectSheet(context);
+        } else {
+          context.go(route);
+        }
+      },
+      items: [
+        MagicNavItem(icon: Icons.home_outlined, activeIcon: Icons.home, label: l10n.navHome),
+        MagicNavItem(
+          icon: Icons.storefront_outlined,
+          activeIcon: Icons.storefront,
+          label: l10n.navShop,
+          key: tourKeys.of(HomeTourTarget.shop),
         ),
-      ),
+        MagicNavItem(
+          icon: Icons.add,
+          activeIcon: Icons.add,
+          label: l10n.navAddProject,
+          key: tourKeys.of(HomeTourTarget.newProject),
+        ),
+        MagicNavItem(
+          icon: Icons.groups_outlined,
+          activeIcon: Icons.groups,
+          label: l10n.navMasters,
+          key: tourKeys.of(HomeTourTarget.masters),
+        ),
+        MagicNavItem(icon: Icons.person_outline, activeIcon: Icons.person, label: l10n.navProfile),
+      ],
     );
   }
-
-  Widget _fabItem(BuildContext context) {
-    return Semantics(
-      key: tourKeys.of(HomeTourTarget.newProject),
-      button: true,
-      label: AppLocalizations.of(context)!.navAddProject,
-      child: InkWell(
-        onTap: () => showNewProjectSheet(context),
-        child: Center(
-          child: Container(
-            width: 40,
-            height: 40,
-            alignment: Alignment.center,
-            decoration: const BoxDecoration(
-              shape: BoxShape.circle,
-              color: DesignTokens.accentOrangeStrong,
-            ),
-            child: const Icon(Icons.add, color: DesignTokens.white, size: 22),
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class _NavTab {
-  const _NavTab({
-    required this.icon,
-    required this.activeIcon,
-    required this.route,
-  });
-
-  final IconData icon;
-  final IconData activeIcon;
-  final String route;
 }
