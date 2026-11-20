@@ -91,8 +91,7 @@ String? signupRedirect(AuthState auth) {
 }
 
 final routerProvider = Provider<GoRouter>((ref) {
-  final refreshNotifier = _GoRouterRefreshNotifier(ref);
-  ref.onDispose(refreshNotifier.dispose);
+  final refreshNotifier = ref.read(authRouterRefreshProvider);
   final newScreenViewObserver = ref.read(screenViewObserverFactoryProvider);
 
   return GoRouter(
@@ -563,19 +562,32 @@ final routerProvider = Provider<GoRouter>((ref) {
   );
 });
 
+/// The router's `refreshListenable`: see [_GoRouterRefreshNotifier].
+@visibleForTesting
+final authRouterRefreshProvider = Provider<Listenable>((ref) {
+  final notifier = _GoRouterRefreshNotifier(ref);
+  ref.onDispose(notifier.dispose);
+  return notifier;
+});
+
 /// Bridges Riverpod's [authStateProvider] to GoRouter's [Listenable]-based
-/// refresh mechanism, so an auth change re-runs `redirect` without
+/// refresh mechanism, so signing in or out re-runs `redirect` without
 /// rebuilding the GoRouter instance (which would reset navigation to
 /// `initialLocation` and remount the whole shell).
+///
+/// Only signed-in vs not: a guest signing up or in (and a token refresh)
+/// changes nothing the redirect decides, and a refresh then re-read the
+/// location last reported — with `/signup` still in it while that screen
+/// was closing — and put the sign-up screen back over the Studio.
 class _GoRouterRefreshNotifier extends ChangeNotifier {
   _GoRouterRefreshNotifier(Ref ref) {
-    _subscription = ref.listen<AuthState>(
-      authStateProvider,
+    _subscription = ref.listen<bool>(
+      authStateProvider.select((s) => s is AuthAuthenticated),
       (previous, next) => notifyListeners(),
     );
   }
 
-  late final ProviderSubscription<AuthState> _subscription;
+  late final ProviderSubscription<bool> _subscription;
 
   @override
   void dispose() {

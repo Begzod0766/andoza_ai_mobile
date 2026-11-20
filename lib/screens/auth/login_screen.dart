@@ -31,8 +31,7 @@ class LoginScreen extends ConsumerStatefulWidget {
   const LoginScreen({super.key, this.fromGuest = false});
 
   /// Opened as `/signup` over a guest's work: no "continue as guest", a close
-  /// button, and on success it pops `true` (before the session flips, so the
-  /// router's guest-only `/signup` rule never resets the stack under it).
+  /// button, and on success it pops `true` once the session has flipped.
   final bool fromGuest;
 
   @override
@@ -115,7 +114,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   AuthRepository get _repo => ref.read(authRepositoryProvider);
 
   /// Every successful sign-in ends here. Over a guest's work (`/signup`) the
-  /// screen pops first, then the session flips.
+  /// session flips, then the screen pops `true`.
   void _signedIn(AuthResponse res, String method) {
     final analytics = ref.read(analyticsProvider);
     final notifier = ref.read(authStateProvider.notifier);
@@ -124,8 +123,12 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     final mergedText = merged > 0
         ? AppLocalizations.of(context)!.guestMergedRooms(merged)
         : null;
-    if (widget.fromGuest && mounted) Navigator.of(context).pop(true);
+    final navigator = widget.fromGuest ? Navigator.of(context) : null;
     notifier.setSession(res);
+    // Over a guest's work: close only after the session flipped. Popping
+    // first let the auth-driven router refresh re-read the location it had
+    // last reported — with /signup still in it — and put the screen back.
+    navigator?.pop(true);
     analytics.login(method);
     // The guest's rooms moved into the account they signed in to.
     if (mergedText != null) {
@@ -224,8 +227,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       _error = null;
     });
     if (widget.fromGuest) {
-      // Over a guest's work: sign in through the repository so the screen can
-      // pop before the state flips (see [_signedIn]).
+      // Over a guest's work: sign in through the repository so the screen
+      // pops right after the state flips (see [_signedIn]).
       try {
         final res = await _repo.login(_username.text.trim(), _password.text);
         _signedIn(res, 'password');

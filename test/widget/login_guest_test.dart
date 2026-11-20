@@ -90,7 +90,7 @@ void main() {
     expect(find.byType(CloseButton), findsOneWidget);
   });
 
-  testWidgets('fromGuest pops true before the session flips', (tester) async {
+  testWidgets('fromGuest flips the session, then pops true', (tester) async {
     final repo = _Repo();
     late ProviderContainer container;
     Object? popped = 'not popped';
@@ -131,9 +131,9 @@ void main() {
     expect(repo.loginCalls, 1);
     expect(popped, isTrue);
     expect(find.byType(LoginScreen), findsNothing);
-    // Popped while still a guest: the router's "/signup is for guests" rule
-    // never sees a registered user on /signup and cannot reset the stack.
-    expect(observer.stateAtPop?.isGuest, isTrue);
+    // Signed in by the time the caller (the sign-up sheet) gets `true`.
+    expect(observer.stateAtPop, isA<AuthAuthenticated>());
+    expect(observer.stateAtPop?.isGuest, isFalse);
     expect(container.read(authStateProvider).isGuest, isFalse);
   });
 }

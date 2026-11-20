@@ -16,6 +16,9 @@ final estimateRepositoryProvider = Provider<EstimateRepository>((ref) {
 /// unreachable.
 final estimatePreviewProvider =
     FutureProvider.autoDispose.family<Estimate, String>((ref, roomId) {
+  // A guest's smeta skips AI and market prices; once they sign up (over a
+  // still-open estimate screen) it is priced in full.
+  ref.watch(authStateProvider.select((s) => s.isGuest));
   return ref.watch(estimateRepositoryProvider).preview(roomId);
 });
 

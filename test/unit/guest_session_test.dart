@@ -7,10 +7,13 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tamir_uy_mobile_flutter/models/api/apartment.dart';
+import 'package:tamir_uy_mobile_flutter/models/api/estimate.dart';
 import 'package:tamir_uy_mobile_flutter/models/user_model.dart';
 import 'package:tamir_uy_mobile_flutter/providers/apartment_provider.dart';
 import 'package:tamir_uy_mobile_flutter/providers/auth_provider.dart';
 import 'package:tamir_uy_mobile_flutter/repositories/apartment_repository.dart';
+import 'package:tamir_uy_mobile_flutter/providers/estimate_api_provider.dart';
+import 'package:tamir_uy_mobile_flutter/repositories/estimate_repository.dart';
 import 'package:tamir_uy_mobile_flutter/repositories/auth_repository.dart';
 import 'package:tamir_uy_mobile_flutter/services/api_client.dart';
 import 'package:tamir_uy_mobile_flutter/services/secure_storage.dart';
@@ -249,6 +252,55 @@ void main() {
     await container.read(apartmentsProvider.future);
     expect(calls, 2);
   });
+
+  test('the server smeta refetches when a guest signs up', () async {
+    var calls = 0;
+    final container = ProviderContainer(overrides: [
+      estimateRepositoryProvider.overrideWithValue(_CountingEstimates(() {
+        calls++;
+      })),
+      authStateProvider.overrideWith((ref) => _SettableAuth()),
+    ]);
+    addTearDown(container.dispose);
+    final auth = container.read(authStateProvider.notifier) as _SettableAuth;
+    auth.set(const AuthAuthenticated(
+        user: User(id: 'g1', isGuest: true), token: 'g'));
+    final sub = container.listen(estimatePreviewProvider('r1'), (_, _) {});
+    addTearDown(sub.close);
+    await container.read(estimatePreviewProvider('r1').future);
+    expect(calls, 1);
+
+    // Signed up: the guest's approximate prices are no longer the answer.
+    auth.set(const AuthAuthenticated(user: User(id: 'g1'), token: 'u'));
+    await container.read(estimatePreviewProvider('r1').future);
+    expect(calls, 2);
+
+    // A token refresh is not a reason to price it again.
+    auth.set(const AuthAuthenticated(user: User(id: 'g1'), token: 'u2'));
+    await container.read(estimatePreviewProvider('r1').future);
+    expect(calls, 2);
+  });
+}
+
+class _CountingEstimates implements EstimateRepository {
+  _CountingEstimates(this._onPreview);
+  final void Function() _onPreview;
+
+  @override
+  Future<Estimate> preview(String roomId) async {
+    _onPreview();
+    return Estimate(
+      id: 'e',
+      roomId: roomId,
+      totalUzs: 1,
+      totalMin: 1,
+      totalMax: 1,
+      createdAt: DateTime(2026),
+    );
+  }
+
+  @override
+  dynamic noSuchMethod(Invocation i) => throw UnimplementedError();
 }
 
 class _NoRepo implements AuthRepository {
