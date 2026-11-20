@@ -76,7 +76,8 @@ menyuda o'yiq bilan; boshqa element tanlansa doira 300 ms da siljiydi.
 "+" oynasi (`room_setup/new_project_sheet_layer.dart`) body ichida, menyu ustida
 to'liq balandlikda ochiladi; holati `newProjectSheetOpenProvider`
 (`features/new_project/`), yagona kirish — `showNewProjectSheet(context)`
-(shell tashqarisidan chaqirilsa avval `/` ga o'tadi). Tugallanmagan skaner
+(shell tashqarisidan — masalan `/setup/summary` — chaqirilsa, o'sha mazmun
+modal oyna bo'lib ochiladi va «Orqaga» o'sha ekranga qaytaradi). Tugallanmagan skaner
 bo'lsa, menyu uni davom ettirishni taklif qiladi.
 
 | Bo'lim | Yo'llar | Izoh |

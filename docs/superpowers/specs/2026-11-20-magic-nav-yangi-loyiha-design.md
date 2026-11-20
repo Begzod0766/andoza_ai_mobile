@@ -22,7 +22,10 @@ Sana: 2026-11-20 · Egasi tasdiqlagan.
 3. **Yagona kirish nuqtasi:** `showNewProjectSheet(context)` qoladi, lekin endi
    Riverpod `newProjectSheetOpenProvider` ni yoqadi. Chaqiruvchi shell
    tashqarisida bo'lsa (`/setup/summary`, `/onboarding/e8` — root navigator),
-   avval `context.go('/')` bilan shellga o'tiladi.
+   o'sha mazmun shu ekran ustida modal oyna bo'lib ochiladi — yopilganda yoki
+   kartadan ochilgan oqimdan «Orqaga» bosilganda foydalanuvchi o'z joyiga
+   qaytadi (nazoratchi qarori, 2026-11-20). Kirish/chiqishda va boshqa yo'lga
+   o'tilganda (deep link, push) oyna yopiladi.
 4. **Uchta animatsiyali karta** uzun tavsiflar o'rniga: tepada animatsiya,
    keyin sarlavha, keyin 3–5 so'zli qisqa izoh (ekran o'quvchi uchun ham).
    - **3D Master:** wizardning izometrik qutisi (`IsometricRoomView`); barmoq
