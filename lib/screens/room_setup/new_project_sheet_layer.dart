@@ -42,6 +42,9 @@ class _NewProjectSheetLayerState extends ConsumerState<NewProjectSheetLayer>
 
   void _onDragUpdate(DragUpdateDetails d) {
     _c.value -= (d.primaryDelta ?? 0) / _sheetHeight;
+    // Dragged all the way down: the header (and its drag-end) is about to
+    // unmount, so close now rather than wait for an end that never comes.
+    if (_c.value == 0) _close();
   }
 
   void _onDragEnd(DragEndDetails d) {
@@ -70,7 +73,6 @@ class _NewProjectSheetLayerState extends ConsumerState<NewProjectSheetLayer>
   @override
   Widget build(BuildContext context) {
     ref.listen<bool>(newProjectSheetOpenProvider, (_, open) => _sync(open));
-    final open = ref.watch(newProjectSheetOpenProvider);
     final topGap = MediaQuery.paddingOf(context).top + 8;
     final sheet = NewProjectSheet(
       onHeaderDragUpdate: _onDragUpdate,
@@ -109,15 +111,18 @@ class _NewProjectSheetLayerState extends ConsumerState<NewProjectSheetLayer>
           ],
         );
       },
-      child: open
-          ? BackButtonListener(
-              onBackButtonPressed: () async {
-                _close();
-                return true;
-              },
-              child: sheet,
-            )
-          : sheet,
+      // Always wrapped (switching wrappers would rebuild the sheet and restart
+      // its cards). Back closes the sheet only while it is open and the shell
+      // is the current route — not when a pushed screen covers it.
+      child: BackButtonListener(
+        onBackButtonPressed: () async {
+          if (!ref.read(newProjectSheetOpenProvider)) return false;
+          if (!(ModalRoute.isCurrentOf(context) ?? true)) return false;
+          _close();
+          return true;
+        },
+        child: sheet,
+      ),
     );
   }
 }

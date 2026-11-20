@@ -2,18 +2,26 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
+import 'package:tamir_uy_mobile_flutter/config/design_tokens.dart';
+import 'package:tamir_uy_mobile_flutter/features/new_project/new_project_sheet_state.dart';
 import 'package:tamir_uy_mobile_flutter/features/tour/home_tour_keys.dart';
 import 'package:tamir_uy_mobile_flutter/features/tour/home_tour_steps.dart';
 import 'package:tamir_uy_mobile_flutter/l10n/app_localizations.dart';
 import 'package:tamir_uy_mobile_flutter/screens/app_shell.dart';
 import 'package:tamir_uy_mobile_flutter/screens/room_setup/new_project_sheet.dart';
 import 'package:tamir_uy_mobile_flutter/widgets/nav/magic_nav_bar.dart';
+import 'package:tamir_uy_mobile_flutter/widgets/new_project/new_project_animations.dart';
 
 /// A minimal GoRouter that reuses the real [AppShell] as its ShellRoute
 /// wrapper but swaps the heavy tab screens for trivial text bodies — so the
 /// bottom-nav behaviour can be tested without pulling in the real screens
 /// (which hit providers/network).
-GoRouter _testRouter({String initial = '/'}) => GoRouter(
+late GoRouter _router;
+
+final _rootKey = GlobalKey<NavigatorState>();
+
+GoRouter _testRouter({String initial = '/'}) => _router = GoRouter(
+  navigatorKey: _rootKey,
   initialLocation: initial,
   routes: [
     ShellRoute(
@@ -34,6 +42,17 @@ GoRouter _testRouter({String initial = '/'}) => GoRouter(
           builder: (_, _) => const Text('HISTORY BODY'),
         ),
       ],
+    ),
+    // Full-screen routes, on the root navigator as in lib/config/router.dart.
+    GoRoute(
+      path: '/studio',
+      parentNavigatorKey: _rootKey,
+      builder: (_, _) => const Text('STUDIO'),
+    ),
+    GoRoute(
+      path: '/wizard',
+      parentNavigatorKey: _rootKey,
+      builder: (_, _) => const Text('WIZARD'),
     ),
     // A root-navigator screen, like /setup/summary or /onboarding/e8.
     GoRoute(
@@ -162,6 +181,14 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
+  test(
+    'the strip the circle rises into is see-through, white over the sheet',
+    () {
+      expect(MagicNavBar.stripColorFor(raised: false), Colors.transparent);
+      expect(MagicNavBar.stripColorFor(raised: true), DesignTokens.white);
+    },
+  );
+
   group('new-project sheet', () {
     Finder plus() => find.bySemanticsLabel(_names[2]);
     final sheet = find.byType(NewProjectSheet);
@@ -244,17 +271,98 @@ void main() {
       expect(sheet, findsOneWidget);
     });
 
+    testWidgets('a caller outside the shell gets a modal and keeps its place', (
+      tester,
+    ) async {
+      final container = await _pumpShell(
+        tester,
+        initial: '/outside',
+        disableAnimations: true,
+      );
+      await tester.tap(find.text('OUTSIDE ADD'));
+      await tester.pumpAndSettle();
+      expect(sheet, findsOneWidget);
+      expect(find.text('OUTSIDE ADD'), findsOneWidget);
+      expect(find.text('HOME BODY'), findsNothing);
+      expect(container.read(newProjectSheetOpenProvider), isFalse);
+      await tester.binding.handlePopRoute();
+      await tester.pumpAndSettle();
+      expect(sheet, findsNothing);
+      expect(find.text('OUTSIDE ADD'), findsOneWidget);
+    });
+
     testWidgets(
-      'a caller outside the shell lands on the shell with the sheet open',
+      'a card in the modal opens its flow; Back returns to the caller',
       (tester) async {
         await _pumpShell(tester, initial: '/outside', disableAnimations: true);
         await tester.tap(find.text('OUTSIDE ADD'));
         await tester.pumpAndSettle();
-        expect(find.text('HOME BODY'), findsOneWidget);
-        expect(sheet, findsOneWidget);
-        expect(_selected(tester), 2);
+        await tester.tap(find.text('3D Master'));
+        await tester.pumpAndSettle();
+        expect(find.text('WIZARD'), findsOneWidget);
+        await tester.binding.handlePopRoute();
+        await tester.pumpAndSettle();
+        expect(find.text('OUTSIDE ADD'), findsOneWidget);
+        expect(sheet, findsNothing);
       },
     );
+
+    testWidgets('a long swipe down closes it for good', (tester) async {
+      final container = await _pumpShell(tester, disableAnimations: true);
+      await tester.tap(plus());
+      await tester.pumpAndSettle();
+      await tester.timedDrag(
+        find.byKey(NewProjectSheet.handleKey),
+        const Offset(0, 2000),
+        const Duration(milliseconds: 600),
+      );
+      await tester.pumpAndSettle();
+      expect(sheet, findsNothing);
+      expect(container.read(newProjectSheetOpenProvider), isFalse);
+      expect(_selected(tester), 0);
+      await tester.tap(plus());
+      await tester.pumpAndSettle();
+      expect(sheet, findsOneWidget);
+    });
+
+    testWidgets('Back on a route pushed over the open sheet pops that route', (
+      tester,
+    ) async {
+      final container = await _pumpShell(tester, disableAnimations: true);
+      await tester.tap(plus());
+      await tester.pumpAndSettle();
+      _router.push('/studio');
+      await tester.pumpAndSettle();
+      expect(find.text('STUDIO'), findsOneWidget);
+      await tester.binding.handlePopRoute();
+      await tester.pumpAndSettle();
+      expect(find.text('STUDIO'), findsNothing);
+      expect(container.read(newProjectSheetOpenProvider), isTrue);
+    });
+
+    testWidgets('a deep link to a tab closes the sheet', (tester) async {
+      final container = await _pumpShell(tester, disableAnimations: true);
+      await tester.tap(plus());
+      await tester.pumpAndSettle();
+      _router.go('/shop/s1');
+      await tester.pumpAndSettle();
+      expect(find.text('SHOP BODY'), findsOneWidget);
+      expect(container.read(newProjectSheetOpenProvider), isFalse);
+      expect(sheet, findsNothing);
+      expect(_selected(tester), 1);
+    });
+
+    testWidgets('closing does not restart the cards', (tester) async {
+      await _pumpShell(tester);
+      await tester.tap(plus());
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 400));
+      final before = tester.state(find.byType(LoopingAnimation).first);
+      await tester.tap(plus());
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 50));
+      expect(tester.state(find.byType(LoopingAnimation).first), same(before));
+    });
 
     testWidgets('with animations on, it slides open and closed', (
       tester,

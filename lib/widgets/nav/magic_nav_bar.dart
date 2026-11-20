@@ -29,8 +29,8 @@ class MagicNavItem {
 ///
 /// The widget's own box includes the strip the circle rises into, so the
 /// circle stays tappable without `extendBody` on the Scaffold. That strip is
-/// painted [DesignTokens.backgroundLight], or white when [raisedBackground]
-/// (a white sheet sits right above the bar).
+/// see-through, or white when [raisedBackground] (a white sheet sits right
+/// above the bar) — see [stripColorFor].
 class MagicNavBar extends StatefulWidget {
   const MagicNavBar({
     required this.items,
@@ -46,6 +46,11 @@ class MagicNavBar extends StatefulWidget {
   final bool raisedBackground;
 
   static const circleKey = Key('magicNavCircle');
+
+  /// The strip above the bar: see-through (the shell Scaffold's own
+  /// background shows), or white when a white sheet sits right above it.
+  static Color stripColorFor({required bool raised}) =>
+      raised ? DesignTokens.white : Colors.transparent;
 
   /// Height of the strip above the bar that the circle rises into.
   static const overhang = 22.0;
@@ -83,9 +88,9 @@ class _MagicNavBarState extends State<MagicNavBar> {
                     child: CustomPaint(
                       painter: _BarPainter(
                         notchX: selected == null ? null : cx,
-                        stripColor: widget.raisedBackground
-                            ? DesignTokens.white
-                            : DesignTokens.backgroundLight,
+                        stripColor: MagicNavBar.stripColorFor(
+                          raised: widget.raisedBackground,
+                        ),
                       ),
                     ),
                   ),

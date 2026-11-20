@@ -11,18 +11,33 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../providers/room_persistence_provider.dart';
 import '../../widgets/new_project/new_project_animations.dart';
 
-/// Opens the A3 "+" sheet — the one entry point for every caller. The sheet
-/// lives in `AppShell`'s body above the menu (`NewProjectSheetLayer`) and the
-/// menu's circle moves to "+". A caller outside the shell (a root-navigator
-/// screen such as `/setup/summary` or `/onboarding/e8`) is taken to the shell
-/// first, since the sheet only exists there.
+/// Opens the A3 "+" sheet — the one entry point for every caller.
+///
+/// Inside the shell the sheet lives in `AppShell`'s body above the menu
+/// (`NewProjectSheetLayer`) and the menu's circle moves to "+". A caller
+/// outside it (a root-navigator screen such as `/setup/summary` or
+/// `/onboarding/e8`) gets the same content as a modal over itself, so closing
+/// it — or Back from the flow a card opens — returns there.
 void showNewProjectSheet(BuildContext context) {
-  final container = ProviderScope.containerOf(context, listen: false);
-  if (!AppShellScope.isInside(context)) GoRouter.of(context).go('/');
-  container.read(newProjectSheetOpenProvider.notifier).state = true;
+  if (AppShellScope.isInside(context)) {
+    ProviderScope.containerOf(context, listen: false)
+        .read(newProjectSheetOpenProvider.notifier)
+        .state = true;
+    return;
+  }
+  showModalBottomSheet<void>(
+    context: context,
+    isScrollControlled: true,
+    useSafeArea: true,
+    backgroundColor: Colors.transparent,
+    barrierColor: const Color(0x801E2439),
+    builder: (sheetContext) => NewProjectSheet(
+      onChosen: () => Navigator.of(sheetContext).pop(),
+    ),
+  );
 }
 
-/// Closes the sheet before a card's flow is pushed over the shell.
+/// Closes the in-shell sheet before a card's flow is pushed over the shell.
 void _closeSheet(BuildContext context) => ProviderScope.containerOf(
   context,
   listen: false,
@@ -36,8 +51,13 @@ class NewProjectSheet extends StatelessWidget {
   const NewProjectSheet({
     this.onHeaderDragUpdate,
     this.onHeaderDragEnd,
+    this.onChosen,
     super.key,
   });
+
+  /// Dismisses the sheet when a card is chosen, before its flow is pushed.
+  /// Null: close the in-shell sheet ([newProjectSheetOpenProvider]).
+  final VoidCallback? onChosen;
 
   /// Vertical drags on the header (handle + title) — the host uses them to
   /// swipe the sheet down.
@@ -46,6 +66,9 @@ class NewProjectSheet extends StatelessWidget {
 
   /// The drag handle at the top of the sheet.
   static const handleKey = Key('newProjectSheetHandle');
+
+  void _dismiss(BuildContext context) =>
+      onChosen != null ? onChosen!() : _closeSheet(context);
 
   @override
   Widget build(BuildContext context) {
@@ -115,7 +138,7 @@ class NewProjectSheet extends StatelessWidget {
                       ProviderScope.containerOf(context)
                           .read(roomPersistenceProvider.notifier)
                           .startNewProject();
-                      _closeSheet(context);
+                      _dismiss(context);
                       context.push('/wizard');
                     },
                   ),
@@ -135,7 +158,7 @@ class NewProjectSheet extends StatelessWidget {
                       ProviderScope.containerOf(context)
                           .read(roomPersistenceProvider.notifier)
                           .continueCurrentProject();
-                      _closeSheet(context);
+                      _dismiss(context);
                       context.push('/scanning/roomplan');
                     },
                   ),
@@ -149,7 +172,7 @@ class NewProjectSheet extends StatelessWidget {
                       ProviderScope.containerOf(context)
                           .read(roomPersistenceProvider.notifier)
                           .startNewProject();
-                      _closeSheet(context);
+                      _dismiss(context);
                       context.push('/setup/draw');
                     },
                   ),

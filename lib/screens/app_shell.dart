@@ -43,6 +43,8 @@ class AppShell extends ConsumerStatefulWidget {
 }
 
 class _AppShellState extends ConsumerState<AppShell> {
+  String? _lastLocation;
+
   // Token restore happens at app bootstrap (SplashScreen) — before the auth
   // guard runs — not here: the shell only ever mounts once already
   // authenticated, so restoring here was dead code.
@@ -124,6 +126,14 @@ class _AppShellState extends ConsumerState<AppShell> {
       return Scaffold(body: widget.child);
     }
 
+    // A route change by anything but "+" (a tab, a deep link, a push
+    // notification) leaves the sheet behind: close it.
+    if (_lastLocation != null && location != _lastLocation) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) ref.read(newProjectSheetOpenProvider.notifier).state = false;
+      });
+    }
+    _lastLocation = location;
     final sheetOpen = ref.watch(newProjectSheetOpenProvider);
     // No extendBody (see CLAUDE.md): the new-project sheet is stacked in the
     // body, above the menu, so the menu stays visible and tappable.
