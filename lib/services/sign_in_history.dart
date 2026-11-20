@@ -11,9 +11,26 @@ class SignInHistory {
   static const _key = 'auth.hasSignedInBefore';
   static const _migratedKey = 'auth.hasSignedInBefore.migrated';
 
-  /// Written by 1.0.2 and older only inside the signed-in app (no guests
-  /// then). Someone who signed out there and updated has no [_key] yet.
-  static const _legacySignedInKeys = ['tour.home.v1.done', 'push_prompt_answered'];
+  /// Written by 1.0.2 and older only inside the signed-in app (every route
+  /// but splash and login needed a session, and there were no guests).
+  /// Someone who signed out there and updated has no [_key] yet. The
+  /// `settings_*` keys are from the older settings screen.
+  static const _legacySignedInKeys = [
+    'tour.home.v1.done',
+    'push_prompt_answered',
+    'blocked_ustalar',
+    'pending_scan_raw_json',
+    'pending_scan_version',
+    'pending_flat_json',
+    'settings_auto_save',
+    'settings_cloud_sync',
+    'settings_email_digest',
+    'settings_large_text',
+    'settings_marketing_emails',
+    'settings_notifications_enabled',
+    'settings_theme',
+    'settings_unit_system',
+  ];
 
   Future<bool> hasSignedInBefore() async {
     try {

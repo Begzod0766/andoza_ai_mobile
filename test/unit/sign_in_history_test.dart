@@ -17,7 +17,17 @@ void main() {
   // 1.0.2 and older had no history flag. Someone who signed out there and
   // then updated must still get the login screen, not a silent guest: those
   // builds wrote these keys only inside the signed-in shell.
-  for (final legacy in ['tour.home.v1.done', 'push_prompt_answered']) {
+  for (final legacy in [
+    'tour.home.v1.done',
+    'push_prompt_answered',
+    // An Android 12 (or iOS, permission already granted) user never got
+    // push_prompt_answered; these are written only inside the signed-in app.
+    'blocked_ustalar',
+    'pending_scan_raw_json',
+    'pending_flat_json',
+    'settings_theme',
+    'settings_unit_system',
+  ]) {
     test('an update from a build that used the app ($legacy) counts', () async {
       SharedPreferences.setMockInitialValues({legacy: true});
       expect(await SignInHistory().hasSignedInBefore(), isTrue);

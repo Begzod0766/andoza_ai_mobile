@@ -216,6 +216,14 @@ class AuthNotifier extends StateNotifier<AuthState> {
   Future<void> restoreToken() async {
     try {
       await _repository.restoreToken();
+      // A stored registered session counts as signed in before even if the
+      // server no longer takes it (refresh older than 30 days): mark it
+      // before checking, so a dead registered session gets /login, not a
+      // silent guest.
+      final stored = _repository.cachedUser;
+      if (stored != null && !stored.isGuest) {
+        await _signInHistory?.markSignedIn();
+      }
       await checkAuth();
     } catch (_) {
       state = const AuthInitial();

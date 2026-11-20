@@ -36,11 +36,19 @@ class _Repo implements AuthRepository {
 
   @override
   Future<void> restoreToken() async {
-    if (restoredUser != null) token = 'stored';
+    if (restoredUser != null) {
+      token = 'stored';
+      // Like the real repository: an id-only user, guest flag from storage.
+      cachedUser = User(id: restoredUser!.id, isGuest: restoredUser!.isGuest);
+    }
   }
 
+  /// A stored session the server no longer accepts (refresh > 30 days old).
+  bool sessionDead = false;
+
   @override
-  Future<User?> getCurrentUser() async => token == null ? null : restoredUser;
+  Future<User?> getCurrentUser() async =>
+      token == null || sessionDead ? null : restoredUser;
 
   @override
   Future<void> clearSession() async {
@@ -127,5 +135,20 @@ void main() {
     await notifier.restoreToken();
     await pumpEventQueue();
     expect(await history.hasSignedInBefore(), isTrue);
+  });
+
+  test('a dead registered session goes to login, not a silent guest',
+      () async {
+    repo.restoredUser = const User(id: 'u1');
+    repo.sessionDead = true;
+    expect(await resolveColdStart(notifier, history), ColdStart.login);
+    expect(repo.guestCalls, 0);
+  });
+
+  test('a dead guest session still becomes a new guest', () async {
+    repo.restoredUser = const User(id: 'g1', isGuest: true);
+    repo.sessionDead = true;
+    expect(await resolveColdStart(notifier, history), ColdStart.home);
+    expect(repo.guestCalls, 1);
   });
 }
