@@ -190,6 +190,19 @@ void main() {
     expect(repo.sent, isEmpty);
   });
 
+  testWidgets('a double tap on send opens one sheet', (tester) async {
+    await _pump(
+      tester,
+      const U5BookingConfirmationScreen(master: _master),
+      overrides: [businessRepositoryProvider.overrideWithValue(_FakeBusiness())],
+    );
+    await tester.enterText(find.byType(TextField).first, '+998 90 123-45-67');
+    await tester.tap(find.text(l10n.mastersSend));
+    await tester.tap(find.text(l10n.mastersSend), warnIfMissed: false);
+    await tester.pumpAndSettle();
+    expect(find.text(l10n.guestSheetTitle), findsOneWidget);
+  });
+
   testWidgets('registered booking sends the lead', (tester) async {
     final repo = _FakeBusiness();
     await _pump(

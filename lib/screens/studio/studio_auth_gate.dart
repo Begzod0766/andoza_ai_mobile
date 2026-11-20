@@ -24,28 +24,42 @@ String? authGateFeatureFromMessage(String message) {
   return null;
 }
 
+bool _authGateOpen = false;
+
 /// Handles one [studioAuthGateChannel] [message]: the sign-up sheet, and
 /// once the guest has signed up or in, the WebView's session is handed over
-/// again (new cookies and auth flag) and the page reloaded — the server
-/// rejects the guest's tokens after an upgrade or merge.
+/// again (new cookies and auth flag) and the page opened afresh with
+/// [reopen] — the server rejects the guest's tokens after an upgrade or
+/// merge, and the page may meanwhile be on the web's own /login.
+///
+/// Ignored when the person is no longer a guest (a page still holding the
+/// guest flag) and while a sheet from an earlier message is open (a double
+/// tap).
 Future<void> onStudioAuthGate(
   BuildContext context,
   String message, {
   required AuthState Function() readAuth,
   required SecureStorageService storage,
   required Future<void> Function(String js) runJavaScript,
-  required Future<void> Function() reload,
+  required Future<void> Function() reopen,
   Future<bool> Function(BuildContext context, {required String feature})
       showSheet = showRegistrationRequiredSheet,
   Future<void> Function(AuthAuthenticated auth, SecureStorageService storage)
       seedCookies = seedStudioCookies,
 }) async {
   final feature = authGateFeatureFromMessage(message);
-  if (feature == null) return;
-  if (!await showSheet(context, feature: feature)) return;
+  if (feature == null || _authGateOpen || !readAuth().isGuest) return;
+  _authGateOpen = true;
+  final bool signedUp;
+  try {
+    signedUp = await showSheet(context, feature: feature);
+  } finally {
+    _authGateOpen = false;
+  }
+  if (!signedUp) return;
   final auth = readAuth();
   if (auth is! AuthAuthenticated || auth.user.isGuest) return;
   await seedCookies(auth, storage);
   await runJavaScript(studioAuthSeedJs(auth.user));
-  await reload();
+  await reopen();
 }

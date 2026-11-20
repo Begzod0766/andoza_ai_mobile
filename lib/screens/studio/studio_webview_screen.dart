@@ -419,7 +419,7 @@ class _StudioWebViewScreenState extends ConsumerState<StudioWebViewScreen>
       readAuth: () => ref.read(authStateProvider),
       storage: ref.read(secureStorageProvider),
       runJavaScript: controller.runJavaScript,
-      reload: controller.reload,
+      reopen: () => controller.loadRequest(Uri.parse(_targetUrl)),
     );
   }
 
