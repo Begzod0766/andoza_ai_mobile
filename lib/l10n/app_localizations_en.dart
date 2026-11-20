@@ -3154,4 +3154,8 @@ class AppLocalizationsEn extends AppLocalizations {
     );
     return '$_temp0';
   }
+
+  @override
+  String get estimateGuestPricesNote =>
+      'Prices are approximate. Sign up to get them refined.';
 }

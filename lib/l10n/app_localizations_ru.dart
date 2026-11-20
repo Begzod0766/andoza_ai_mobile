@@ -3157,4 +3157,8 @@ class AppLocalizationsRu extends AppLocalizations {
     );
     return '$_temp0';
   }
+
+  @override
+  String get estimateGuestPricesNote =>
+      'Цены ориентировочные. После регистрации они будут уточнены.';
 }

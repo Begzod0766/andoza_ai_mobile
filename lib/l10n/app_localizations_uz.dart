@@ -3154,4 +3154,8 @@ class AppLocalizationsUz extends AppLocalizations {
     );
     return '$_temp0';
   }
+
+  @override
+  String get estimateGuestPricesNote =>
+      'Narxlar taxminiy. Ro\'yxatdan o\'tsangiz, aniqlashtiriladi.';
 }

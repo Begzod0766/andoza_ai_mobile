@@ -3436,5 +3436,10 @@
         "type": "int"
       }
     }
+  },
+
+  "estimateGuestPricesNote": "Narxlar taxminiy. Ro'yxatdan o'tsangiz, aniqlashtiriladi.",
+  "@estimateGuestPricesNote": {
+    "description": "Estimate screen, guests only: AI and market prices were skipped, so the prices are approximate."
   }
 }

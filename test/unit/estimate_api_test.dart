@@ -68,6 +68,15 @@ void main() {
       expect(elec.isApproximate, isTrue);
       expect(elec.category, 'elektr');
     });
+
+    test('parses the guest prices flag', () {
+      expect(
+        Estimate.fromJson({...json, 'prices_approximate_for_guest': true})
+            .pricesApproximateForGuest,
+        isTrue,
+      );
+      expect(Estimate.fromJson(json).pricesApproximateForGuest, isFalse);
+    });
   });
 
   group('Estimate (exact/approximate split)', () {

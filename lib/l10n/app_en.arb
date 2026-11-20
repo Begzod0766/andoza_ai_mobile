@@ -2985,5 +2985,7 @@
         "type": "int"
       }
     }
-  }
+  },
+
+  "estimateGuestPricesNote": "Prices are approximate. Sign up to get them refined."
 }

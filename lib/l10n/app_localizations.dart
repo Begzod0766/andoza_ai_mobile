@@ -5787,6 +5787,12 @@ abstract class AppLocalizations {
   /// In uz, this message translates to:
   /// **'{count, plural, other{{count} xona akkauntingizga qo\'shildi}}'**
   String guestMergedRooms(int count);
+
+  /// Estimate screen, guests only: AI and market prices were skipped, so the prices are approximate.
+  ///
+  /// In uz, this message translates to:
+  /// **'Narxlar taxminiy. Ro\'yxatdan o\'tsangiz, aniqlashtiriladi.'**
+  String get estimateGuestPricesNote;
 }
 
 class _AppLocalizationsDelegate

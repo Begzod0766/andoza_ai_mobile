@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import '../../config/design_tokens.dart';
 import '../../l10n/app_localizations.dart';
 import '../../models/api/api.dart' show DeltaResponse, RoomStateValue;
+import '../../models/api/api.dart' as api show Estimate;
 import '../../utils/error_mapper.dart';
 import '../../models/design_selection_model.dart';
 import '../../models/estimate_model.dart';
@@ -15,6 +16,7 @@ import '../../providers/room_persistence_provider.dart';
 import '../../providers/room_provider.dart';
 import '../../services/pdf_share_service.dart';
 import '../../utils/currency.dart';
+import '../../widgets/registration_required_sheet.dart';
 import '../studio/ai_builder_sheet.dart';
 
 /// E1: Remont smetasi — money appears for the first time here. Big blue
@@ -132,9 +134,10 @@ class _E1EstimationIntroScreenState
         : ref.watch(serverRoomProvider(roomId)).valueOrNull;
     // The server smeta prices a floor type picked without a product from the
     // median shop product; the note says whether it did.
-    final serverLines = roomId == null
+    final serverEstimate = roomId == null
         ? null
-        : ref.watch(estimatePreviewProvider(roomId)).valueOrNull?.lines;
+        : ref.watch(estimatePreviewProvider(roomId)).valueOrNull;
+    final serverLines = serverEstimate?.lines;
     final floor = serverRoom == null
         ? null
         : floorNote(serverRoom, serverLines);
@@ -165,6 +168,19 @@ class _E1EstimationIntroScreenState
                 DesignTokens.screenPaddingHorizontal,
               ),
               children: [
+                GuestPricesNote(
+                  estimate: serverEstimate,
+                  onSignUp: () async {
+                    final ok = await showRegistrationRequiredSheet(
+                      context,
+                      feature: 'market_prices',
+                    );
+                    // Signed up: the server prices it in full now.
+                    if (ok && roomId != null) {
+                      ref.invalidate(estimatePreviewProvider(roomId));
+                    }
+                  },
+                ),
                 if (floor != null) ...[
                   _FloorNoteBanner(
                     note: floor,
@@ -457,6 +473,54 @@ class _StageRow extends StatelessWidget {
 /// Shown when the Studio has a floor type but no floor product: the server
 /// either priced it from the median shop product (approximate) or left it out.
 /// Either way it leads back to the Studio to pick one.
+/// For a guest's server smeta (`prices_approximate_for_guest`): AI and market
+/// prices were skipped, so say the prices are approximate, with a way to sign
+/// up. Nothing otherwise.
+class GuestPricesNote extends StatelessWidget {
+  const GuestPricesNote({
+    required this.estimate,
+    required this.onSignUp,
+    super.key,
+  });
+
+  final api.Estimate? estimate;
+  final VoidCallback onSignUp;
+
+  @override
+  Widget build(BuildContext context) {
+    if (estimate?.pricesApproximateForGuest != true) {
+      return const SizedBox.shrink();
+    }
+    final l10n = AppLocalizations.of(context)!;
+    return Padding(
+      padding: const EdgeInsets.only(bottom: DesignTokens.spacingMd),
+      child: Container(
+        padding: const EdgeInsets.symmetric(
+          horizontal: DesignTokens.spacingMd,
+          vertical: DesignTokens.spacingSm,
+        ),
+        decoration: BoxDecoration(
+          color: DesignTokens.primaryBlue.withValues(alpha: 0.06),
+          borderRadius: BorderRadius.circular(DesignTokens.radiusMd),
+          border: Border.all(
+            color: DesignTokens.primaryBlue.withValues(alpha: 0.25),
+          ),
+        ),
+        child: Row(
+          children: [
+            const Icon(Icons.info_outline, color: DesignTokens.primaryBlue),
+            const SizedBox(width: DesignTokens.spacingSm),
+            Expanded(
+              child: Text(l10n.estimateGuestPricesNote, style: DesignTokens.body2),
+            ),
+            TextButton(onPressed: onSignUp, child: Text(l10n.guestSheetSignUp)),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
 class _FloorNoteBanner extends StatelessWidget {
   const _FloorNoteBanner({required this.note, required this.onPick});
 
