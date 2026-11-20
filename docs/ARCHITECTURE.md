@@ -69,9 +69,15 @@ dialoglari ko'rsatilmaydi (`homeTourRunningProvider`). Fayllar: `home_tour_store
 foydalanuvchi `/login` ga kirsa, bosh sahifaga qaytariladi. `/splash` va
 `/login` dan boshqa hamma yo'llar login talab qiladi.
 
-**Pastki menyu** (`AppShell`): Uy `/` · Do'kon `/shop/s1` · "+" (yangi loyiha
-oynasi) · Ustalar `/masters/u1` · Profil `/profile`. Tugallanmagan skaner bo'lsa,
-menyu uni davom ettirishni taklif qiladi.
+**Pastki menyu** (`AppShell`, `widgets/nav/magic_nav_bar.dart`): 5 ta teng
+element — Uy `/` · Do'kon `/shop/s1` · "+" (yangi loyiha oynasi) · Ustalar
+`/masters/u1` · Profil `/profile`. Faol element ikonkasi ko'tarilgan ko'k doirada,
+menyuda o'yiq bilan; boshqa element tanlansa doira 300 ms da siljiydi.
+"+" oynasi (`room_setup/new_project_sheet_layer.dart`) body ichida, menyu ustida
+to'liq balandlikda ochiladi; holati `newProjectSheetOpenProvider`
+(`features/new_project/`), yagona kirish — `showNewProjectSheet(context)`
+(shell tashqarisidan chaqirilsa avval `/` ga o'tadi). Tugallanmagan skaner
+bo'lsa, menyu uni davom ettirishni taklif qiladi.
 
 | Bo'lim | Yo'llar | Izoh |
 |---|---|---|
