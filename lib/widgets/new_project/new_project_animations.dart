@@ -132,7 +132,7 @@ class WizardBoxAnimation extends StatelessWidget {
         final w = 3.0 + e;
         final d = 2.5 + 0.5 * e;
         final corners = [Offset.zero, Offset(w, 0), Offset(w, d), Offset(0, d)];
-        final zoom = 0.78 + 0.22 * e;
+        final zoom = 0.95 + 0.2 * e;
         final finger = t < 0.05
             ? t / 0.05
             : (t < 0.72 ? 1.0 : 1 - _phase(t, 0.72, 0.8));
@@ -374,14 +374,12 @@ class _DrawPainter extends CustomPainter {
 
   final double t;
 
-  /// An L-shaped room, metres.
+  /// The room being drawn, metres.
   static const _room = [
     Offset(0, 0),
     Offset(4.0, 0),
-    Offset(4.0, 3.2),
-    Offset(1.6, 3.2),
-    Offset(1.6, 2.0),
-    Offset(0, 2.0),
+    Offset(4.0, 3.0),
+    Offset(0, 3.0),
   ];
 
   @override
@@ -395,7 +393,7 @@ class _DrawPainter extends CustomPainter {
     }
 
     final out = 1 - _phase(t, 0.92, 1.0);
-    final scale = (size.height - 40) / 3.2;
+    final scale = (size.height - 44) / 3.0;
     final origin = Offset((size.width - 4.0 * scale) / 2, 20);
     final pts = [for (final p in _room) origin + p * scale];
     final segs = [
@@ -451,7 +449,10 @@ class _DrawPainter extends CustomPainter {
       var outward = Offset(dir.dy, -dir.dx);
       if (outline.contains(mid + outward * 4)) outward = -outward;
       final metres = (_room[(i + 1) % _room.length] - _room[i]).distance;
-      _paintNumber(canvas, _m(metres), mid + outward * 11, alpha: numbers);
+      // Vertical sides need room for the label's width, horizontal ones
+      // only for its height.
+      final gap = dir.dx.abs() < 0.5 ? 22.0 : 11.0;
+      _paintNumber(canvas, _m(metres), mid + outward * gap, alpha: numbers);
     }
 
     // The finger, while drawing.
