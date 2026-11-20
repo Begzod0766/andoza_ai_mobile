@@ -3332,5 +3332,114 @@
         "type": "int"
       }
     }
+  },
+
+  "loginContinueAsGuest": "Ro'yxatdan o'tmasdan davom etish",
+  "@loginContinueAsGuest": {
+    "description": "Login screen: button that starts a guest session (no account) instead of signing in."
+  },
+  "loginContinueAsGuestHint": "Xonalaringiz bu qurilmada mehmon sifatida saqlanadi.",
+  "@loginContinueAsGuestHint": {
+    "description": "Login screen: small note under the continue-without-signing-up button."
+  },
+  "guestSessionFailed": "Hozir ulanib bo'lmadi. Qayta urinib ko'ring yoki tizimga kiring.",
+  "@guestSessionFailed": {
+    "description": "Snackbar when a guest session could not be started (offline, server limit, guest mode off)."
+  },
+
+  "guestSheetTitle": "Bu imkoniyat uchun ro'yxatdan o'ting",
+  "@guestSheetTitle": {
+    "description": "Sign-up sheet title, shown to a guest who tapped a paid or contact feature."
+  },
+  "guestSheetBody": "Xonalaringiz saqlanib qoladi va hisobingizga o'tadi.",
+  "@guestSheetBody": {
+    "description": "Sign-up sheet body: reassures the guest their rooms are kept."
+  },
+  "guestSheetSignUp": "Ro'yxatdan o'tish",
+  "@guestSheetSignUp": {
+    "description": "Sign-up sheet: primary button that opens sign-up / sign-in."
+  },
+  "guestSheetLater": "Keyinroq",
+  "@guestSheetLater": {
+    "description": "Sign-up sheet: secondary button that closes the sheet."
+  },
+  "guestFeatureAiDesign": "AI dizayner",
+  "@guestFeatureAiDesign": {
+    "description": "Sign-up sheet: name of the feature that needs an account (AI room design)."
+  },
+  "guestFeatureAiBuild": "AI quruvchi",
+  "@guestFeatureAiBuild": {
+    "description": "Sign-up sheet: feature name (AI builder)."
+  },
+  "guestFeatureRender": "Fotoreal render",
+  "@guestFeatureRender": {
+    "description": "Sign-up sheet: feature name (photoreal render)."
+  },
+  "guestFeatureSmetaAsk": "Smeta bo'yicha savol",
+  "@guestFeatureSmetaAsk": {
+    "description": "Sign-up sheet: feature name (ask AI about the estimate)."
+  },
+  "guestFeatureMebelAi": "Mebel AI",
+  "@guestFeatureMebelAi": {
+    "description": "Sign-up sheet: feature name (AI cabinet suggestions)."
+  },
+  "guestFeaturePhotoModel": "Fotodan 3D model",
+  "@guestFeaturePhotoModel": {
+    "description": "Sign-up sheet: feature name (photo to 3D model)."
+  },
+  "guestFeatureContact": "Usta yoki do'kon bilan bog'lanish",
+  "@guestFeatureContact": {
+    "description": "Sign-up sheet: feature name (sending a request to an usta or a shop)."
+  },
+  "guestFeatureOrder": "Buyurtma",
+  "@guestFeatureOrder": {
+    "description": "Sign-up sheet: feature name (placing an order)."
+  },
+  "guestFeatureWorkshopLink": "Ustaxona havolasi",
+  "@guestFeatureWorkshopLink": {
+    "description": "Sign-up sheet: feature name (furniture workshop link)."
+  },
+  "guestFeatureBusiness": "Sotuvchi va usta bo'limi",
+  "@guestFeatureBusiness": {
+    "description": "Sign-up sheet: feature name (shop/usta business section)."
+  },
+  "guestFeatureMarketPrices": "Aniq bozor narxlari",
+  "@guestFeatureMarketPrices": {
+    "description": "Sign-up sheet: feature name (exact market prices on the estimate)."
+  },
+
+  "profileGuestTitle": "Mehmon",
+  "@profileGuestTitle": {
+    "description": "Profile for a guest (no account): card title."
+  },
+  "profileGuestBody": "Siz ro'yxatdan o'tmagansiz. Ilovani o'chirsangiz, xonalaringiz yo'qoladi.",
+  "@profileGuestBody": {
+    "description": "Profile for a guest: warns that uninstalling loses the rooms."
+  },
+  "profileGuestCta": "Ro'yxatdan o'tish yoki kirish",
+  "@profileGuestCta": {
+    "description": "Profile for a guest: button that opens sign-up / sign-in."
+  },
+  "profileGuestDelete": "Mehmon ma'lumotlarini o'chirish",
+  "@profileGuestDelete": {
+    "description": "Profile for a guest: destructive row that deletes the guest account and its rooms."
+  },
+  "guestDeleteConfirm": "Barcha xonalaringiz o'chiriladi. Buni qaytarib bo'lmaydi.",
+  "@guestDeleteConfirm": {
+    "description": "Delete-guest-data dialog body."
+  },
+  "guestMergedRooms": "{count, plural, other{{count} xona akkauntingizga qo'shildi}}",
+  "@guestMergedRooms": {
+    "description": "Snackbar after a guest signed in to an existing account: how many of the guest's rooms moved into it.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+
+  "estimateGuestPricesNote": "Narxlar taxminiy. Ro'yxatdan o'tsangiz, aniqlashtiriladi.",
+  "@estimateGuestPricesNote": {
+    "description": "Estimate screen, guests only: AI and market prices were skipped, so the prices are approximate."
   }
 }

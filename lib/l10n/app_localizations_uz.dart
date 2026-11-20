@@ -3070,4 +3070,92 @@ class AppLocalizationsUz extends AppLocalizations {
   String tourStepOf(int current, int total) {
     return '$current/$total';
   }
+
+  @override
+  String get loginContinueAsGuest => 'Ro\'yxatdan o\'tmasdan davom etish';
+
+  @override
+  String get loginContinueAsGuestHint =>
+      'Xonalaringiz bu qurilmada mehmon sifatida saqlanadi.';
+
+  @override
+  String get guestSessionFailed =>
+      'Hozir ulanib bo\'lmadi. Qayta urinib ko\'ring yoki tizimga kiring.';
+
+  @override
+  String get guestSheetTitle => 'Bu imkoniyat uchun ro\'yxatdan o\'ting';
+
+  @override
+  String get guestSheetBody =>
+      'Xonalaringiz saqlanib qoladi va hisobingizga o\'tadi.';
+
+  @override
+  String get guestSheetSignUp => 'Ro\'yxatdan o\'tish';
+
+  @override
+  String get guestSheetLater => 'Keyinroq';
+
+  @override
+  String get guestFeatureAiDesign => 'AI dizayner';
+
+  @override
+  String get guestFeatureAiBuild => 'AI quruvchi';
+
+  @override
+  String get guestFeatureRender => 'Fotoreal render';
+
+  @override
+  String get guestFeatureSmetaAsk => 'Smeta bo\'yicha savol';
+
+  @override
+  String get guestFeatureMebelAi => 'Mebel AI';
+
+  @override
+  String get guestFeaturePhotoModel => 'Fotodan 3D model';
+
+  @override
+  String get guestFeatureContact => 'Usta yoki do\'kon bilan bog\'lanish';
+
+  @override
+  String get guestFeatureOrder => 'Buyurtma';
+
+  @override
+  String get guestFeatureWorkshopLink => 'Ustaxona havolasi';
+
+  @override
+  String get guestFeatureBusiness => 'Sotuvchi va usta bo\'limi';
+
+  @override
+  String get guestFeatureMarketPrices => 'Aniq bozor narxlari';
+
+  @override
+  String get profileGuestTitle => 'Mehmon';
+
+  @override
+  String get profileGuestBody =>
+      'Siz ro\'yxatdan o\'tmagansiz. Ilovani o\'chirsangiz, xonalaringiz yo\'qoladi.';
+
+  @override
+  String get profileGuestCta => 'Ro\'yxatdan o\'tish yoki kirish';
+
+  @override
+  String get profileGuestDelete => 'Mehmon ma\'lumotlarini o\'chirish';
+
+  @override
+  String get guestDeleteConfirm =>
+      'Barcha xonalaringiz o\'chiriladi. Buni qaytarib bo\'lmaydi.';
+
+  @override
+  String guestMergedRooms(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count xona akkauntingizga qo\'shildi',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get estimateGuestPricesNote =>
+      'Narxlar taxminiy. Ro\'yxatdan o\'tsangiz, aniqlashtiriladi.';
 }

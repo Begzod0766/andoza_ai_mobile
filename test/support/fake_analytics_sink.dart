@@ -4,6 +4,7 @@ import 'package:tamir_uy_mobile_flutter/services/analytics_service.dart';
 class FakeSink implements AnalyticsSink {
   final events = <(String, Map<String, Object>?)>[];
   final userIds = <String?>[];
+  final userProperties = <(String, String?)>[];
 
   @override
   Future<void> logEvent(String name, [Map<String, Object>? params]) async =>
@@ -11,4 +12,8 @@ class FakeSink implements AnalyticsSink {
 
   @override
   Future<void> setUserId(String? id) async => userIds.add(id);
+
+  @override
+  Future<void> setUserProperty(String name, String? value) async =>
+      userProperties.add((name, value));
 }

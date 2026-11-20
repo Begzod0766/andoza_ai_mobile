@@ -57,6 +57,11 @@ abstract class Estimate with _$Estimate {
     bool electricalConfirmed,
     @JsonKey(name: 'usd_rate') @Default(0.0) double usdRate,
     @JsonKey(name: 'total_usd') @Default(0) int totalUsd,
+
+    /// The caller is a guest: AI gap-fill and market prices were skipped, so
+    /// the prices are catalogue/approximate until they sign up.
+    @JsonKey(name: 'prices_approximate_for_guest') @Default(false)
+    bool pricesApproximateForGuest,
   }) = _Estimate;
 
   factory Estimate.fromJson(Map<String, dynamic> json) =>

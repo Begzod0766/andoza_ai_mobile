@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:logger/logger.dart';
@@ -6,14 +8,44 @@ import '../config/app_config.dart';
 import 'sse_client.dart';
 
 class ApiException implements Exception {
-  ApiException({required this.message, this.statusCode, this.response});
+  ApiException({
+    required this.message,
+    this.statusCode,
+    this.response,
+    this.code,
+    this.feature,
+  });
 
   final String message;
   final int? statusCode;
   final dynamic response;
 
+  /// Machine-readable `detail.code` when the server sent a structured error,
+  /// e.g. `registration_required`.
+  final String? code;
+
+  /// `detail.feature` of a `registration_required` error (`render`, `contact`…).
+  final String? feature;
+
+  /// The guest-mode contract: HTTP 403 `{"detail": {"code":
+  /// "registration_required", "feature": …, "message": …}}`.
+  bool get isRegistrationRequired =>
+      statusCode == 403 && code == 'registration_required';
+
   @override
   String toString() => message;
+}
+
+/// What [ApiClient.refreshNow] did.
+enum RefreshOutcome {
+  /// New tokens are in place.
+  refreshed,
+
+  /// The server refused the refresh token: the session is dead and cleared.
+  refused,
+
+  /// No refresh token, or the call failed (offline…): nothing changed.
+  failed,
 }
 
 class ApiClient {
@@ -103,6 +135,49 @@ class ApiClient {
     _refreshToken = token;
   }
 
+  /// The current access token (null when signed out).
+  String? get authToken => _authToken;
+
+  /// Refreshes the session now, not on a 401 — a guest about to sign up or
+  /// in needs a valid bearer, since the server recognises the guest (and
+  /// keeps its rooms) only through one.
+  Future<RefreshOutcome> refreshNow() async {
+    final refreshToken = _refreshToken;
+    if (refreshToken == null || refreshToken.isEmpty) {
+      return RefreshOutcome.failed;
+    }
+    Response<dynamic> response;
+    try {
+      response = await _refreshDio.post<dynamic>(
+        '/auth/refresh',
+        options: Options(headers: {'Cookie': 'refresh_token=$refreshToken'}),
+      );
+    } on DioException catch (e) {
+      final status = e.response?.statusCode;
+      if ((status == 401 || status == 403) && _refreshToken == refreshToken) {
+        await _handleRefreshFailure(refreshToken);
+        return RefreshOutcome.refused;
+      }
+      return RefreshOutcome.failed;
+    }
+    if (_refreshToken != refreshToken) return RefreshOutcome.failed;
+    final data = response.data;
+    final newAccess =
+        data is Map<String, dynamic> ? data['access_token'] as String? : null;
+    if (newAccess == null || newAccess.isEmpty) return RefreshOutcome.failed;
+    final newRefresh = (data!['refresh_token'] as String?) ?? refreshToken;
+    _authToken = newAccess;
+    _refreshToken = newRefresh;
+    await onTokensRefreshed?.call(newAccess, newRefresh);
+    return RefreshOutcome.refreshed;
+  }
+
+  /// Forgets the refresh token, e.g. when a sign-in replaced a guest session
+  /// but returned none: the guest's token is dead and must not be used.
+  void clearRefreshToken() {
+    _refreshToken = null;
+  }
+
   /// Auth endpoints must never trigger a refresh-and-retry: a 401 from these is
   /// terminal (bad credentials / already-invalid refresh token), and retrying
   /// would loop.
@@ -114,6 +189,8 @@ class ApiClient {
     '/auth/otp/verify',
     '/auth/register',
     '/auth/google',
+    '/auth/apple',
+    '/auth/guest',
   };
 
   static bool _isAuthPath(String path) =>
@@ -151,57 +228,89 @@ class ApiClient {
             _authToken != null ? 'Bearer $_authToken' : null;
         if (currentBearer != null &&
             requestOptions.headers['Authorization'] != currentBearer) {
-          try {
-            requestOptions.extra['__retried'] = true;
-            requestOptions.headers['Authorization'] = currentBearer;
-            final retried = await _refreshDio.fetch<dynamic>(requestOptions);
-            handler.resolve(retried);
-          } catch (_) {
-            handler.next(err);
-          }
+          await _replayWithCurrentToken(requestOptions, err, handler);
           return;
         }
 
+        Response<dynamic> refreshResponse;
         try {
           // The backend only accepts the refresh token via the `refresh_token`
           // cookie header — not as a body field or bearer token.
-          final refreshResponse = await _refreshDio.post<dynamic>(
+          refreshResponse = await _refreshDio.post<dynamic>(
             '/auth/refresh',
             options: Options(
               headers: {'Cookie': 'refresh_token=$refreshToken'},
             ),
           );
-          final data = refreshResponse.data;
-          final newAccess = data is Map<String, dynamic>
-              ? data['access_token'] as String?
-              : null;
-          if (newAccess == null || newAccess.isEmpty) {
-            await _handleRefreshFailure();
-            handler.next(err);
-            return;
-          }
-          final newRefresh = (data['refresh_token'] as String?) ?? refreshToken;
+        } catch (_) {
+          refreshResponse = Response(requestOptions: requestOptions);
+        }
 
-          _authToken = newAccess;
-          _refreshToken = newRefresh;
-          await onTokensRefreshed?.call(newAccess, newRefresh);
+        // A sign-in finished while this refresh was in flight (a guest signing
+        // up or in): its tokens win, whatever the guest's refresh returned —
+        // the server rejects the guest's tokens once upgraded or merged.
+        // Replay with the new bearer instead of storing or clearing anything.
+        if (_refreshToken != refreshToken) {
+          await _replayWithCurrentToken(requestOptions, err, handler);
+          return;
+        }
 
-          // Replay the original request through the bare client with the fresh
-          // bearer. `__retried` guards against a second refresh if it 401s
-          // again; using `_refreshDio` also keeps it out of this interceptor.
+        final data = refreshResponse.data;
+        final newAccess = data is Map<String, dynamic>
+            ? data['access_token'] as String?
+            : null;
+        if (newAccess == null || newAccess.isEmpty) {
+          await _handleRefreshFailure(refreshToken);
+          handler.next(err);
+          return;
+        }
+        final newRefresh = (data['refresh_token'] as String?) ?? refreshToken;
+
+        _authToken = newAccess;
+        _refreshToken = newRefresh;
+        await onTokensRefreshed?.call(newAccess, newRefresh);
+
+        // Replay the original request through the bare client with the fresh
+        // bearer. `__retried` guards against a second refresh if it 401s
+        // again; using `_refreshDio` also keeps it out of this interceptor.
+        try {
           requestOptions.extra['__retried'] = true;
           requestOptions.headers['Authorization'] = 'Bearer $newAccess';
           final retried = await _refreshDio.fetch<dynamic>(requestOptions);
           handler.resolve(retried);
-        } catch (_) {
-          await _handleRefreshFailure();
-          handler.next(err);
+        } catch (e) {
+          await _handleRefreshFailure(newRefresh);
+          handler.next(e is DioException ? e : err);
         }
       },
     );
   }
 
-  Future<void> _handleRefreshFailure() async {
+  Future<void> _replayWithCurrentToken(
+    RequestOptions requestOptions,
+    DioException err,
+    ErrorInterceptorHandler handler,
+  ) async {
+    final current = _authToken;
+    if (current == null || current.isEmpty) {
+      handler.next(err);
+      return;
+    }
+    try {
+      requestOptions.extra['__retried'] = true;
+      requestOptions.headers['Authorization'] = 'Bearer $current';
+      handler.resolve(await _refreshDio.fetch<dynamic>(requestOptions));
+    } catch (e) {
+      // The replay's own failure (a 500, a refusal), not the first 401.
+      handler.next(e is DioException ? e : err);
+    }
+  }
+
+  /// Drops the session whose [usedRefreshToken] just failed — unless a
+  /// sign-in replaced it while the call was in flight (a guest signing up:
+  /// the server refuses the guest's tokens once it is upgraded or merged).
+  Future<void> _handleRefreshFailure(String usedRefreshToken) async {
+    if (_refreshToken != usedRefreshToken) return;
     _authToken = null;
     _refreshToken = null;
     await onTokensCleared?.call();
@@ -396,7 +505,7 @@ class ApiClient {
       if (body == null) return;
       yield* parseSseStream(body.stream.cast<List<int>>());
     } on DioException catch (e) {
-      throw _handleDioError(e);
+      throw _handleDioError(await _withDecodedStreamBody(e));
     } finally {
       // Runs when the stream completes OR the subscription is cancelled — either
       // way, tear down the connection.
@@ -404,7 +513,45 @@ class ApiClient {
     }
   }
 
+  /// A `ResponseType.stream` request keeps an error body as a [ResponseBody];
+  /// read and decode it so a 403's `detail.code` is not lost.
+  Future<DioException> _withDecodedStreamBody(DioException e) async {
+    final response = e.response;
+    final data = response?.data;
+    if (response == null || data is! ResponseBody) return e;
+    dynamic decoded;
+    try {
+      final text = await utf8.decodeStream(data.stream);
+      decoded = text.isEmpty ? null : jsonDecode(text);
+    } catch (_) {
+      decoded = null;
+    }
+    return e.copyWith(
+      response: Response<dynamic>(
+        requestOptions: response.requestOptions,
+        data: decoded,
+        statusCode: response.statusCode,
+        statusMessage: response.statusMessage,
+        headers: response.headers,
+      ),
+    );
+  }
+
   ApiException _handleDioError(DioException error) {
+    final data = error.response?.data;
+    final detail = data is Map ? data['detail'] : null;
+    if (detail is Map && detail['code'] is String) {
+      final detailMessage = detail['message'];
+      return ApiException(
+        message: detailMessage is String && detailMessage.isNotEmpty
+            ? detailMessage
+            : _handleBadResponse(error),
+        statusCode: error.response?.statusCode,
+        response: data,
+        code: detail['code'] as String,
+        feature: detail['feature'] as String?,
+      );
+    }
     final message = switch (error.type) {
       DioExceptionType.connectionTimeout => 'Connection timeout',
       DioExceptionType.sendTimeout => 'Send timeout',

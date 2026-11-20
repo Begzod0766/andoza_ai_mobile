@@ -2,11 +2,28 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:tamir_uy_mobile_flutter/models/user_model.dart';
+import 'package:tamir_uy_mobile_flutter/providers/auth_provider.dart';
+import 'package:tamir_uy_mobile_flutter/repositories/auth_repository.dart';
 import 'package:tamir_uy_mobile_flutter/services/firebase_setup.dart';
 import 'package:tamir_uy_mobile_flutter/services/push_permission.dart';
 import 'package:tamir_uy_mobile_flutter/widgets/push_permission_prompt.dart';
 
 import '../support/localized_pump.dart';
+
+class _NoRepo implements AuthRepository {
+  @override
+  dynamic noSuchMethod(Invocation i) => throw UnimplementedError();
+}
+
+class _GuestAuth extends AuthNotifier {
+  _GuestAuth() : super(_NoRepo()) {
+    state = const AuthAuthenticated(
+      user: User(id: 'g1', isGuest: true),
+      token: 'g',
+    );
+  }
+}
 
 class _FakePermission implements PushPermission {
   _FakePermission({this.granted = false});
@@ -28,12 +45,14 @@ void main() {
     WidgetTester tester,
     _FakePermission perm, {
     bool firebaseReady = true,
+    bool guest = false,
   }) async {
     await tester.pumpWidget(
       ProviderScope(
         overrides: [
           firebaseReadyProvider.overrideWithValue(firebaseReady),
           pushPermissionProvider.overrideWithValue(perm),
+          if (guest) authStateProvider.overrideWith((ref) => _GuestAuth()),
         ],
         child: wrapLocalized(
           const PushPermissionPrompt(child: Text('home')),
@@ -45,6 +64,13 @@ void main() {
   }
 
   setUp(() => SharedPreferences.setMockInitialValues({}));
+
+  testWidgets('no permission dialog for a guest', (tester) async {
+    final perm = _FakePermission();
+    await pump(tester, perm, guest: true);
+    expect(find.text('Xabar beraylikmi?'), findsNothing);
+    expect(perm.requests, 0);
+  });
 
   testWidgets('the prompt shows once', (tester) async {
     final perm = _FakePermission();

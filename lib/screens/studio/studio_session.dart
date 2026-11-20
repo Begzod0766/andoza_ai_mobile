@@ -134,6 +134,7 @@ String studioAuthSeedJs(User user) {
         'phone': user.phone,
         'username': user.username,
         'name': user.name,
+        'is_guest': user.isGuest,
         'created_at': DateTime.now().toUtc().toIso8601String(),
       },
       'isAuthenticated': true,

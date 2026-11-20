@@ -6,6 +6,7 @@ import '../../config/design_tokens.dart';
 import '../../l10n/app_localizations.dart';
 import '../../models/business_profile.dart';
 import '../../providers/business_provider.dart';
+import '../../widgets/registration_required_sheet.dart';
 import 'business_labels.dart';
 
 /// "Biznesim": the account's shop and/or usta profile with where each stands
@@ -47,13 +48,23 @@ class BusinessScreen extends ConsumerWidget {
               _AddButton(
                 icon: Icons.storefront_outlined,
                 label: l10n.businessApplyShopTitle,
-                onTap: () => context.push('/business/apply/shop'),
+                onTap: () async {
+                  if (await ensureRegistered(context, ref, 'business') &&
+                      context.mounted) {
+                    context.push('/business/apply/shop');
+                  }
+                },
               ),
             if (!roles.isUsta)
               _AddButton(
                 icon: Icons.handyman_outlined,
                 label: l10n.businessApplyUstaTitle,
-                onTap: () => context.push('/business/apply/usta'),
+                onTap: () async {
+                  if (await ensureRegistered(context, ref, 'business') &&
+                      context.mounted) {
+                    context.push('/business/apply/usta');
+                  }
+                },
               ),
           ],
         ),

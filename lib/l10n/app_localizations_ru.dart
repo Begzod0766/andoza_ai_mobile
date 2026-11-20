@@ -3071,4 +3071,94 @@ class AppLocalizationsRu extends AppLocalizations {
   String tourStepOf(int current, int total) {
     return '$current/$total';
   }
+
+  @override
+  String get loginContinueAsGuest => 'Продолжить без регистрации';
+
+  @override
+  String get loginContinueAsGuestHint =>
+      'Ваши комнаты сохранятся на этом устройстве как у гостя.';
+
+  @override
+  String get guestSessionFailed =>
+      'Сейчас не удалось подключиться. Попробуйте ещё раз или войдите.';
+
+  @override
+  String get guestSheetTitle => 'Для этой функции нужна регистрация';
+
+  @override
+  String get guestSheetBody =>
+      'Ваши комнаты сохранятся и перейдут в ваш аккаунт.';
+
+  @override
+  String get guestSheetSignUp => 'Зарегистрироваться';
+
+  @override
+  String get guestSheetLater => 'Позже';
+
+  @override
+  String get guestFeatureAiDesign => 'AI-дизайнер';
+
+  @override
+  String get guestFeatureAiBuild => 'AI-строитель';
+
+  @override
+  String get guestFeatureRender => 'Фотореалистичный рендер';
+
+  @override
+  String get guestFeatureSmetaAsk => 'Вопрос по смете';
+
+  @override
+  String get guestFeatureMebelAi => 'Мебель AI';
+
+  @override
+  String get guestFeaturePhotoModel => '3D-модель по фото';
+
+  @override
+  String get guestFeatureContact => 'Связь с мастером или магазином';
+
+  @override
+  String get guestFeatureOrder => 'Заказ';
+
+  @override
+  String get guestFeatureWorkshopLink => 'Ссылка для мастерской';
+
+  @override
+  String get guestFeatureBusiness => 'Раздел продавца и мастера';
+
+  @override
+  String get guestFeatureMarketPrices => 'Точные рыночные цены';
+
+  @override
+  String get profileGuestTitle => 'Гость';
+
+  @override
+  String get profileGuestBody =>
+      'Вы не зарегистрированы. Если удалить приложение, ваши комнаты пропадут.';
+
+  @override
+  String get profileGuestCta => 'Регистрация или вход';
+
+  @override
+  String get profileGuestDelete => 'Удалить данные гостя';
+
+  @override
+  String get guestDeleteConfirm =>
+      'Все ваши комнаты будут удалены. Это нельзя отменить.';
+
+  @override
+  String guestMergedRooms(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count комнат добавлено в ваш аккаунт',
+      few: '$count комнаты добавлены в ваш аккаунт',
+      one: '$count комната добавлена в ваш аккаунт',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get estimateGuestPricesNote =>
+      'Цены ориентировочные. После регистрации они будут уточнены.';
 }

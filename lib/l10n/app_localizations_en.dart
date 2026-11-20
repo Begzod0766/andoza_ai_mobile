@@ -3070,4 +3070,92 @@ class AppLocalizationsEn extends AppLocalizations {
   String tourStepOf(int current, int total) {
     return '$current/$total';
   }
+
+  @override
+  String get loginContinueAsGuest => 'Continue without signing up';
+
+  @override
+  String get loginContinueAsGuestHint =>
+      'Your rooms are kept on this device as a guest.';
+
+  @override
+  String get guestSessionFailed =>
+      'Couldn\'t connect right now. Try again or sign in.';
+
+  @override
+  String get guestSheetTitle => 'Sign up to use this';
+
+  @override
+  String get guestSheetBody => 'Your rooms stay and move to your account.';
+
+  @override
+  String get guestSheetSignUp => 'Sign up';
+
+  @override
+  String get guestSheetLater => 'Later';
+
+  @override
+  String get guestFeatureAiDesign => 'AI designer';
+
+  @override
+  String get guestFeatureAiBuild => 'AI builder';
+
+  @override
+  String get guestFeatureRender => 'Photoreal render';
+
+  @override
+  String get guestFeatureSmetaAsk => 'Question about the estimate';
+
+  @override
+  String get guestFeatureMebelAi => 'Furniture AI';
+
+  @override
+  String get guestFeaturePhotoModel => '3D model from a photo';
+
+  @override
+  String get guestFeatureContact => 'Contacting a pro or a shop';
+
+  @override
+  String get guestFeatureOrder => 'Ordering';
+
+  @override
+  String get guestFeatureWorkshopLink => 'Workshop link';
+
+  @override
+  String get guestFeatureBusiness => 'Seller and pro section';
+
+  @override
+  String get guestFeatureMarketPrices => 'Exact market prices';
+
+  @override
+  String get profileGuestTitle => 'Guest';
+
+  @override
+  String get profileGuestBody =>
+      'You haven\'t signed up. If you delete the app, your rooms are lost.';
+
+  @override
+  String get profileGuestCta => 'Sign up or sign in';
+
+  @override
+  String get profileGuestDelete => 'Delete guest data';
+
+  @override
+  String get guestDeleteConfirm =>
+      'All your rooms will be deleted. This can\'t be undone.';
+
+  @override
+  String guestMergedRooms(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count rooms were added to your account',
+      one: '$count room was added to your account',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get estimateGuestPricesNote =>
+      'Prices are approximate. Sign up to get them refined.';
 }

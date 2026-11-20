@@ -14,6 +14,10 @@ class User {
   /// The account's interface language (uz/ru/en), from `/auth/me`.
   final String? language;
 
+  /// A server-side guest account (`is_guest` on `/auth/me` and login
+  /// responses): no phone/username, paid and contact features are closed.
+  final bool isGuest;
+
   const User({
     required this.id,
     this.email,
@@ -25,6 +29,7 @@ class User {
     this.avatar,
     this.createdAt,
     this.language,
+    this.isGuest = false,
   });
 
   factory User.fromJson(Map<String, dynamic> json) {
@@ -44,6 +49,7 @@ class User {
           ? DateTime.parse(json['created_at'] as String)
           : null,
       language: json['language'] as String?,
+      isGuest: json['is_guest'] == true,
     );
   }
 }
@@ -54,11 +60,16 @@ class AuthResponse {
   final String? tokenType;
   final User user;
 
+  /// Rooms moved from this device's guest account into the signed-in account
+  /// (login responses only; null when nothing was merged).
+  final int? guestMergedRooms;
+
   const AuthResponse({
     required this.token,
     this.refreshToken,
     this.tokenType,
     required this.user,
+    this.guestMergedRooms,
   });
 
   factory AuthResponse.fromJson(Map<String, dynamic> json) {
@@ -67,6 +78,7 @@ class AuthResponse {
       refreshToken: json['refresh_token'] as String?,
       tokenType: json['token_type'] as String?,
       user: User.fromJson(json['user'] as Map<String, dynamic>),
+      guestMergedRooms: (json['guest_merged_rooms'] as num?)?.toInt(),
     );
   }
 }

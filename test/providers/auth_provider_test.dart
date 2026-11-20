@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:typed_data';
 
@@ -8,6 +9,7 @@ import 'package:riverpod/riverpod.dart';
 import 'package:tamir_uy_mobile_flutter/models/user_model.dart';
 import 'package:tamir_uy_mobile_flutter/providers/auth_provider.dart';
 import 'package:tamir_uy_mobile_flutter/repositories/auth_repository.dart';
+import 'package:tamir_uy_mobile_flutter/services/api_client.dart';
 
 /// A fully in-memory AuthRepository: no ApiClient, no network. Each method is
 /// scripted per-test so we can exercise the AuthNotifier state machine (login
@@ -15,9 +17,28 @@ import 'package:tamir_uy_mobile_flutter/repositories/auth_repository.dart';
 /// handleUnauthorized guard) without touching real HTTP.
 class _FakeAuthRepository implements AuthRepository {
   // ignore_for_file: prefer_initializing_formals
-  _FakeAuthRepository({AuthResponse? loginResult, Object? loginError})
-      : _loginResult = loginResult,
+  _FakeAuthRepository({
+    AuthResponse? loginResult,
+    Object? loginError,
+    this.guestResult,
+    this.guestError,
+  })  : _loginResult = loginResult,
         _loginError = loginError;
+
+  AuthResponse? guestResult;
+  Object? guestError;
+  int guestCalls = 0;
+
+  /// When set, guest creation waits for it (to test overlapping calls).
+  Completer<void>? guestGate;
+
+  @override
+  Future<AuthResponse> startGuestSession() async {
+    guestCalls++;
+    await guestGate?.future;
+    if (guestError != null) throw guestError!;
+    return guestResult!;
+  }
 
   final AuthResponse? _loginResult;
   final Object? _loginError;
@@ -153,7 +174,144 @@ ResponseBody _json(Object? body, int status) => ResponseBody.fromString(
   return (container: container, adapter: adapter, store: seed);
 }
 
+AuthResponse _guest({String id = 'g1', String token = 'guest-tok'}) =>
+    AuthResponse(
+      token: token,
+      refreshToken: 'guest-refresh',
+      user: User(id: id, isGuest: true),
+    );
+
 void main() {
+  group('AuthNotifier.startGuestSession', () {
+    test('startGuestSession authenticates a guest', () async {
+      final container =
+          _container(_FakeAuthRepository(guestResult: _guest()));
+      final notifier = container.read(authStateProvider.notifier);
+      expect(await notifier.startGuestSession(), isTrue);
+      expect(container.read(authStateProvider).isGuest, isTrue);
+    });
+
+    test('startGuestSession failure stays AuthInitial', () async {
+      final container = _container(_FakeAuthRepository(
+        guestError: ApiException(message: 'off', statusCode: 503),
+      ));
+      final notifier = container.read(authStateProvider.notifier);
+      expect(await notifier.startGuestSession(), isFalse);
+      expect(container.read(authStateProvider), isA<AuthInitial>());
+    });
+
+    for (final c in [
+      (503, true, 'guest mode switched off'),
+      (429, false, 'rate limit'),
+      (null, false, 'offline'),
+    ]) {
+      test('guest mode counts as off only on 503 (${c.$3})', () async {
+        final container = _container(_FakeAuthRepository(
+          guestError: ApiException(message: 'x', statusCode: c.$1),
+        ));
+        final notifier = container.read(authStateProvider.notifier);
+        expect(notifier.guestModeDisabled, isFalse);
+        await notifier.startGuestSession();
+        expect(notifier.guestModeDisabled, c.$2);
+      });
+    }
+
+    test('a registered session is not a guest', () async {
+      final container =
+          _container(_FakeAuthRepository(loginResult: _response()));
+      await container.read(authStateProvider.notifier).login('a', 'b');
+      expect(container.read(authStateProvider).isGuest, isFalse);
+      expect(const AuthInitial().isGuest, isFalse);
+    });
+
+    test('dead guest session becomes a new guest', () async {
+      final repo = _FakeAuthRepository(guestResult: _guest());
+      final container = _container(repo);
+      final notifier = container.read(authStateProvider.notifier);
+      await notifier.startGuestSession();
+      repo.guestResult = _guest(id: 'g2', token: 'guest-tok-2');
+
+      await notifier.handleUnauthorized();
+
+      expect(repo.clearSessionCalls, 1);
+      expect(repo.guestCalls, 2);
+      final state = container.read(authStateProvider);
+      expect(state.isGuest, isTrue);
+      expect((state as AuthAuthenticated).user.id, 'g2');
+    });
+
+    test('dead guest whose replacement fails goes to AuthInitial', () async {
+      final repo = _FakeAuthRepository(guestResult: _guest());
+      final container = _container(repo);
+      final notifier = container.read(authStateProvider.notifier);
+      await notifier.startGuestSession();
+      repo.guestError = ApiException(message: 'offline');
+
+      await notifier.handleUnauthorized();
+
+      expect(container.read(authStateProvider), isA<AuthInitial>());
+    });
+
+    test('a sign-in during a dead guest teardown survives it', () async {
+      final repo = _FakeAuthRepository(guestResult: _guest());
+      final container = _container(repo);
+      final notifier = container.read(authStateProvider.notifier);
+      await notifier.startGuestSession();
+      final ended = Completer<void>();
+      notifier.onSessionEnded = () => ended.future;
+
+      final teardown = notifier.handleUnauthorized();
+      // The guest signs up while the dead-session teardown is still running.
+      notifier.setSession(_response());
+      ended.complete();
+      await teardown;
+
+      final state = container.read(authStateProvider);
+      expect(state, isA<AuthAuthenticated>());
+      expect(state.isGuest, isFalse);
+      expect(repo.clearSessionCalls, 0);
+      expect(repo.guestCalls, 1);
+    });
+
+    test('overlapping guest starts create one guest', () async {
+      final repo = _FakeAuthRepository(guestResult: _guest())
+        ..guestGate = Completer<void>();
+      final container = _container(repo);
+      final notifier = container.read(authStateProvider.notifier);
+      final a = notifier.startGuestSession();
+      final b = notifier.startGuestSession();
+      repo.guestGate!.complete();
+      expect(await Future.wait([a, b]), [true, true]);
+      expect(repo.guestCalls, 1);
+    });
+
+    test('parallel 401s of a dead guest create one new guest', () async {
+      final repo = _FakeAuthRepository(guestResult: _guest());
+      final container = _container(repo);
+      final notifier = container.read(authStateProvider.notifier);
+      await notifier.startGuestSession();
+      repo.guestGate = Completer<void>();
+      final a = notifier.handleUnauthorized();
+      final b = notifier.handleUnauthorized();
+      repo.guestGate!.complete();
+      await Future.wait([a, b]);
+      expect(repo.guestCalls, 2); // the first guest + one replacement
+      expect(repo.clearSessionCalls, 1);
+    });
+
+    test('dead registered session goes to AuthInitial', () async {
+      final repo = _FakeAuthRepository(loginResult: _response());
+      final container = _container(repo);
+      final notifier = container.read(authStateProvider.notifier);
+      await notifier.login('a', 'b');
+
+      await notifier.handleUnauthorized();
+
+      expect(repo.guestCalls, 0);
+      expect(container.read(authStateProvider), isA<AuthInitial>());
+    });
+  });
+
   group('AuthNotifier.login — success', () {
     test('successful login moves state to AuthAuthenticated with the user', () async {
       final container = _container(

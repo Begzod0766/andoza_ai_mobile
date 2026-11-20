@@ -5,6 +5,7 @@ import '../repositories/auth_repository.dart';
 import '../services/api_client.dart';
 import '../services/push_service.dart';
 import '../services/secure_storage.dart';
+import '../services/sign_in_history.dart';
 import 'locale_provider.dart';
 
 // Secure Storage provider
@@ -62,7 +63,7 @@ final Provider<AuthRepository> authRepositoryProvider =
 final StateNotifierProvider<AuthNotifier, AuthState> authStateProvider =
     StateNotifierProvider<AuthNotifier, AuthState>((ref) {
   final repository = ref.watch(authRepositoryProvider);
-  final notifier = AuthNotifier(repository);
+  final notifier = AuthNotifier(repository, ref.read(signInHistoryProvider));
   // Read lazily: pushService depends on apiClient, which depends back on this.
   notifier.beforeLogout = () => ref.read(pushServiceProvider).unregister();
   notifier.onSessionEnded =
@@ -80,9 +81,22 @@ final currentUserProvider = FutureProvider.autoDispose<User?>((ref) async {
 
 // Auth notifier for managing auth state
 class AuthNotifier extends StateNotifier<AuthState> {
-  AuthNotifier(this._repository) : super(const AuthInitial());
+  AuthNotifier(this._repository, [this._signInHistory])
+      : super(const AuthInitial());
 
   final AuthRepository _repository;
+  final SignInHistory? _signInHistory;
+
+  /// Every registered session (login, Google, Apple, OTP, register, a guest's
+  /// upgrade or merge, a restored session) marks the device as signed in
+  /// before; a guest session does not.
+  @override
+  set state(AuthState value) {
+    super.state = value;
+    if (value is AuthAuthenticated && !value.user.isGuest) {
+      _signInHistory?.markSignedIn();
+    }
+  }
 
   /// Awaited first in [logout], while the session is still valid (push token
   /// removal needs auth). Must not throw.
@@ -108,6 +122,38 @@ class AuthNotifier extends StateNotifier<AuthState> {
     }
   }
 
+  bool get isAuthenticated => state is AuthAuthenticated;
+
+  /// The server answered `POST /auth/guest` with 503: guest mode is switched
+  /// off. The login screen then stops offering "continue without signing
+  /// up" for the rest of this app run; the next cold start asks again, so
+  /// it comes back by itself once guest mode is on. Offline and 429 do not
+  /// count — those are worth retrying.
+  bool get guestModeDisabled => _guestModeDisabled;
+  bool _guestModeDisabled = false;
+
+  /// Opens a silent guest session (`POST /auth/guest`). True and
+  /// [AuthAuthenticated] (a guest user) on success; false and [AuthInitial] on
+  /// any failure — never [AuthError]: this path has no error UI.
+  ///
+  /// Overlapping calls (a cold start and a dead-session 401, parallel 401s)
+  /// share one request: one guest, one hit on the server's limits.
+  Future<bool> startGuestSession() =>
+      _guestStart ??= _startGuestSession().whenComplete(() => _guestStart = null);
+  Future<bool>? _guestStart;
+
+  Future<bool> _startGuestSession() async {
+    try {
+      final response = await _repository.startGuestSession();
+      state = AuthAuthenticated(user: response.user, token: response.token);
+      return true;
+    } catch (e) {
+      if (e is ApiException && e.statusCode == 503) _guestModeDisabled = true;
+      state = const AuthInitial();
+      return false;
+    }
+  }
+
   /// Flip to authenticated from an already-completed auth call (OTP verify /
   /// register / password login done directly against the repository). The
   /// repository has persisted the tokens; this just drives the router redirect.
@@ -124,10 +170,30 @@ class AuthNotifier extends StateNotifier<AuthState> {
   ///
   /// No-op unless currently authenticated, so it can't clobber an in-flight
   /// login's AuthLoading/AuthError (a failed login must not force-clear).
-  Future<void> handleUnauthorized() async {
-    if (state is! AuthAuthenticated) return;
+  ///
+  /// A dead guest session becomes a fresh guest silently (its rooms are gone
+  /// with it anyway); the state goes straight from the old guest to the new
+  /// one, so the router does not flash /login. Only if that fails →
+  /// [AuthInitial].
+  ///
+  /// Parallel 401s share one teardown, and a sign-in that lands meanwhile (a
+  /// guest signing up) wins: the dead session is only cleared while it is
+  /// still the current one.
+  Future<void> handleUnauthorized() => _unauthorized ??=
+      _handleUnauthorized().whenComplete(() => _unauthorized = null);
+  Future<void>? _unauthorized;
+
+  Future<void> _handleUnauthorized() async {
+    final current = state;
+    if (current is! AuthAuthenticated) return;
     await onSessionEnded?.call();
+    if (!identical(state, current)) return;
     await _repository.clearSession();
+    if (!identical(state, current)) return;
+    if (current.user.isGuest) {
+      await startGuestSession();
+      return;
+    }
     state = const AuthInitial();
   }
 
@@ -176,6 +242,14 @@ class AuthNotifier extends StateNotifier<AuthState> {
   Future<void> restoreToken() async {
     try {
       await _repository.restoreToken();
+      // A stored registered session counts as signed in before even if the
+      // server no longer takes it (refresh older than 30 days): mark it
+      // before checking, so a dead registered session gets /login, not a
+      // silent guest.
+      final stored = _repository.cachedUser;
+      if (stored != null && !stored.isGuest) {
+        await _signInHistory?.markSignedIn();
+      }
       await checkAuth();
     } catch (_) {
       state = const AuthInitial();
@@ -183,8 +257,32 @@ class AuthNotifier extends StateNotifier<AuthState> {
   }
 }
 
+/// Where a cold start lands once the splash is done.
+enum ColdStart { home, login }
+
+/// Restores the stored session; without one, a device that was signed in to
+/// a registered account before gets the login screen, and a fresh one a
+/// silent guest session (the login screen if that fails: offline, 429, 503).
+Future<ColdStart> resolveColdStart(
+  AuthNotifier notifier,
+  SignInHistory history,
+) async {
+  await notifier.restoreToken();
+  if (notifier.isAuthenticated) return ColdStart.home;
+  if (await history.hasSignedInBefore()) return ColdStart.login;
+  return await notifier.startGuestSession() ? ColdStart.home : ColdStart.login;
+}
+
 sealed class AuthState {
   const AuthState();
+}
+
+extension GuestAuthState on AuthState {
+  /// Signed in on a server-side guest account.
+  bool get isGuest {
+    final self = this;
+    return self is AuthAuthenticated && self.user.isGuest;
+  }
 }
 
 class AuthInitial extends AuthState {

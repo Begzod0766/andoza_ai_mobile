@@ -9,6 +9,7 @@ import '../../l10n/app_localizations.dart';
 import '../../providers/auth_provider.dart';
 import '../../providers/locale_provider.dart';
 import '../../widgets/common/error_view.dart';
+import '../studio/studio_auth_gate.dart';
 import '../studio/studio_session.dart';
 import '../studio/studio_webview_screen.dart' show studioPageUrl;
 import 'mebel_bridge.dart';
@@ -74,6 +75,11 @@ class _MebelWebViewScreenState extends ConsumerState<MebelWebViewScreen> {
         final csv = parseMebelCsv(m.message);
         if (csv != null) _export(() => shareMebelCsv(csv, origin: _shareOrigin()));
       })
+      // A guest tapped AI suggestions or the workshop link.
+      ..addJavaScriptChannel(
+        studioAuthGateChannel,
+        onMessageReceived: (m) => _onAuthGate(m.message),
+      )
       ..setNavigationDelegate(
         NavigationDelegate(
           // The WebView carries the user's session: never follow a main-frame
@@ -122,6 +128,19 @@ class _MebelWebViewScreenState extends ConsumerState<MebelWebViewScreen> {
     await seedStudioCookies(auth, ref.read(secureStorageProvider));
     // A static page on the origin first, so localStorage is writable for the seed.
     await controller.loadRequest(studioBootstrapUri(AppConfig.studioBaseUrl));
+  }
+
+  Future<void> _onAuthGate(String message) async {
+    final controller = _controller;
+    if (controller == null || !mounted) return;
+    await onStudioAuthGate(
+      context,
+      message,
+      readAuth: () => ref.read(authStateProvider),
+      storage: ref.read(secureStorageProvider),
+      runJavaScript: controller.runJavaScript,
+      reopen: () => controller.loadRequest(Uri.parse(_targetUrl)),
+    );
   }
 
   /// The screen's area, for the share sheet to point from.

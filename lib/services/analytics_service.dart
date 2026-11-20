@@ -13,6 +13,9 @@ abstract class AnalyticsSink {
 
   /// Sets the user id for analytics and crashlytics (null clears it).
   Future<void> setUserId(String? id);
+
+  /// Sets an analytics user property (null clears it), e.g. `account_type`.
+  Future<void> setUserProperty(String name, String? value);
 }
 
 /// Forwards to Firebase; a silent no-op unless this build collects telemetry
@@ -50,6 +53,16 @@ class FirebaseAnalyticsSink implements AnalyticsSink {
       await FirebaseCrashlytics.instance.setUserIdentifier(id ?? '');
     } catch (e) {
       debugPrint('Analytics setUserId failed: $e');
+    }
+  }
+
+  @override
+  Future<void> setUserProperty(String name, String? value) async {
+    if (!_active) return;
+    try {
+      await _analytics().setUserProperty(name: name, value: value);
+    } catch (e) {
+      debugPrint('Analytics setUserProperty failed: $e');
     }
   }
 }

@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import '../../config/design_tokens.dart';
 import '../../l10n/app_localizations.dart';
 import '../../providers/auth_provider.dart';
+import '../../services/sign_in_history.dart';
 import '../../widgets/brand/assembling_logo.dart';
 
 /// Splash Screen (S0)
@@ -52,9 +53,13 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
   /// a valid stored token lands on Home instead of being bounced to /login by
   /// the router's auth guard. Once auth resolves (and the logo has had its
   /// moment), we leave the splash and the redirect routes to '/'
-  /// (authenticated) or '/login' (not).
+  /// (authenticated, a silent guest included) or '/login' (not) — see
+  /// [resolveColdStart].
   Future<void> _bootstrap({required Duration minimum}) async {
-    final restore = ref.read(authStateProvider.notifier).restoreToken();
+    final restore = resolveColdStart(
+      ref.read(authStateProvider.notifier),
+      ref.read(signInHistoryProvider),
+    );
     await Future.wait([restore, Future<void>.delayed(minimum)]);
     if (!mounted) return;
     context.go('/');

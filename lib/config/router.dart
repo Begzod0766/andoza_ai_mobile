@@ -82,9 +82,16 @@ import '../screens/onboarding/e9_preferences_settings_screen.dart';
 
 final _rootNavigatorKey = GlobalKey<NavigatorState>();
 
+/// `/signup` (the login screen opened over a guest's work) is for guests: a
+/// registered user goes home, a signed-out one to `/login`.
+@visibleForTesting
+String? signupRedirect(AuthState auth) {
+  if (auth.isGuest) return null;
+  return auth is AuthAuthenticated ? '/' : '/login';
+}
+
 final routerProvider = Provider<GoRouter>((ref) {
-  final refreshNotifier = _GoRouterRefreshNotifier(ref);
-  ref.onDispose(refreshNotifier.dispose);
+  final refreshNotifier = ref.read(authRouterRefreshProvider);
   final newScreenViewObserver = ref.read(screenViewObserverFactoryProvider);
 
   return GoRouter(
@@ -104,6 +111,8 @@ final routerProvider = Provider<GoRouter>((ref) {
       if (isSplash) {
         return null;
       }
+
+      if (state.matchedLocation == '/signup') return signupRedirect(authState);
 
       // Redirect unauthenticated users to login
       if (!isAuthenticated && !isLoginRoute) {
@@ -137,6 +146,13 @@ final routerProvider = Provider<GoRouter>((ref) {
         builder: (context, state) => const SplashScreen(),
       ),
       GoRoute(path: '/login', builder: (context, state) => const LoginScreen()),
+      // A guest signing up or in over what they were doing; pops `true` once
+      // signed in (`showRegistrationRequiredSheet`).
+      GoRoute(
+        path: '/signup',
+        parentNavigatorKey: _rootNavigatorKey,
+        builder: (context, state) => const LoginScreen(fromGuest: true),
+      ),
       ShellRoute(
         // The shell has its own navigator, so it needs its own observer
         // instance or its tab/inner screens never reach Analytics.
@@ -546,19 +562,32 @@ final routerProvider = Provider<GoRouter>((ref) {
   );
 });
 
+/// The router's `refreshListenable`: see [_GoRouterRefreshNotifier].
+@visibleForTesting
+final authRouterRefreshProvider = Provider<Listenable>((ref) {
+  final notifier = _GoRouterRefreshNotifier(ref);
+  ref.onDispose(notifier.dispose);
+  return notifier;
+});
+
 /// Bridges Riverpod's [authStateProvider] to GoRouter's [Listenable]-based
-/// refresh mechanism, so an auth change re-runs `redirect` without
+/// refresh mechanism, so signing in or out re-runs `redirect` without
 /// rebuilding the GoRouter instance (which would reset navigation to
 /// `initialLocation` and remount the whole shell).
+///
+/// Only signed-in vs not: a guest signing up or in (and a token refresh)
+/// changes nothing the redirect decides, and a refresh then re-read the
+/// location last reported — with `/signup` still in it while that screen
+/// was closing — and put the sign-up screen back over the Studio.
 class _GoRouterRefreshNotifier extends ChangeNotifier {
   _GoRouterRefreshNotifier(Ref ref) {
-    _subscription = ref.listen<AuthState>(
-      authStateProvider,
+    _subscription = ref.listen<bool>(
+      authStateProvider.select((s) => s is AuthAuthenticated),
       (previous, next) => notifyListeners(),
     );
   }
 
-  late final ProviderSubscription<AuthState> _subscription;
+  late final ProviderSubscription<bool> _subscription;
 
   @override
   void dispose() {

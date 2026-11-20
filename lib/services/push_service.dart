@@ -128,13 +128,14 @@ final pushServiceProvider = Provider<PushService>((ref) {
 });
 
 /// Keep-alive: while signed in, the phone's token is registered with the
-/// backend and re-registered when it rotates.
+/// backend and re-registered when it rotates. Not for a guest (no pushes for
+/// guests); a guest who signs up or in is registered then.
 final pushRegistrationProvider = Provider<void>((ref) {
   final service = ref.read(pushServiceProvider);
   var active = false;
 
   void apply(AuthState state) {
-    if (state is AuthAuthenticated) {
+    if (state is AuthAuthenticated && !state.user.isGuest) {
       if (active) return;
       active = true;
       service.registerCurrent();

@@ -5643,6 +5643,156 @@ abstract class AppLocalizations {
   /// In uz, this message translates to:
   /// **'{current}/{total}'**
   String tourStepOf(int current, int total);
+
+  /// Login screen: button that starts a guest session (no account) instead of signing in.
+  ///
+  /// In uz, this message translates to:
+  /// **'Ro\'yxatdan o\'tmasdan davom etish'**
+  String get loginContinueAsGuest;
+
+  /// Login screen: small note under the continue-without-signing-up button.
+  ///
+  /// In uz, this message translates to:
+  /// **'Xonalaringiz bu qurilmada mehmon sifatida saqlanadi.'**
+  String get loginContinueAsGuestHint;
+
+  /// Snackbar when a guest session could not be started (offline, server limit, guest mode off).
+  ///
+  /// In uz, this message translates to:
+  /// **'Hozir ulanib bo\'lmadi. Qayta urinib ko\'ring yoki tizimga kiring.'**
+  String get guestSessionFailed;
+
+  /// Sign-up sheet title, shown to a guest who tapped a paid or contact feature.
+  ///
+  /// In uz, this message translates to:
+  /// **'Bu imkoniyat uchun ro\'yxatdan o\'ting'**
+  String get guestSheetTitle;
+
+  /// Sign-up sheet body: reassures the guest their rooms are kept.
+  ///
+  /// In uz, this message translates to:
+  /// **'Xonalaringiz saqlanib qoladi va hisobingizga o\'tadi.'**
+  String get guestSheetBody;
+
+  /// Sign-up sheet: primary button that opens sign-up / sign-in.
+  ///
+  /// In uz, this message translates to:
+  /// **'Ro\'yxatdan o\'tish'**
+  String get guestSheetSignUp;
+
+  /// Sign-up sheet: secondary button that closes the sheet.
+  ///
+  /// In uz, this message translates to:
+  /// **'Keyinroq'**
+  String get guestSheetLater;
+
+  /// Sign-up sheet: name of the feature that needs an account (AI room design).
+  ///
+  /// In uz, this message translates to:
+  /// **'AI dizayner'**
+  String get guestFeatureAiDesign;
+
+  /// Sign-up sheet: feature name (AI builder).
+  ///
+  /// In uz, this message translates to:
+  /// **'AI quruvchi'**
+  String get guestFeatureAiBuild;
+
+  /// Sign-up sheet: feature name (photoreal render).
+  ///
+  /// In uz, this message translates to:
+  /// **'Fotoreal render'**
+  String get guestFeatureRender;
+
+  /// Sign-up sheet: feature name (ask AI about the estimate).
+  ///
+  /// In uz, this message translates to:
+  /// **'Smeta bo\'yicha savol'**
+  String get guestFeatureSmetaAsk;
+
+  /// Sign-up sheet: feature name (AI cabinet suggestions).
+  ///
+  /// In uz, this message translates to:
+  /// **'Mebel AI'**
+  String get guestFeatureMebelAi;
+
+  /// Sign-up sheet: feature name (photo to 3D model).
+  ///
+  /// In uz, this message translates to:
+  /// **'Fotodan 3D model'**
+  String get guestFeaturePhotoModel;
+
+  /// Sign-up sheet: feature name (sending a request to an usta or a shop).
+  ///
+  /// In uz, this message translates to:
+  /// **'Usta yoki do\'kon bilan bog\'lanish'**
+  String get guestFeatureContact;
+
+  /// Sign-up sheet: feature name (placing an order).
+  ///
+  /// In uz, this message translates to:
+  /// **'Buyurtma'**
+  String get guestFeatureOrder;
+
+  /// Sign-up sheet: feature name (furniture workshop link).
+  ///
+  /// In uz, this message translates to:
+  /// **'Ustaxona havolasi'**
+  String get guestFeatureWorkshopLink;
+
+  /// Sign-up sheet: feature name (shop/usta business section).
+  ///
+  /// In uz, this message translates to:
+  /// **'Sotuvchi va usta bo\'limi'**
+  String get guestFeatureBusiness;
+
+  /// Sign-up sheet: feature name (exact market prices on the estimate).
+  ///
+  /// In uz, this message translates to:
+  /// **'Aniq bozor narxlari'**
+  String get guestFeatureMarketPrices;
+
+  /// Profile for a guest (no account): card title.
+  ///
+  /// In uz, this message translates to:
+  /// **'Mehmon'**
+  String get profileGuestTitle;
+
+  /// Profile for a guest: warns that uninstalling loses the rooms.
+  ///
+  /// In uz, this message translates to:
+  /// **'Siz ro\'yxatdan o\'tmagansiz. Ilovani o\'chirsangiz, xonalaringiz yo\'qoladi.'**
+  String get profileGuestBody;
+
+  /// Profile for a guest: button that opens sign-up / sign-in.
+  ///
+  /// In uz, this message translates to:
+  /// **'Ro\'yxatdan o\'tish yoki kirish'**
+  String get profileGuestCta;
+
+  /// Profile for a guest: destructive row that deletes the guest account and its rooms.
+  ///
+  /// In uz, this message translates to:
+  /// **'Mehmon ma\'lumotlarini o\'chirish'**
+  String get profileGuestDelete;
+
+  /// Delete-guest-data dialog body.
+  ///
+  /// In uz, this message translates to:
+  /// **'Barcha xonalaringiz o\'chiriladi. Buni qaytarib bo\'lmaydi.'**
+  String get guestDeleteConfirm;
+
+  /// Snackbar after a guest signed in to an existing account: how many of the guest's rooms moved into it.
+  ///
+  /// In uz, this message translates to:
+  /// **'{count, plural, other{{count} xona akkauntingizga qo\'shildi}}'**
+  String guestMergedRooms(int count);
+
+  /// Estimate screen, guests only: AI and market prices were skipped, so the prices are approximate.
+  ///
+  /// In uz, this message translates to:
+  /// **'Narxlar taxminiy. Ro\'yxatdan o\'tsangiz, aniqlashtiriladi.'**
+  String get estimateGuestPricesNote;
 }
 
 class _AppLocalizationsDelegate

@@ -54,6 +54,8 @@ _Estimate _$EstimateFromJson(Map<String, dynamic> json) => _Estimate(
   electricalConfirmed: json['electrical_confirmed'] as bool? ?? false,
   usdRate: (json['usd_rate'] as num?)?.toDouble() ?? 0.0,
   totalUsd: (json['total_usd'] as num?)?.toInt() ?? 0,
+  pricesApproximateForGuest:
+      json['prices_approximate_for_guest'] as bool? ?? false,
 );
 
 Map<String, dynamic> _$EstimateToJson(_Estimate instance) => <String, dynamic>{
@@ -72,6 +74,7 @@ Map<String, dynamic> _$EstimateToJson(_Estimate instance) => <String, dynamic>{
   'electrical_confirmed': instance.electricalConfirmed,
   'usd_rate': instance.usdRate,
   'total_usd': instance.totalUsd,
+  'prices_approximate_for_guest': instance.pricesApproximateForGuest,
 };
 
 _EstimateSummary _$EstimateSummaryFromJson(Map<String, dynamic> json) =>

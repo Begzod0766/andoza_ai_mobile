@@ -13,6 +13,7 @@ import '../../providers/orders_provider.dart';
 import '../../services/analytics_service.dart';
 import '../../utils/currency.dart';
 import '../../utils/phone.dart';
+import '../../widgets/registration_required_sheet.dart';
 
 /// Matches a canonical UUID — used to decide whether a cart product's id is a
 /// real backend material UUID (send as `material_id`) or a local/synthetic
@@ -89,6 +90,9 @@ class _S6CheckoutScreenState extends ConsumerState<S6CheckoutScreen> {
   /// the error is shown here. When every dealer's order is accepted the
   /// confirmation opens.
   Future<void> _placeOrder(List<CartLine> lines) async {
+    // Ordering needs an account (`POST /orders` 403s for a guest).
+    if (!await ensureRegistered(context, ref, 'order')) return;
+    if (!mounted) return;
     final l10n = AppLocalizations.of(context)!;
     final messenger = ScaffoldMessenger.of(context);
 
@@ -177,6 +181,8 @@ class _S6CheckoutScreenState extends ConsumerState<S6CheckoutScreen> {
     setState(() => _isPlacing = false);
 
     if (failure != null) {
+      if (await handleRegistrationRequired(context, failure)) return;
+      if (!mounted) return;
       final message = mapErrorWithServerDetail(failure);
       messenger.showSnackBar(
         SnackBar(

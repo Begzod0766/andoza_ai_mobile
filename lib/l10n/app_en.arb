@@ -2951,5 +2951,41 @@
         "type": "int"
       }
     }
-  }
+  },
+
+  "loginContinueAsGuest": "Continue without signing up",
+  "loginContinueAsGuestHint": "Your rooms are kept on this device as a guest.",
+  "guestSessionFailed": "Couldn't connect right now. Try again or sign in.",
+
+  "guestSheetTitle": "Sign up to use this",
+  "guestSheetBody": "Your rooms stay and move to your account.",
+  "guestSheetSignUp": "Sign up",
+  "guestSheetLater": "Later",
+  "guestFeatureAiDesign": "AI designer",
+  "guestFeatureAiBuild": "AI builder",
+  "guestFeatureRender": "Photoreal render",
+  "guestFeatureSmetaAsk": "Question about the estimate",
+  "guestFeatureMebelAi": "Furniture AI",
+  "guestFeaturePhotoModel": "3D model from a photo",
+  "guestFeatureContact": "Contacting a pro or a shop",
+  "guestFeatureOrder": "Ordering",
+  "guestFeatureWorkshopLink": "Workshop link",
+  "guestFeatureBusiness": "Seller and pro section",
+  "guestFeatureMarketPrices": "Exact market prices",
+
+  "profileGuestTitle": "Guest",
+  "profileGuestBody": "You haven't signed up. If you delete the app, your rooms are lost.",
+  "profileGuestCta": "Sign up or sign in",
+  "profileGuestDelete": "Delete guest data",
+  "guestDeleteConfirm": "All your rooms will be deleted. This can't be undone.",
+  "guestMergedRooms": "{count, plural, one{{count} room was added to your account} other{{count} rooms were added to your account}}",
+  "@guestMergedRooms": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+
+  "estimateGuestPricesNote": "Prices are approximate. Sign up to get them refined."
 }

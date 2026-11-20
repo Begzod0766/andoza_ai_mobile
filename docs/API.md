@@ -20,13 +20,25 @@ Studio "Frame load interrupted" bilan ochilmaydi (handoff §9.1).
   - 401 kelsa (auth yo'llaridan boshqa joyda), klient `POST /auth/refresh` ni `Cookie: refresh_token=…` bilan chaqiradi.
   - Ikkala tokenni yangilab, so'rovni bir marta qaytaradi.
   - Bir vaqtda kelgan bir nechta 401 bitta yangilashga birlashadi.
-  - Yangilash muvaffaqiyatsiz bo'lsa, tokenlar o'chiriladi va foydalanuvchi login sahifasiga qaytariladi.
-- **Xatolar:** `ApiException` ga o'raladi. Foydalanuvchiga ko'rinadigan matnni `utils/error_mapper.dart` beradi, ilova tilida (`error*` ARB kalitlari; tilni `MyApp` `setErrorMessagesLocale` bilan beradi). Serverning `detail` matni (`mapErrorWithServerDetail`) ham ilova tilida keladi: ilova har so'rovga `Accept-Language` qo'yadi, backend uni `app/i18n/messages.py` jadvali bo'yicha tarjima qiladi.
+  - Yangilash muvaffaqiyatsiz bo'lsa, tokenlar o'chiriladi va foydalanuvchi login sahifasiga qaytariladi (mehmon esa jimgina yangi mehmon bo'ladi).
+  - Yangilash paytida kirish (mehmon ro'yxatdan o'tdi yoki kirdi) tokenlarni almashtirgan bo'lsa, eski javob saqlanmaydi ham, o'chirilmaydi ham: so'rov yangi token bilan qaytariladi. Backend mehmon tokenlarini upgrade/merge'dan keyin 401 bilan rad etadi.
+  - Auth yo'llari (`/auth/login`, `/register`, `/otp/*`, `/google`, `/apple`, `/guest`, `/refresh`, `/logout`) 401 da yangilanmaydi.
+- **Xatolar:** `ApiException` ga o'raladi. `detail` obyekt bo'lsa, `code`, `feature` va `message` olinadi (SSE oqimda ham: xato tanasi o'qib, JSON qilib ochiladi). Foydalanuvchiga ko'rinadigan matnni `utils/error_mapper.dart` beradi, ilova tilida (`error*` ARB kalitlari; tilni `MyApp` `setErrorMessagesLocale` bilan beradi). Serverning `detail` matni (`mapErrorWithServerDetail`) ham ilova tilida keladi: ilova har so'rovga `Accept-Language` qo'yadi, backend uni `app/i18n/messages.py` jadvali bo'yicha tarjima qiladi.
 - **Til:** har bir so'rov `Accept-Language: uz|ru|en` (ilova tili) bilan ketadi, shuning uchun server xato matnlarini shu tilda qaytaradi. Tanlangan til akkauntga `PATCH /auth/me {language}` bilan yoziladi.
 - **Log:** faqat debug rejimida, faqat metod, yo'l va status. So'rov va javob tanasi log qilinmaydi.
 - **Tokenlar:** `flutter_secure_storage` da (`services/secure_storage.dart`), kalitlar `auth_token`, `refresh_token`, `user_id`.
   - Android'da EncryptedSharedPreferences.
   - iOS'da Keychain, `first_unlock_this_device` rejimida.
+  - `user_is_guest` (oflayn sovuq startda mehmonligini bilish uchun) va `install_id` (tasodifiy UUID, `/auth/guest` uchun). `install_id` chiqishda o'chirilmaydi.
+
+## Mehmon rejimi
+
+- `POST /auth/guest` `{"install_id": "<uuid>", "language": "uz|ru|en"}` → 201 `LoginResponse`, `user.is_guest: true`. 503 — rejim o'chiq, 429 — limit (IP 30/soat, install 3/kun). Har qanday xato → login ekrani (`AuthNotifier.startGuestSession` false qaytaradi; so'rov ko'pi bilan 8 s kutiladi). 503 bo'lsa login ekrani shu ishga tushirish davomida "Ro'yxatdan o'tmasdan davom etish" tugmasini ko'rsatmaydi (`guestModeDisabled`); keyingi sovuq startda qayta so'raladi.
+- Mehmon ro'yxatdan o'tishi yoki kirishidan (register, login, OTP, Google, Apple) oldin ilova mehmon tokenini majburan yangilaydi (`ApiClient.refreshNow`): backend mehmonni faqat amaldagi bearer orqali taniydi, 30 daqiqalik access token esa ko'pincha eskirgan bo'ladi. Yangilash rad etilsa (mehmon o'chgan), kirish mehmonsiz davom etadi.
+- Pullik yoki aloqa talab qiladigan endpoint mehmonga **403** `{"detail": {"code": "registration_required", "feature": "<feature>", "message": "<matn>"}}` qaytaradi (401 emas). `ApiException.isRegistrationRequired`; ilova "ro'yxatdan o'ting" oynasini ochadi (`widgets/registration_required_sheet.dart`). Feature'lar: `ai_design`, `ai_build`, `smeta_ask`, `render`, `photo_model`, `mebel_ai`, `contact`, `order`, `workshop_link`, `business`, `market_prices`.
+- Login javoblarida `guest_merged_rooms` (int yoki null) — mehmon mavjud akkauntga kirganda ko'chgan xonalar soni; ilova "N xona akkauntingizga qo'shildi" deydi.
+- Smeta javobida `prices_approximate_for_guest` — mehmonga AI/bozor narxi o'tkazilgan; `/estimation/e1` izoh ko'rsatadi.
+- Mehmon refresh tokeni 90 kun. O'chirilgan yoki merge qilingan foydalanuvchining refresh'i 401.
 
 ## Endpoint'lar
 
@@ -34,7 +46,7 @@ Hammasi `/api/v1` ga nisbatan. Har bir mavzu uchun bitta repository fayli (`lib/
 
 | Mavzu | So'rovlar | Fayl |
 |---|---|---|
-| Kirish | `POST /auth/login`, `/auth/register`, `/auth/otp/request`, `/auth/otp/verify`, `/auth/google` (`id_token`), `/auth/apple` (`identity_token`, `name` faqat birinchi kirishda; faqat iOS), `/auth/refresh`, `/auth/logout`, `/auth/delete-account`; `GET /auth/me`, `PATCH /auth/me` (`language`) | `auth_repository.dart`, `services/api_client.dart` |
+| Kirish | `POST /auth/guest` (`install_id`, `language`), `/auth/login`, `/auth/register`, `/auth/otp/request`, `/auth/otp/verify`, `/auth/google` (`id_token`), `/auth/apple` (`identity_token`, `name` faqat birinchi kirishda; faqat iOS), `/auth/refresh`, `/auth/logout`, `/auth/delete-account`; `GET /auth/me`, `PATCH /auth/me` (`language`) | `auth_repository.dart`, `services/api_client.dart` |
 | Kvartira va xonalar | `GET/POST /apartments`; `GET/PATCH/DELETE /apartments/{id}`; `GET/POST /apartments/{id}/rooms` (yaratishda `room_type` — `hammom`, `oshxona`, … — tanlangan bo'lsa yuboriladi); `GET/PATCH/DELETE /rooms/{id}` (loyiha/xona nomini o'zgartirish va o'chirish: kartochkadagi "⋮", `screens/projects/project_menu.dart`) | `apartment_repository.dart` |
 | Xona holati | `GET/POST/PATCH /rooms/{id}/state`; `GET /rooms/{id}/delta` | `room_state_repository.dart` |
 | Bezak va elektr | `GET/PUT /rooms/{id}/decoration`; `GET/PUT /rooms/{id}/electrical` | `decoration_repository.dart`, `electrical_repository.dart` |

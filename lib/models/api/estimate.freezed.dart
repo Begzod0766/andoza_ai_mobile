@@ -321,7 +321,9 @@ mixin _$Estimate {
 /// persisted before the backend added the split still deserialises.
 @JsonKey(name: 'total_exact_uzs') int get totalExactUzs;@JsonKey(name: 'total_approx_uzs') int get totalApproxUzs;/// Whether [hasElectrical] is backed by real placed devices rather than
 /// the backend's default-point-count guess.
-@JsonKey(name: 'electrical_confirmed') bool get electricalConfirmed;@JsonKey(name: 'usd_rate') double get usdRate;@JsonKey(name: 'total_usd') int get totalUsd;
+@JsonKey(name: 'electrical_confirmed') bool get electricalConfirmed;@JsonKey(name: 'usd_rate') double get usdRate;@JsonKey(name: 'total_usd') int get totalUsd;/// The caller is a guest: AI gap-fill and market prices were skipped, so
+/// the prices are catalogue/approximate until they sign up.
+@JsonKey(name: 'prices_approximate_for_guest') bool get pricesApproximateForGuest;
 /// Create a copy of Estimate
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -335,20 +337,20 @@ $EstimateCopyWith<Estimate> get copyWith => _$EstimateCopyWithImpl<Estimate>(thi
 @override
 bool operator ==(Object other) {
   final _this = this as Estimate;
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is Estimate&&(identical(other.id, _this.id) || other.id == _this.id)&&(identical(other.roomId, _this.roomId) || other.roomId == _this.roomId)&&const DeepCollectionEquality().equals(other.lines, _this.lines)&&(identical(other.totalUzs, _this.totalUzs) || other.totalUzs == _this.totalUzs)&&(identical(other.totalMin, _this.totalMin) || other.totalMin == _this.totalMin)&&(identical(other.totalMax, _this.totalMax) || other.totalMax == _this.totalMax)&&(identical(other.currency, _this.currency) || other.currency == _this.currency)&&(identical(other.status, _this.status) || other.status == _this.status)&&(identical(other.createdAt, _this.createdAt) || other.createdAt == _this.createdAt)&&(identical(other.hasElectrical, _this.hasElectrical) || other.hasElectrical == _this.hasElectrical)&&(identical(other.totalExactUzs, _this.totalExactUzs) || other.totalExactUzs == _this.totalExactUzs)&&(identical(other.totalApproxUzs, _this.totalApproxUzs) || other.totalApproxUzs == _this.totalApproxUzs)&&(identical(other.electricalConfirmed, _this.electricalConfirmed) || other.electricalConfirmed == _this.electricalConfirmed)&&(identical(other.usdRate, _this.usdRate) || other.usdRate == _this.usdRate)&&(identical(other.totalUsd, _this.totalUsd) || other.totalUsd == _this.totalUsd));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is Estimate&&(identical(other.id, _this.id) || other.id == _this.id)&&(identical(other.roomId, _this.roomId) || other.roomId == _this.roomId)&&const DeepCollectionEquality().equals(other.lines, _this.lines)&&(identical(other.totalUzs, _this.totalUzs) || other.totalUzs == _this.totalUzs)&&(identical(other.totalMin, _this.totalMin) || other.totalMin == _this.totalMin)&&(identical(other.totalMax, _this.totalMax) || other.totalMax == _this.totalMax)&&(identical(other.currency, _this.currency) || other.currency == _this.currency)&&(identical(other.status, _this.status) || other.status == _this.status)&&(identical(other.createdAt, _this.createdAt) || other.createdAt == _this.createdAt)&&(identical(other.hasElectrical, _this.hasElectrical) || other.hasElectrical == _this.hasElectrical)&&(identical(other.totalExactUzs, _this.totalExactUzs) || other.totalExactUzs == _this.totalExactUzs)&&(identical(other.totalApproxUzs, _this.totalApproxUzs) || other.totalApproxUzs == _this.totalApproxUzs)&&(identical(other.electricalConfirmed, _this.electricalConfirmed) || other.electricalConfirmed == _this.electricalConfirmed)&&(identical(other.usdRate, _this.usdRate) || other.usdRate == _this.usdRate)&&(identical(other.totalUsd, _this.totalUsd) || other.totalUsd == _this.totalUsd)&&(identical(other.pricesApproximateForGuest, _this.pricesApproximateForGuest) || other.pricesApproximateForGuest == _this.pricesApproximateForGuest));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
 int get hashCode {
   final _this = this as Estimate;
-  return Object.hash(runtimeType,_this.id,_this.roomId,const DeepCollectionEquality().hash(_this.lines),_this.totalUzs,_this.totalMin,_this.totalMax,_this.currency,_this.status,_this.createdAt,_this.hasElectrical,_this.totalExactUzs,_this.totalApproxUzs,_this.electricalConfirmed,_this.usdRate,_this.totalUsd);
+  return Object.hash(runtimeType,_this.id,_this.roomId,const DeepCollectionEquality().hash(_this.lines),_this.totalUzs,_this.totalMin,_this.totalMax,_this.currency,_this.status,_this.createdAt,_this.hasElectrical,_this.totalExactUzs,_this.totalApproxUzs,_this.electricalConfirmed,_this.usdRate,_this.totalUsd,_this.pricesApproximateForGuest);
 }
 
 @override
 String toString() {
   final _this = this as Estimate;
-  return 'Estimate(id: ${_this.id}, roomId: ${_this.roomId}, lines: ${_this.lines}, totalUzs: ${_this.totalUzs}, totalMin: ${_this.totalMin}, totalMax: ${_this.totalMax}, currency: ${_this.currency}, status: ${_this.status}, createdAt: ${_this.createdAt}, hasElectrical: ${_this.hasElectrical}, totalExactUzs: ${_this.totalExactUzs}, totalApproxUzs: ${_this.totalApproxUzs}, electricalConfirmed: ${_this.electricalConfirmed}, usdRate: ${_this.usdRate}, totalUsd: ${_this.totalUsd})';
+  return 'Estimate(id: ${_this.id}, roomId: ${_this.roomId}, lines: ${_this.lines}, totalUzs: ${_this.totalUzs}, totalMin: ${_this.totalMin}, totalMax: ${_this.totalMax}, currency: ${_this.currency}, status: ${_this.status}, createdAt: ${_this.createdAt}, hasElectrical: ${_this.hasElectrical}, totalExactUzs: ${_this.totalExactUzs}, totalApproxUzs: ${_this.totalApproxUzs}, electricalConfirmed: ${_this.electricalConfirmed}, usdRate: ${_this.usdRate}, totalUsd: ${_this.totalUsd}, pricesApproximateForGuest: ${_this.pricesApproximateForGuest})';
 }
 
 
@@ -359,7 +361,7 @@ abstract mixin class $EstimateCopyWith<$Res>  {
   factory $EstimateCopyWith(Estimate value, $Res Function(Estimate) _then) = _$EstimateCopyWithImpl;
 @useResult
 $Res call({
- String id,@JsonKey(name: 'room_id') String roomId, List<EstimateLine> lines,@JsonKey(name: 'total_uzs') int totalUzs,@JsonKey(name: 'total_min') int totalMin,@JsonKey(name: 'total_max') int totalMax, String currency, String status,@JsonKey(name: 'created_at') DateTime createdAt,@JsonKey(name: 'has_electrical') bool hasElectrical,@JsonKey(name: 'total_exact_uzs') int totalExactUzs,@JsonKey(name: 'total_approx_uzs') int totalApproxUzs,@JsonKey(name: 'electrical_confirmed') bool electricalConfirmed,@JsonKey(name: 'usd_rate') double usdRate,@JsonKey(name: 'total_usd') int totalUsd
+ String id,@JsonKey(name: 'room_id') String roomId, List<EstimateLine> lines,@JsonKey(name: 'total_uzs') int totalUzs,@JsonKey(name: 'total_min') int totalMin,@JsonKey(name: 'total_max') int totalMax, String currency, String status,@JsonKey(name: 'created_at') DateTime createdAt,@JsonKey(name: 'has_electrical') bool hasElectrical,@JsonKey(name: 'total_exact_uzs') int totalExactUzs,@JsonKey(name: 'total_approx_uzs') int totalApproxUzs,@JsonKey(name: 'electrical_confirmed') bool electricalConfirmed,@JsonKey(name: 'usd_rate') double usdRate,@JsonKey(name: 'total_usd') int totalUsd,@JsonKey(name: 'prices_approximate_for_guest') bool pricesApproximateForGuest
 });
 
 
@@ -376,7 +378,7 @@ class _$EstimateCopyWithImpl<$Res>
 
 /// Create a copy of Estimate
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? roomId = null,Object? lines = null,Object? totalUzs = null,Object? totalMin = null,Object? totalMax = null,Object? currency = null,Object? status = null,Object? createdAt = null,Object? hasElectrical = null,Object? totalExactUzs = null,Object? totalApproxUzs = null,Object? electricalConfirmed = null,Object? usdRate = null,Object? totalUsd = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? roomId = null,Object? lines = null,Object? totalUzs = null,Object? totalMin = null,Object? totalMax = null,Object? currency = null,Object? status = null,Object? createdAt = null,Object? hasElectrical = null,Object? totalExactUzs = null,Object? totalApproxUzs = null,Object? electricalConfirmed = null,Object? usdRate = null,Object? totalUsd = null,Object? pricesApproximateForGuest = null,}) {
   return _then(Estimate(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,roomId: null == roomId ? _self.roomId : roomId // ignore: cast_nullable_to_non_nullable
@@ -393,7 +395,8 @@ as int,totalApproxUzs: null == totalApproxUzs ? _self.totalApproxUzs : totalAppr
 as int,electricalConfirmed: null == electricalConfirmed ? _self.electricalConfirmed : electricalConfirmed // ignore: cast_nullable_to_non_nullable
 as bool,usdRate: null == usdRate ? _self.usdRate : usdRate // ignore: cast_nullable_to_non_nullable
 as double,totalUsd: null == totalUsd ? _self.totalUsd : totalUsd // ignore: cast_nullable_to_non_nullable
-as int,
+as int,pricesApproximateForGuest: null == pricesApproximateForGuest ? _self.pricesApproximateForGuest : pricesApproximateForGuest // ignore: cast_nullable_to_non_nullable
+as bool,
   ));
 }
 
@@ -478,10 +481,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id, @JsonKey(name: 'room_id')  String roomId,  List<EstimateLine> lines, @JsonKey(name: 'total_uzs')  int totalUzs, @JsonKey(name: 'total_min')  int totalMin, @JsonKey(name: 'total_max')  int totalMax,  String currency,  String status, @JsonKey(name: 'created_at')  DateTime createdAt, @JsonKey(name: 'has_electrical')  bool hasElectrical, @JsonKey(name: 'total_exact_uzs')  int totalExactUzs, @JsonKey(name: 'total_approx_uzs')  int totalApproxUzs, @JsonKey(name: 'electrical_confirmed')  bool electricalConfirmed, @JsonKey(name: 'usd_rate')  double usdRate, @JsonKey(name: 'total_usd')  int totalUsd)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id, @JsonKey(name: 'room_id')  String roomId,  List<EstimateLine> lines, @JsonKey(name: 'total_uzs')  int totalUzs, @JsonKey(name: 'total_min')  int totalMin, @JsonKey(name: 'total_max')  int totalMax,  String currency,  String status, @JsonKey(name: 'created_at')  DateTime createdAt, @JsonKey(name: 'has_electrical')  bool hasElectrical, @JsonKey(name: 'total_exact_uzs')  int totalExactUzs, @JsonKey(name: 'total_approx_uzs')  int totalApproxUzs, @JsonKey(name: 'electrical_confirmed')  bool electricalConfirmed, @JsonKey(name: 'usd_rate')  double usdRate, @JsonKey(name: 'total_usd')  int totalUsd, @JsonKey(name: 'prices_approximate_for_guest')  bool pricesApproximateForGuest)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _Estimate() when $default != null:
-return $default(_that.id,_that.roomId,_that.lines,_that.totalUzs,_that.totalMin,_that.totalMax,_that.currency,_that.status,_that.createdAt,_that.hasElectrical,_that.totalExactUzs,_that.totalApproxUzs,_that.electricalConfirmed,_that.usdRate,_that.totalUsd);case _:
+return $default(_that.id,_that.roomId,_that.lines,_that.totalUzs,_that.totalMin,_that.totalMax,_that.currency,_that.status,_that.createdAt,_that.hasElectrical,_that.totalExactUzs,_that.totalApproxUzs,_that.electricalConfirmed,_that.usdRate,_that.totalUsd,_that.pricesApproximateForGuest);case _:
   return orElse();
 
 }
@@ -499,10 +502,10 @@ return $default(_that.id,_that.roomId,_that.lines,_that.totalUzs,_that.totalMin,
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id, @JsonKey(name: 'room_id')  String roomId,  List<EstimateLine> lines, @JsonKey(name: 'total_uzs')  int totalUzs, @JsonKey(name: 'total_min')  int totalMin, @JsonKey(name: 'total_max')  int totalMax,  String currency,  String status, @JsonKey(name: 'created_at')  DateTime createdAt, @JsonKey(name: 'has_electrical')  bool hasElectrical, @JsonKey(name: 'total_exact_uzs')  int totalExactUzs, @JsonKey(name: 'total_approx_uzs')  int totalApproxUzs, @JsonKey(name: 'electrical_confirmed')  bool electricalConfirmed, @JsonKey(name: 'usd_rate')  double usdRate, @JsonKey(name: 'total_usd')  int totalUsd)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id, @JsonKey(name: 'room_id')  String roomId,  List<EstimateLine> lines, @JsonKey(name: 'total_uzs')  int totalUzs, @JsonKey(name: 'total_min')  int totalMin, @JsonKey(name: 'total_max')  int totalMax,  String currency,  String status, @JsonKey(name: 'created_at')  DateTime createdAt, @JsonKey(name: 'has_electrical')  bool hasElectrical, @JsonKey(name: 'total_exact_uzs')  int totalExactUzs, @JsonKey(name: 'total_approx_uzs')  int totalApproxUzs, @JsonKey(name: 'electrical_confirmed')  bool electricalConfirmed, @JsonKey(name: 'usd_rate')  double usdRate, @JsonKey(name: 'total_usd')  int totalUsd, @JsonKey(name: 'prices_approximate_for_guest')  bool pricesApproximateForGuest)  $default,) {final _that = this;
 switch (_that) {
 case _Estimate():
-return $default(_that.id,_that.roomId,_that.lines,_that.totalUzs,_that.totalMin,_that.totalMax,_that.currency,_that.status,_that.createdAt,_that.hasElectrical,_that.totalExactUzs,_that.totalApproxUzs,_that.electricalConfirmed,_that.usdRate,_that.totalUsd);case _:
+return $default(_that.id,_that.roomId,_that.lines,_that.totalUzs,_that.totalMin,_that.totalMax,_that.currency,_that.status,_that.createdAt,_that.hasElectrical,_that.totalExactUzs,_that.totalApproxUzs,_that.electricalConfirmed,_that.usdRate,_that.totalUsd,_that.pricesApproximateForGuest);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -519,10 +522,10 @@ return $default(_that.id,_that.roomId,_that.lines,_that.totalUzs,_that.totalMin,
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id, @JsonKey(name: 'room_id')  String roomId,  List<EstimateLine> lines, @JsonKey(name: 'total_uzs')  int totalUzs, @JsonKey(name: 'total_min')  int totalMin, @JsonKey(name: 'total_max')  int totalMax,  String currency,  String status, @JsonKey(name: 'created_at')  DateTime createdAt, @JsonKey(name: 'has_electrical')  bool hasElectrical, @JsonKey(name: 'total_exact_uzs')  int totalExactUzs, @JsonKey(name: 'total_approx_uzs')  int totalApproxUzs, @JsonKey(name: 'electrical_confirmed')  bool electricalConfirmed, @JsonKey(name: 'usd_rate')  double usdRate, @JsonKey(name: 'total_usd')  int totalUsd)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id, @JsonKey(name: 'room_id')  String roomId,  List<EstimateLine> lines, @JsonKey(name: 'total_uzs')  int totalUzs, @JsonKey(name: 'total_min')  int totalMin, @JsonKey(name: 'total_max')  int totalMax,  String currency,  String status, @JsonKey(name: 'created_at')  DateTime createdAt, @JsonKey(name: 'has_electrical')  bool hasElectrical, @JsonKey(name: 'total_exact_uzs')  int totalExactUzs, @JsonKey(name: 'total_approx_uzs')  int totalApproxUzs, @JsonKey(name: 'electrical_confirmed')  bool electricalConfirmed, @JsonKey(name: 'usd_rate')  double usdRate, @JsonKey(name: 'total_usd')  int totalUsd, @JsonKey(name: 'prices_approximate_for_guest')  bool pricesApproximateForGuest)?  $default,) {final _that = this;
 switch (_that) {
 case _Estimate() when $default != null:
-return $default(_that.id,_that.roomId,_that.lines,_that.totalUzs,_that.totalMin,_that.totalMax,_that.currency,_that.status,_that.createdAt,_that.hasElectrical,_that.totalExactUzs,_that.totalApproxUzs,_that.electricalConfirmed,_that.usdRate,_that.totalUsd);case _:
+return $default(_that.id,_that.roomId,_that.lines,_that.totalUzs,_that.totalMin,_that.totalMax,_that.currency,_that.status,_that.createdAt,_that.hasElectrical,_that.totalExactUzs,_that.totalApproxUzs,_that.electricalConfirmed,_that.usdRate,_that.totalUsd,_that.pricesApproximateForGuest);case _:
   return null;
 
 }
@@ -534,7 +537,7 @@ return $default(_that.id,_that.roomId,_that.lines,_that.totalUzs,_that.totalMin,
 @JsonSerializable()
 
 class _Estimate implements Estimate {
-  const _Estimate({required this.id, @JsonKey(name: 'room_id') required this.roomId,  List<EstimateLine> lines = const <EstimateLine>[], @JsonKey(name: 'total_uzs') required this.totalUzs, @JsonKey(name: 'total_min') required this.totalMin, @JsonKey(name: 'total_max') required this.totalMax, this.currency = 'UZS', this.status = 'final', @JsonKey(name: 'created_at') required this.createdAt, @JsonKey(name: 'has_electrical') this.hasElectrical = false, @JsonKey(name: 'total_exact_uzs') this.totalExactUzs = 0, @JsonKey(name: 'total_approx_uzs') this.totalApproxUzs = 0, @JsonKey(name: 'electrical_confirmed') this.electricalConfirmed = false, @JsonKey(name: 'usd_rate') this.usdRate = 0.0, @JsonKey(name: 'total_usd') this.totalUsd = 0}): _lines = lines;
+  const _Estimate({required this.id, @JsonKey(name: 'room_id') required this.roomId,  List<EstimateLine> lines = const <EstimateLine>[], @JsonKey(name: 'total_uzs') required this.totalUzs, @JsonKey(name: 'total_min') required this.totalMin, @JsonKey(name: 'total_max') required this.totalMax, this.currency = 'UZS', this.status = 'final', @JsonKey(name: 'created_at') required this.createdAt, @JsonKey(name: 'has_electrical') this.hasElectrical = false, @JsonKey(name: 'total_exact_uzs') this.totalExactUzs = 0, @JsonKey(name: 'total_approx_uzs') this.totalApproxUzs = 0, @JsonKey(name: 'electrical_confirmed') this.electricalConfirmed = false, @JsonKey(name: 'usd_rate') this.usdRate = 0.0, @JsonKey(name: 'total_usd') this.totalUsd = 0, @JsonKey(name: 'prices_approximate_for_guest') this.pricesApproximateForGuest = false}): _lines = lines;
   factory _Estimate.fromJson(Map<String, dynamic> json) => _$EstimateFromJson(json);
 
 @override final  String id;
@@ -562,6 +565,9 @@ class _Estimate implements Estimate {
 @override@JsonKey(name: 'electrical_confirmed') final  bool electricalConfirmed;
 @override@JsonKey(name: 'usd_rate') final  double usdRate;
 @override@JsonKey(name: 'total_usd') final  int totalUsd;
+/// The caller is a guest: AI gap-fill and market prices were skipped, so
+/// the prices are catalogue/approximate until they sign up.
+@override@JsonKey(name: 'prices_approximate_for_guest') final  bool pricesApproximateForGuest;
 
 /// Create a copy of Estimate
 /// with the given fields replaced by the non-null parameter values.
@@ -576,18 +582,18 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-    return identical(this, other) || (other.runtimeType == runtimeType&&other is _Estimate&&(identical(other.id, id) || other.id == id)&&(identical(other.roomId, roomId) || other.roomId == roomId)&&const DeepCollectionEquality().equals(other.lines, _lines)&&(identical(other.totalUzs, totalUzs) || other.totalUzs == totalUzs)&&(identical(other.totalMin, totalMin) || other.totalMin == totalMin)&&(identical(other.totalMax, totalMax) || other.totalMax == totalMax)&&(identical(other.currency, currency) || other.currency == currency)&&(identical(other.status, status) || other.status == status)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt)&&(identical(other.hasElectrical, hasElectrical) || other.hasElectrical == hasElectrical)&&(identical(other.totalExactUzs, totalExactUzs) || other.totalExactUzs == totalExactUzs)&&(identical(other.totalApproxUzs, totalApproxUzs) || other.totalApproxUzs == totalApproxUzs)&&(identical(other.electricalConfirmed, electricalConfirmed) || other.electricalConfirmed == electricalConfirmed)&&(identical(other.usdRate, usdRate) || other.usdRate == usdRate)&&(identical(other.totalUsd, totalUsd) || other.totalUsd == totalUsd));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is _Estimate&&(identical(other.id, id) || other.id == id)&&(identical(other.roomId, roomId) || other.roomId == roomId)&&const DeepCollectionEquality().equals(other.lines, _lines)&&(identical(other.totalUzs, totalUzs) || other.totalUzs == totalUzs)&&(identical(other.totalMin, totalMin) || other.totalMin == totalMin)&&(identical(other.totalMax, totalMax) || other.totalMax == totalMax)&&(identical(other.currency, currency) || other.currency == currency)&&(identical(other.status, status) || other.status == status)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt)&&(identical(other.hasElectrical, hasElectrical) || other.hasElectrical == hasElectrical)&&(identical(other.totalExactUzs, totalExactUzs) || other.totalExactUzs == totalExactUzs)&&(identical(other.totalApproxUzs, totalApproxUzs) || other.totalApproxUzs == totalApproxUzs)&&(identical(other.electricalConfirmed, electricalConfirmed) || other.electricalConfirmed == electricalConfirmed)&&(identical(other.usdRate, usdRate) || other.usdRate == usdRate)&&(identical(other.totalUsd, totalUsd) || other.totalUsd == totalUsd)&&(identical(other.pricesApproximateForGuest, pricesApproximateForGuest) || other.pricesApproximateForGuest == pricesApproximateForGuest));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
 int get hashCode {
-    return Object.hash(runtimeType,id,roomId,const DeepCollectionEquality().hash(_lines),totalUzs,totalMin,totalMax,currency,status,createdAt,hasElectrical,totalExactUzs,totalApproxUzs,electricalConfirmed,usdRate,totalUsd);
+    return Object.hash(runtimeType,id,roomId,const DeepCollectionEquality().hash(_lines),totalUzs,totalMin,totalMax,currency,status,createdAt,hasElectrical,totalExactUzs,totalApproxUzs,electricalConfirmed,usdRate,totalUsd,pricesApproximateForGuest);
 }
 
 @override
 String toString() {
-    return 'Estimate(id: $id, roomId: $roomId, lines: $lines, totalUzs: $totalUzs, totalMin: $totalMin, totalMax: $totalMax, currency: $currency, status: $status, createdAt: $createdAt, hasElectrical: $hasElectrical, totalExactUzs: $totalExactUzs, totalApproxUzs: $totalApproxUzs, electricalConfirmed: $electricalConfirmed, usdRate: $usdRate, totalUsd: $totalUsd)';
+    return 'Estimate(id: $id, roomId: $roomId, lines: $lines, totalUzs: $totalUzs, totalMin: $totalMin, totalMax: $totalMax, currency: $currency, status: $status, createdAt: $createdAt, hasElectrical: $hasElectrical, totalExactUzs: $totalExactUzs, totalApproxUzs: $totalApproxUzs, electricalConfirmed: $electricalConfirmed, usdRate: $usdRate, totalUsd: $totalUsd, pricesApproximateForGuest: $pricesApproximateForGuest)';
 }
 
 
@@ -598,7 +604,7 @@ abstract mixin class _$EstimateCopyWith<$Res> implements $EstimateCopyWith<$Res>
   factory _$EstimateCopyWith(_Estimate value, $Res Function(_Estimate) _then) = __$EstimateCopyWithImpl;
 @override @useResult
 $Res call({
- String id,@JsonKey(name: 'room_id') String roomId, List<EstimateLine> lines,@JsonKey(name: 'total_uzs') int totalUzs,@JsonKey(name: 'total_min') int totalMin,@JsonKey(name: 'total_max') int totalMax, String currency, String status,@JsonKey(name: 'created_at') DateTime createdAt,@JsonKey(name: 'has_electrical') bool hasElectrical,@JsonKey(name: 'total_exact_uzs') int totalExactUzs,@JsonKey(name: 'total_approx_uzs') int totalApproxUzs,@JsonKey(name: 'electrical_confirmed') bool electricalConfirmed,@JsonKey(name: 'usd_rate') double usdRate,@JsonKey(name: 'total_usd') int totalUsd
+ String id,@JsonKey(name: 'room_id') String roomId, List<EstimateLine> lines,@JsonKey(name: 'total_uzs') int totalUzs,@JsonKey(name: 'total_min') int totalMin,@JsonKey(name: 'total_max') int totalMax, String currency, String status,@JsonKey(name: 'created_at') DateTime createdAt,@JsonKey(name: 'has_electrical') bool hasElectrical,@JsonKey(name: 'total_exact_uzs') int totalExactUzs,@JsonKey(name: 'total_approx_uzs') int totalApproxUzs,@JsonKey(name: 'electrical_confirmed') bool electricalConfirmed,@JsonKey(name: 'usd_rate') double usdRate,@JsonKey(name: 'total_usd') int totalUsd,@JsonKey(name: 'prices_approximate_for_guest') bool pricesApproximateForGuest
 });
 
 
@@ -615,7 +621,7 @@ class __$EstimateCopyWithImpl<$Res>
 
 /// Create a copy of Estimate
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? roomId = null,Object? lines = null,Object? totalUzs = null,Object? totalMin = null,Object? totalMax = null,Object? currency = null,Object? status = null,Object? createdAt = null,Object? hasElectrical = null,Object? totalExactUzs = null,Object? totalApproxUzs = null,Object? electricalConfirmed = null,Object? usdRate = null,Object? totalUsd = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? roomId = null,Object? lines = null,Object? totalUzs = null,Object? totalMin = null,Object? totalMax = null,Object? currency = null,Object? status = null,Object? createdAt = null,Object? hasElectrical = null,Object? totalExactUzs = null,Object? totalApproxUzs = null,Object? electricalConfirmed = null,Object? usdRate = null,Object? totalUsd = null,Object? pricesApproximateForGuest = null,}) {
   return _then(_Estimate(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,roomId: null == roomId ? _self.roomId : roomId // ignore: cast_nullable_to_non_nullable
@@ -632,7 +638,8 @@ as int,totalApproxUzs: null == totalApproxUzs ? _self.totalApproxUzs : totalAppr
 as int,electricalConfirmed: null == electricalConfirmed ? _self.electricalConfirmed : electricalConfirmed // ignore: cast_nullable_to_non_nullable
 as bool,usdRate: null == usdRate ? _self.usdRate : usdRate // ignore: cast_nullable_to_non_nullable
 as double,totalUsd: null == totalUsd ? _self.totalUsd : totalUsd // ignore: cast_nullable_to_non_nullable
-as int,
+as int,pricesApproximateForGuest: null == pricesApproximateForGuest ? _self.pricesApproximateForGuest : pricesApproximateForGuest // ignore: cast_nullable_to_non_nullable
+as bool,
   ));
 }
 
