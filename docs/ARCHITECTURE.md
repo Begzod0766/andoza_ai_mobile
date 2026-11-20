@@ -64,7 +64,20 @@ dialoglari ko'rsatilmaydi (`homeTourRunningProvider`). Fayllar: `home_tour_store
 
 ## Ekranlar va navigatsiya
 
-`lib/config/router.dart` da 63 ta yo'l. Ilova `/splash` dan ochiladi.
+`lib/config/router.dart` da 64 ta yo'l. Ilova `/splash` dan ochiladi.
+
+**Sovuq start** (`resolveColdStart`, `providers/auth_provider.dart`): saqlangan sessiya
+bo'lsa — bosh sahifa. Bo'lmasa: shu qurilmada avval ro'yxatdan o'tgan akkaunt bilan
+kirilgan bo'lsa (`auth.hasSignedInBefore`, `shared_preferences`, `services/sign_in_history.dart`;
+chiqish va akkauntni o'chirishda ham qoladi) — `/login`, aks holda jimgina mehmon sessiyasi
+(`POST /auth/guest`); u ham bo'lmasa (oflayn, 429, 503) — `/login`. Login ekranida
+"Ro'yxatdan o'tmasdan davom etish" tugmasi mehmon sessiyasini ochadi.
+**Mehmon** — `AuthAuthenticated` va `user.isGuest` (`AuthState.isGuest`). Pullik va aloqa
+tugmalari (`ensureRegistered`) va 403 `registration_required` (`handleRegistrationRequired`)
+"ro'yxatdan o'ting" oynasini ochadi; u `/signup` ni (root navigator'da `LoginScreen(fromGuest: true)`)
+ochadi. `/signup` faqat mehmonga: ekran muvaffaqiyatda avval yopiladi, keyin sessiya almashadi,
+shuning uchun ostidagi ekran (Studio ham) joyida qoladi. Mehmon profilida "Chiqish" yo'q, o'rniga
+"Mehmon ma'lumotlarini o'chirish". Mehmonga push yo'q; analitikada `account_type`.
 **Login qilmagan foydalanuvchi** `/login` ga yo'naltiriladi. Login qilgan
 foydalanuvchi `/login` ga kirsa, bosh sahifaga qaytariladi. `/splash` va
 `/login` dan boshqa hamma yo'llar login talab qiladi.
@@ -82,7 +95,7 @@ bo'lsa, menyu uni davom ettirishni taklif qiladi.
 
 | Bo'lim | Yo'llar | Izoh |
 |---|---|---|
-| Kirish | `/splash`, `/login` | Standart holatda login va parol bilan kirish va ro'yxatdan o'tish. SMS kod bilan kirish `SMS_LOGIN_ENABLED=true` bilan yoqiladi. |
+| Kirish | `/splash`, `/login`, `/signup` (mehmon uchun, root navigator) | Standart holatda login va parol bilan kirish va ro'yxatdan o'tish. SMS kod bilan kirish `SMS_LOGIN_ENABLED=true` bilan yoqiladi. |
 | Uy va loyihalar | `/`, `/profile/e5`, `/profile/e11` | Loyihalar ro'yxati, saqlangan dizaynlar |
 | Xonani kiritish | `/wizard`, `/setup/draw`, `/setup/dimensions`, `/setup/wall-measurements`, `/setup/summary` | Native o'lchash ustasi (1-qadam: xona turi va shift balandligi; tur tanlansa, tegilmagan xona turning odatiy o'lchamini oladi — `utils/room_type_size.dart`, saytdagi jadval bilan bir xil), xonani chizish, qo'lda o'lchamlar. Tur `room_type` bo'lib yaratishda yuboriladi; skaner natijasida ham tanlanadi, devorlar o'zgarmaydi |
 | Skaner | `/scanning/roomplan`, `/scanning/roomplan/review`, `/scanning/photo` | LiDAR skaner (iPhone Pro), natijani ko'rish, foto rejimi |
@@ -114,7 +127,7 @@ tilda ochiladi va uni akkauntga saqlaydi.
 - Boshqa domenlarga o'tish bloklanadi.
 - Studiya `/studio/*` dan chiqsa (masalan `/projects` yoki `/login` ga), ekran yopiladi va ilovaga qaytiladi.
 - "Orqaga" bosilganda ilova `window.__captureRoomThumbnail?.()` ni chaqiradi (xona rasmini saqlash) va 150 ms dan keyin yopiladi.
-- JS'dan ilovaga xabar kanali yo'q.
+- **Mehmon va `AndozaAuthGate`.** Web mehmonga pullik tugmani bosganda (`frontend/src/lib/guestGate.ts`) `AndozaAuthGate` kanaliga `{"feature": "<feature>"}` yuboradi; ilova oynani ochadi (`screens/studio/studio_auth_gate.dart`). Ro'yxatdan o'tilsa, cookie'lar va `uy-tamir-auth` (endi `is_guest` bilan) qayta yoziladi va sahifa qayta yuklanadi — eski mehmon tokeni 401. Mebel ekrani ham shu kanalni tinglaydi.
 - **Fayl yuklash (`<input type="file">`).** Studiyadagi rasm yuklashlar (rasmdan AI dizayn, pol teksturasi, mebel fotosi) iOS'da WKWebView'ning o'z oynasi orqali ishlaydi. Android WebView esa ilova javob bermaguncha bu tugmalarni e'tiborsiz qoldiradi. Shuning uchun Android'da `AndroidWebViewController.setOnShowFileSelector` ulangan (`screens/studio/webview_file_chooser.dart`): foydalanuvchi kamera yoki galereyani tanlaydi, `image_picker` rasmni 2048 px gacha kichraytirib, JPEG qilib beradi. Faqat rasm qabul qiladigan input'larga javob beriladi.
 - **Fayl yuklab olish (smeta "Download PDF").** Web fayl saqlash uchun `blob:` havolali `<a download>` ni bosadi; WKWebView ham, Android WebView ham buni o'zi bajarmaydi, tugma hech narsa qilmasdi. Studiya sahifasi yuklanganda `screens/studio/webview_download.dart` dagi JS `URL.createObjectURL` blob'larini eslab qoladi, shunday havola bosilganda faylni base64 qilib `AndozaDownload` kanaliga beradi; ilova uni vaqtinchalik faylga yozib, ulashish oynasini ochadi (`services/pdf_share_service.dart` → `shareFileBytes`). Fayl nomidan yo'l olib tashlanadi. Ikkilik fayllar uchun; mebel ekranidagi CSV ko'prigi (`mebel_bridge.dart`) alohida.
 - **Deploydan keyin yangi versiya.** `index.html` serverda `no-cache`, shuning uchun yangi ochilgan Studio doim joriy versiyada. Fonda ochiq qolgan sahifa esa eski build'da qolardi: ilova fondan qaytganda ekran sahifadagi entry script'ni server `index.html`idagisi bilan solishtiradi va farq qilsa sahifani qayta yuklaydi (`screens/studio/studio_freshness.dart`).
