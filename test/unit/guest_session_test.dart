@@ -251,6 +251,11 @@ void main() {
     auth.set(const AuthAuthenticated(user: User(id: 'u9'), token: 'm'));
     await container.read(apartmentsProvider.future);
     expect(calls, 2);
+
+    // Signed out: no request without a session (it would only 401).
+    auth.set(const AuthInitial());
+    expect(await container.read(apartmentsProvider.future), isEmpty);
+    expect(calls, 2);
   });
 
   test('the server smeta refetches when a guest signs up', () async {
