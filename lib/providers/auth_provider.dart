@@ -108,6 +108,20 @@ class AuthNotifier extends StateNotifier<AuthState> {
     }
   }
 
+  /// Opens a silent guest session (`POST /auth/guest`). True and
+  /// [AuthAuthenticated] (a guest user) on success; false and [AuthInitial] on
+  /// any failure — never [AuthError]: this path has no error UI.
+  Future<bool> startGuestSession() async {
+    try {
+      final response = await _repository.startGuestSession();
+      state = AuthAuthenticated(user: response.user, token: response.token);
+      return true;
+    } catch (_) {
+      state = const AuthInitial();
+      return false;
+    }
+  }
+
   /// Flip to authenticated from an already-completed auth call (OTP verify /
   /// register / password login done directly against the repository). The
   /// repository has persisted the tokens; this just drives the router redirect.
@@ -124,10 +138,20 @@ class AuthNotifier extends StateNotifier<AuthState> {
   ///
   /// No-op unless currently authenticated, so it can't clobber an in-flight
   /// login's AuthLoading/AuthError (a failed login must not force-clear).
+  ///
+  /// A dead guest session becomes a fresh guest silently (its rooms are gone
+  /// with it anyway); the state goes straight from the old guest to the new
+  /// one, so the router does not flash /login. Only if that fails →
+  /// [AuthInitial].
   Future<void> handleUnauthorized() async {
-    if (state is! AuthAuthenticated) return;
+    final current = state;
+    if (current is! AuthAuthenticated) return;
     await onSessionEnded?.call();
     await _repository.clearSession();
+    if (current.user.isGuest) {
+      await startGuestSession();
+      return;
+    }
     state = const AuthInitial();
   }
 
@@ -185,6 +209,14 @@ class AuthNotifier extends StateNotifier<AuthState> {
 
 sealed class AuthState {
   const AuthState();
+}
+
+extension GuestAuthState on AuthState {
+  /// Signed in on a server-side guest account.
+  bool get isGuest {
+    final self = this;
+    return self is AuthAuthenticated && self.user.isGuest;
+  }
 }
 
 class AuthInitial extends AuthState {

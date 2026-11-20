@@ -56,6 +56,10 @@ FloorNote? floorNote(RoomOut room, List<EstimateLine>? lines) {
 }
 
 final apartmentsProvider = FutureProvider.autoDispose<List<Apartment>>((ref) {
+  // Refetch when the account changes under a mounted Home: a guest signing in
+  // to an existing account (merge) now owns that account's rooms too.
+  ref.watch(authStateProvider
+      .select((s) => s is AuthAuthenticated ? s.user.id : null));
   return ref.watch(apartmentRepositoryProvider).listApartments();
 });
 

@@ -15,6 +15,11 @@ abstract interface class AuthRepository {
   /// authorization); the server keeps it for a new account only.
   Future<AuthResponse> loginWithApple(String identityToken, {String? name});
   Future<void> requestOtp(String phone);
+
+  /// Opens a server-side guest account via `POST /auth/guest` (this
+  /// install's id + the app language). Same persistence as [login]. Throws
+  /// [ApiException] (503: guest mode off, 429: rate limit, offline…).
+  Future<AuthResponse> startGuestSession();
   Future<AuthResponse> verifyOtp(String phone, String code);
   Future<AuthResponse> register(String username, String password, String? name);
   Future<void> logout();
@@ -104,18 +109,40 @@ class AuthRepositoryImpl implements AuthRepository {
     }
   }
 
+  @override
+  Future<AuthResponse> startGuestSession() async {
+    final installId = await _storage.getOrCreateInstallId();
+    final response = await _apiClient.post<Map<String, dynamic>>(
+      '/auth/guest',
+      data: {'install_id': installId, 'language': language?.call() ?? 'uz'},
+      fromJson: (json) => json as Map<String, dynamic>,
+    );
+    final authResponse = AuthResponse.fromJson(response);
+    await _persistSession(authResponse);
+    return authResponse;
+  }
+
   /// Persist an authenticated session (access + refresh tokens) so silent
-  /// refresh-on-401 works. Shared by login / Google / OTP verify / register.
+  /// refresh-on-401 works. Shared by login / Google / OTP verify / register /
+  /// guest. Replaces any previous session's tokens in memory first: a guest
+  /// signing up or in gets new tokens and the server rejects the guest's.
   Future<void> _persistSession(AuthResponse authResponse) async {
     _cachedToken = authResponse.token;
     _cachedUser = authResponse.user;
-    await _storage.saveToken(authResponse.token);
-    await _storage.saveUserId(authResponse.user.id);
     _apiClient.setAuthToken(authResponse.token);
     final refreshToken = authResponse.refreshToken;
     if (refreshToken != null && refreshToken.isNotEmpty) {
-      await _storage.saveRefreshToken(refreshToken);
       _apiClient.setRefreshToken(refreshToken);
+    } else {
+      _apiClient.clearRefreshToken();
+    }
+    await _storage.saveToken(authResponse.token);
+    await _storage.saveUserId(authResponse.user.id);
+    await _storage.saveUserIsGuest(authResponse.user.isGuest);
+    if (refreshToken != null && refreshToken.isNotEmpty) {
+      await _storage.saveRefreshToken(refreshToken);
+    } else {
+      await _storage.deleteRefreshToken();
     }
   }
 
@@ -208,6 +235,7 @@ class AuthRepositoryImpl implements AuthRepository {
         fromJson: (json) => User.fromJson(json as Map<String, dynamic>),
       );
       _cachedUser = user;
+      await _storage.saveUserIsGuest(user.isGuest);
       return user;
     } on ApiException catch (e) {
       // A real 401 means the session is genuinely invalid → report it (null) so
@@ -231,7 +259,10 @@ class AuthRepositoryImpl implements AuthRepository {
       // overwritten with the full user as soon as /auth/me succeeds.
       final userId = await _storage.getUserId();
       if (userId != null) {
-        _cachedUser = User(id: userId);
+        _cachedUser = User(
+          id: userId,
+          isGuest: await _storage.getUserIsGuest(),
+        );
       }
     }
     // Also restore the refresh token so an expired access token can be

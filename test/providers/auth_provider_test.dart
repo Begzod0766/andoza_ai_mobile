@@ -8,6 +8,7 @@ import 'package:riverpod/riverpod.dart';
 import 'package:tamir_uy_mobile_flutter/models/user_model.dart';
 import 'package:tamir_uy_mobile_flutter/providers/auth_provider.dart';
 import 'package:tamir_uy_mobile_flutter/repositories/auth_repository.dart';
+import 'package:tamir_uy_mobile_flutter/services/api_client.dart';
 
 /// A fully in-memory AuthRepository: no ApiClient, no network. Each method is
 /// scripted per-test so we can exercise the AuthNotifier state machine (login
@@ -15,9 +16,24 @@ import 'package:tamir_uy_mobile_flutter/repositories/auth_repository.dart';
 /// handleUnauthorized guard) without touching real HTTP.
 class _FakeAuthRepository implements AuthRepository {
   // ignore_for_file: prefer_initializing_formals
-  _FakeAuthRepository({AuthResponse? loginResult, Object? loginError})
-      : _loginResult = loginResult,
+  _FakeAuthRepository({
+    AuthResponse? loginResult,
+    Object? loginError,
+    this.guestResult,
+    this.guestError,
+  })  : _loginResult = loginResult,
         _loginError = loginError;
+
+  AuthResponse? guestResult;
+  Object? guestError;
+  int guestCalls = 0;
+
+  @override
+  Future<AuthResponse> startGuestSession() async {
+    guestCalls++;
+    if (guestError != null) throw guestError!;
+    return guestResult!;
+  }
 
   final AuthResponse? _loginResult;
   final Object? _loginError;
@@ -153,7 +169,81 @@ ResponseBody _json(Object? body, int status) => ResponseBody.fromString(
   return (container: container, adapter: adapter, store: seed);
 }
 
+AuthResponse _guest({String id = 'g1', String token = 'guest-tok'}) =>
+    AuthResponse(
+      token: token,
+      refreshToken: 'guest-refresh',
+      user: User(id: id, isGuest: true),
+    );
+
 void main() {
+  group('AuthNotifier.startGuestSession', () {
+    test('startGuestSession authenticates a guest', () async {
+      final container =
+          _container(_FakeAuthRepository(guestResult: _guest()));
+      final notifier = container.read(authStateProvider.notifier);
+      expect(await notifier.startGuestSession(), isTrue);
+      expect(container.read(authStateProvider).isGuest, isTrue);
+    });
+
+    test('startGuestSession failure stays AuthInitial', () async {
+      final container = _container(_FakeAuthRepository(
+        guestError: ApiException(message: 'off', statusCode: 503),
+      ));
+      final notifier = container.read(authStateProvider.notifier);
+      expect(await notifier.startGuestSession(), isFalse);
+      expect(container.read(authStateProvider), isA<AuthInitial>());
+    });
+
+    test('a registered session is not a guest', () async {
+      final container =
+          _container(_FakeAuthRepository(loginResult: _response()));
+      await container.read(authStateProvider.notifier).login('a', 'b');
+      expect(container.read(authStateProvider).isGuest, isFalse);
+      expect(const AuthInitial().isGuest, isFalse);
+    });
+
+    test('dead guest session becomes a new guest', () async {
+      final repo = _FakeAuthRepository(guestResult: _guest());
+      final container = _container(repo);
+      final notifier = container.read(authStateProvider.notifier);
+      await notifier.startGuestSession();
+      repo.guestResult = _guest(id: 'g2', token: 'guest-tok-2');
+
+      await notifier.handleUnauthorized();
+
+      expect(repo.clearSessionCalls, 1);
+      expect(repo.guestCalls, 2);
+      final state = container.read(authStateProvider);
+      expect(state.isGuest, isTrue);
+      expect((state as AuthAuthenticated).user.id, 'g2');
+    });
+
+    test('dead guest whose replacement fails goes to AuthInitial', () async {
+      final repo = _FakeAuthRepository(guestResult: _guest());
+      final container = _container(repo);
+      final notifier = container.read(authStateProvider.notifier);
+      await notifier.startGuestSession();
+      repo.guestError = ApiException(message: 'offline');
+
+      await notifier.handleUnauthorized();
+
+      expect(container.read(authStateProvider), isA<AuthInitial>());
+    });
+
+    test('dead registered session goes to AuthInitial', () async {
+      final repo = _FakeAuthRepository(loginResult: _response());
+      final container = _container(repo);
+      final notifier = container.read(authStateProvider.notifier);
+      await notifier.login('a', 'b');
+
+      await notifier.handleUnauthorized();
+
+      expect(repo.guestCalls, 0);
+      expect(container.read(authStateProvider), isA<AuthInitial>());
+    });
+  });
+
   group('AuthNotifier.login — success', () {
     test('successful login moves state to AuthAuthenticated with the user', () async {
       final container = _container(

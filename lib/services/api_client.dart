@@ -123,6 +123,12 @@ class ApiClient {
     _refreshToken = token;
   }
 
+  /// Forgets the refresh token, e.g. when a sign-in replaced a guest session
+  /// but returned none: the guest's token is dead and must not be used.
+  void clearRefreshToken() {
+    _refreshToken = null;
+  }
+
   /// Auth endpoints must never trigger a refresh-and-retry: a 401 from these is
   /// terminal (bad credentials / already-invalid refresh token), and retrying
   /// would loop.
@@ -184,33 +190,48 @@ class ApiClient {
           return;
         }
 
+        Response<dynamic> refreshResponse;
         try {
           // The backend only accepts the refresh token via the `refresh_token`
           // cookie header — not as a body field or bearer token.
-          final refreshResponse = await _refreshDio.post<dynamic>(
+          refreshResponse = await _refreshDio.post<dynamic>(
             '/auth/refresh',
             options: Options(
               headers: {'Cookie': 'refresh_token=$refreshToken'},
             ),
           );
-          final data = refreshResponse.data;
-          final newAccess = data is Map<String, dynamic>
-              ? data['access_token'] as String?
-              : null;
-          if (newAccess == null || newAccess.isEmpty) {
-            await _handleRefreshFailure();
-            handler.next(err);
-            return;
-          }
-          final newRefresh = (data['refresh_token'] as String?) ?? refreshToken;
+        } catch (_) {
+          refreshResponse = Response(requestOptions: requestOptions);
+        }
 
-          _authToken = newAccess;
-          _refreshToken = newRefresh;
-          await onTokensRefreshed?.call(newAccess, newRefresh);
+        // A sign-in finished while this refresh was in flight (a guest signing
+        // up or in): its tokens win, whatever the guest's refresh returned —
+        // the server rejects the guest's tokens once upgraded or merged.
+        // Replay with the new bearer instead of storing or clearing anything.
+        if (_refreshToken != refreshToken) {
+          await _replayWithCurrentToken(requestOptions, err, handler);
+          return;
+        }
 
-          // Replay the original request through the bare client with the fresh
-          // bearer. `__retried` guards against a second refresh if it 401s
-          // again; using `_refreshDio` also keeps it out of this interceptor.
+        final data = refreshResponse.data;
+        final newAccess = data is Map<String, dynamic>
+            ? data['access_token'] as String?
+            : null;
+        if (newAccess == null || newAccess.isEmpty) {
+          await _handleRefreshFailure();
+          handler.next(err);
+          return;
+        }
+        final newRefresh = (data['refresh_token'] as String?) ?? refreshToken;
+
+        _authToken = newAccess;
+        _refreshToken = newRefresh;
+        await onTokensRefreshed?.call(newAccess, newRefresh);
+
+        // Replay the original request through the bare client with the fresh
+        // bearer. `__retried` guards against a second refresh if it 401s
+        // again; using `_refreshDio` also keeps it out of this interceptor.
+        try {
           requestOptions.extra['__retried'] = true;
           requestOptions.headers['Authorization'] = 'Bearer $newAccess';
           final retried = await _refreshDio.fetch<dynamic>(requestOptions);
@@ -221,6 +242,25 @@ class ApiClient {
         }
       },
     );
+  }
+
+  Future<void> _replayWithCurrentToken(
+    RequestOptions requestOptions,
+    DioException err,
+    ErrorInterceptorHandler handler,
+  ) async {
+    final current = _authToken;
+    if (current == null || current.isEmpty) {
+      handler.next(err);
+      return;
+    }
+    try {
+      requestOptions.extra['__retried'] = true;
+      requestOptions.headers['Authorization'] = 'Bearer $current';
+      handler.resolve(await _refreshDio.fetch<dynamic>(requestOptions));
+    } catch (_) {
+      handler.next(err);
+    }
   }
 
   Future<void> _handleRefreshFailure() async {
