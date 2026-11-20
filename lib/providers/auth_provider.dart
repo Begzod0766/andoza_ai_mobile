@@ -122,9 +122,6 @@ class AuthNotifier extends StateNotifier<AuthState> {
     }
   }
 
-  /// Opens a silent guest session (`POST /auth/guest`). True and
-  /// [AuthAuthenticated] (a guest user) on success; false and [AuthInitial] on
-  /// any failure — never [AuthError]: this path has no error UI.
   bool get isAuthenticated => state is AuthAuthenticated;
 
   /// The server answered `POST /auth/guest` with 503: guest mode is switched
@@ -135,7 +132,17 @@ class AuthNotifier extends StateNotifier<AuthState> {
   bool get guestModeDisabled => _guestModeDisabled;
   bool _guestModeDisabled = false;
 
-  Future<bool> startGuestSession() async {
+  /// Opens a silent guest session (`POST /auth/guest`). True and
+  /// [AuthAuthenticated] (a guest user) on success; false and [AuthInitial] on
+  /// any failure — never [AuthError]: this path has no error UI.
+  ///
+  /// Overlapping calls (a cold start and a dead-session 401, parallel 401s)
+  /// share one request: one guest, one hit on the server's limits.
+  Future<bool> startGuestSession() =>
+      _guestStart ??= _startGuestSession().whenComplete(() => _guestStart = null);
+  Future<bool>? _guestStart;
+
+  Future<bool> _startGuestSession() async {
     try {
       final response = await _repository.startGuestSession();
       state = AuthAuthenticated(user: response.user, token: response.token);
@@ -168,11 +175,21 @@ class AuthNotifier extends StateNotifier<AuthState> {
   /// with it anyway); the state goes straight from the old guest to the new
   /// one, so the router does not flash /login. Only if that fails →
   /// [AuthInitial].
-  Future<void> handleUnauthorized() async {
+  ///
+  /// Parallel 401s share one teardown, and a sign-in that lands meanwhile (a
+  /// guest signing up) wins: the dead session is only cleared while it is
+  /// still the current one.
+  Future<void> handleUnauthorized() => _unauthorized ??=
+      _handleUnauthorized().whenComplete(() => _unauthorized = null);
+  Future<void>? _unauthorized;
+
+  Future<void> _handleUnauthorized() async {
     final current = state;
     if (current is! AuthAuthenticated) return;
     await onSessionEnded?.call();
+    if (!identical(state, current)) return;
     await _repository.clearSession();
+    if (!identical(state, current)) return;
     if (current.user.isGuest) {
       await startGuestSession();
       return;

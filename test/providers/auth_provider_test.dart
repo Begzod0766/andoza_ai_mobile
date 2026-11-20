@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:typed_data';
 
@@ -28,9 +29,13 @@ class _FakeAuthRepository implements AuthRepository {
   Object? guestError;
   int guestCalls = 0;
 
+  /// When set, guest creation waits for it (to test overlapping calls).
+  Completer<void>? guestGate;
+
   @override
   Future<AuthResponse> startGuestSession() async {
     guestCalls++;
+    await guestGate?.future;
     if (guestError != null) throw guestError!;
     return guestResult!;
   }
@@ -245,6 +250,53 @@ void main() {
       await notifier.handleUnauthorized();
 
       expect(container.read(authStateProvider), isA<AuthInitial>());
+    });
+
+    test('a sign-in during a dead guest teardown survives it', () async {
+      final repo = _FakeAuthRepository(guestResult: _guest());
+      final container = _container(repo);
+      final notifier = container.read(authStateProvider.notifier);
+      await notifier.startGuestSession();
+      final ended = Completer<void>();
+      notifier.onSessionEnded = () => ended.future;
+
+      final teardown = notifier.handleUnauthorized();
+      // The guest signs up while the dead-session teardown is still running.
+      notifier.setSession(_response());
+      ended.complete();
+      await teardown;
+
+      final state = container.read(authStateProvider);
+      expect(state, isA<AuthAuthenticated>());
+      expect(state.isGuest, isFalse);
+      expect(repo.clearSessionCalls, 0);
+      expect(repo.guestCalls, 1);
+    });
+
+    test('overlapping guest starts create one guest', () async {
+      final repo = _FakeAuthRepository(guestResult: _guest())
+        ..guestGate = Completer<void>();
+      final container = _container(repo);
+      final notifier = container.read(authStateProvider.notifier);
+      final a = notifier.startGuestSession();
+      final b = notifier.startGuestSession();
+      repo.guestGate!.complete();
+      expect(await Future.wait([a, b]), [true, true]);
+      expect(repo.guestCalls, 1);
+    });
+
+    test('parallel 401s of a dead guest create one new guest', () async {
+      final repo = _FakeAuthRepository(guestResult: _guest());
+      final container = _container(repo);
+      final notifier = container.read(authStateProvider.notifier);
+      await notifier.startGuestSession();
+      repo.guestGate = Completer<void>();
+      final a = notifier.handleUnauthorized();
+      final b = notifier.handleUnauthorized();
+      repo.guestGate!.complete();
+      await Future.wait([a, b]);
+      expect(repo.guestCalls, 2); // the first guest + one replacement
+      expect(repo.clearSessionCalls, 1);
     });
 
     test('dead registered session goes to AuthInitial', () async {

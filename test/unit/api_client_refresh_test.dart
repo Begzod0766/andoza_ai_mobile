@@ -219,5 +219,65 @@ void main() {
         expect(unauthorized, 0);
       });
     }
+  
+    test('a sign-in during the replay is not wiped by its failure', () async {
+      var cleared = false;
+      late ApiClient client;
+      client = ApiClient(
+        baseUrl: 'http://test.local/api/v1',
+        onTokensCleared: () async => cleared = true,
+      );
+      client.setAuthToken('guest-expired');
+      client.setRefreshToken('guest-refresh');
+      final adapter = _FakeAdapter((options) {
+        if (options.path.endsWith('/auth/refresh')) {
+          return _json({'access_token': 'guest-new', 'refresh_token': 'gr2'}, 200);
+        }
+        if (options.headers['Authorization'] == 'Bearer guest-new') {
+          // The guest's sign-in lands while the replay is on the wire; the
+          // server has just merged the guest, so the replay is refused.
+          client.setAuthToken('user-access');
+          client.setRefreshToken('user-refresh');
+          return _json({'detail': 'merged'}, 401);
+        }
+        return _json({'detail': 'expired'}, 401);
+      });
+      client.httpDioForTest.httpClientAdapter = adapter;
+      client.refreshDioForTest.httpClientAdapter = adapter;
+
+      await expectLater(
+        client.get<dynamic>('/apartments', fromJson: (j) => j),
+        throwsA(isA<ApiException>()),
+      );
+      expect(cleared, isFalse);
+      expect(client.authToken, 'user-access');
+    });
+
+    test('a replay that fails reports its own error, not the first 401',
+        () async {
+      final client = ApiClient(baseUrl: 'http://test.local/api/v1');
+      client.setAuthToken('guest-expired');
+      client.setRefreshToken('guest-refresh');
+      final adapter = _FakeAdapter((options) {
+        if (options.path.endsWith('/auth/refresh')) {
+          // A sign-in replaced the tokens while this refresh was in flight.
+          client.setAuthToken('user-access');
+          client.setRefreshToken('user-refresh');
+          return _json({'detail': 'merged'}, 401);
+        }
+        if (options.headers['Authorization'] == 'Bearer user-access') {
+          return _json({'detail': 'boom'}, 500);
+        }
+        return _json({'detail': 'expired'}, 401);
+      });
+      client.httpDioForTest.httpClientAdapter = adapter;
+      client.refreshDioForTest.httpClientAdapter = adapter;
+
+      await expectLater(
+        client.get<dynamic>('/apartments', fromJson: (j) => j),
+        throwsA(isA<ApiException>()
+            .having((e) => e.statusCode, 'status', 500)),
+      );
+    });
   });
 }

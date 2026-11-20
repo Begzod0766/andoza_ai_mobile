@@ -155,7 +155,7 @@ class ApiClient {
     } on DioException catch (e) {
       final status = e.response?.statusCode;
       if ((status == 401 || status == 403) && _refreshToken == refreshToken) {
-        await _handleRefreshFailure();
+        await _handleRefreshFailure(refreshToken);
         return RefreshOutcome.refused;
       }
       return RefreshOutcome.failed;
@@ -228,14 +228,7 @@ class ApiClient {
             _authToken != null ? 'Bearer $_authToken' : null;
         if (currentBearer != null &&
             requestOptions.headers['Authorization'] != currentBearer) {
-          try {
-            requestOptions.extra['__retried'] = true;
-            requestOptions.headers['Authorization'] = currentBearer;
-            final retried = await _refreshDio.fetch<dynamic>(requestOptions);
-            handler.resolve(retried);
-          } catch (_) {
-            handler.next(err);
-          }
+          await _replayWithCurrentToken(requestOptions, err, handler);
           return;
         }
 
@@ -267,7 +260,7 @@ class ApiClient {
             ? data['access_token'] as String?
             : null;
         if (newAccess == null || newAccess.isEmpty) {
-          await _handleRefreshFailure();
+          await _handleRefreshFailure(refreshToken);
           handler.next(err);
           return;
         }
@@ -285,9 +278,9 @@ class ApiClient {
           requestOptions.headers['Authorization'] = 'Bearer $newAccess';
           final retried = await _refreshDio.fetch<dynamic>(requestOptions);
           handler.resolve(retried);
-        } catch (_) {
-          await _handleRefreshFailure();
-          handler.next(err);
+        } catch (e) {
+          await _handleRefreshFailure(newRefresh);
+          handler.next(e is DioException ? e : err);
         }
       },
     );
@@ -307,12 +300,17 @@ class ApiClient {
       requestOptions.extra['__retried'] = true;
       requestOptions.headers['Authorization'] = 'Bearer $current';
       handler.resolve(await _refreshDio.fetch<dynamic>(requestOptions));
-    } catch (_) {
-      handler.next(err);
+    } catch (e) {
+      // The replay's own failure (a 500, a refusal), not the first 401.
+      handler.next(e is DioException ? e : err);
     }
   }
 
-  Future<void> _handleRefreshFailure() async {
+  /// Drops the session whose [usedRefreshToken] just failed — unless a
+  /// sign-in replaced it while the call was in flight (a guest signing up:
+  /// the server refuses the guest's tokens once it is upgraded or merged).
+  Future<void> _handleRefreshFailure(String usedRefreshToken) async {
+    if (_refreshToken != usedRefreshToken) return;
     _authToken = null;
     _refreshToken = null;
     await onTokensCleared?.call();
