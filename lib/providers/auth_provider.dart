@@ -127,12 +127,21 @@ class AuthNotifier extends StateNotifier<AuthState> {
   /// any failure — never [AuthError]: this path has no error UI.
   bool get isAuthenticated => state is AuthAuthenticated;
 
+  /// The server answered `POST /auth/guest` with 503: guest mode is switched
+  /// off. The login screen then stops offering "continue without signing
+  /// up" for the rest of this app run; the next cold start asks again, so
+  /// it comes back by itself once guest mode is on. Offline and 429 do not
+  /// count — those are worth retrying.
+  bool get guestModeDisabled => _guestModeDisabled;
+  bool _guestModeDisabled = false;
+
   Future<bool> startGuestSession() async {
     try {
       final response = await _repository.startGuestSession();
       state = AuthAuthenticated(user: response.user, token: response.token);
       return true;
-    } catch (_) {
+    } catch (e) {
+      if (e is ApiException && e.statusCode == 503) _guestModeDisabled = true;
       state = const AuthInitial();
       return false;
     }

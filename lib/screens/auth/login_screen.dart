@@ -142,10 +142,14 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     final messenger = ScaffoldMessenger.of(context);
     final failed = AppLocalizations.of(context)!.guestSessionFailed;
     setState(() => _startingGuest = true);
-    final ok = await ref.read(authStateProvider.notifier).startGuestSession();
+    final notifier = ref.read(authStateProvider.notifier);
+    final ok = await notifier.startGuestSession();
     if (!mounted) return;
     setState(() => _startingGuest = false);
-    if (!ok) messenger.showSnackBar(SnackBar(content: Text(failed)));
+    // Guest mode switched off: the button goes away, nothing to retry.
+    if (!ok && !notifier.guestModeDisabled) {
+      messenger.showSnackBar(SnackBar(content: Text(failed)));
+    }
   }
 
   // ── actions ───────────────────────────────────────────────────────────────
@@ -406,7 +410,10 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                       const _BrandHeader(),
                       const SizedBox(height: DesignTokens.spacing32),
                       _card(),
-                      if (!widget.fromGuest) ...[
+                      if (!widget.fromGuest &&
+                          !ref
+                              .read(authStateProvider.notifier)
+                              .guestModeDisabled) ...[
                         const SizedBox(height: DesignTokens.spacing16),
                         _continueAsGuestSection(),
                       ],

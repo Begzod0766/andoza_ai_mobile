@@ -195,6 +195,22 @@ void main() {
       expect(container.read(authStateProvider), isA<AuthInitial>());
     });
 
+    for (final c in [
+      (503, true, 'guest mode switched off'),
+      (429, false, 'rate limit'),
+      (null, false, 'offline'),
+    ]) {
+      test('guest mode counts as off only on 503 (${c.$3})', () async {
+        final container = _container(_FakeAuthRepository(
+          guestError: ApiException(message: 'x', statusCode: c.$1),
+        ));
+        final notifier = container.read(authStateProvider.notifier);
+        expect(notifier.guestModeDisabled, isFalse);
+        await notifier.startGuestSession();
+        expect(notifier.guestModeDisabled, c.$2);
+      });
+    }
+
     test('a registered session is not a guest', () async {
       final container =
           _container(_FakeAuthRepository(loginResult: _response()));

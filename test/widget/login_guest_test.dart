@@ -70,8 +70,41 @@ void main() {
     expect(container.read(authStateProvider).isGuest, isTrue);
   });
 
-  testWidgets('a failed guest start says so', (tester) async {
+  testWidgets('guest mode switched off (503) hides the button', (tester) async {
     final repo = _Repo(guestError: ApiException(message: 'x', statusCode: 503));
+    await _pump(tester, repo);
+    final button = find.text(_continue);
+    await tester.ensureVisible(button);
+    await tester.tap(button);
+    await tester.pumpAndSettle();
+    expect(find.text(_continue), findsNothing);
+    expect(
+      find.text('Xonalaringiz bu qurilmada mehmon sifatida saqlanadi.'),
+      findsNothing,
+    );
+    // Nothing to retry: no "couldn't connect" message either.
+    expect(find.byType(SnackBar), findsNothing);
+  });
+
+  testWidgets('after a 503 at cold start the button is not offered',
+      (tester) async {
+    final repo = _Repo(guestError: ApiException(message: 'x', statusCode: 503));
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [authRepositoryProvider.overrideWithValue(repo)],
+        child: Consumer(builder: (context, ref, _) {
+          return wrapLocalized(const _ColdStartThenLogin(),
+              withProviderScope: false);
+        }),
+      ),
+    );
+    await tester.pumpAndSettle();
+    expect(find.byType(LoginScreen), findsOneWidget);
+    expect(find.text(_continue), findsNothing);
+  });
+
+  testWidgets('a failed guest start says so', (tester) async {
+    final repo = _Repo(guestError: ApiException(message: 'offline'));
     await _pump(tester, repo);
     final button = find.text(_continue);
     await tester.ensureVisible(button);
@@ -147,4 +180,28 @@ class _PopObserver extends NavigatorObserver {
   void didPop(Route<dynamic> route, Route<dynamic>? previousRoute) {
     stateAtPop ??= _read();
   }
+}
+
+/// Tries a guest session (as the splash does), then shows the login screen.
+class _ColdStartThenLogin extends ConsumerStatefulWidget {
+  const _ColdStartThenLogin();
+
+  @override
+  ConsumerState<_ColdStartThenLogin> createState() => _ColdStartThenLoginState();
+}
+
+class _ColdStartThenLoginState extends ConsumerState<_ColdStartThenLogin> {
+  bool _done = false;
+
+  @override
+  void initState() {
+    super.initState();
+    ref.read(authStateProvider.notifier).startGuestSession().then((_) {
+      if (mounted) setState(() => _done = true);
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) =>
+      _done ? const LoginScreen() : const SizedBox.shrink();
 }
