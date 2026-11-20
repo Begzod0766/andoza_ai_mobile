@@ -69,14 +69,17 @@ dialoglari ko'rsatilmaydi (`homeTourRunningProvider`). Fayllar: `home_tour_store
 **Sovuq start** (`resolveColdStart`, `providers/auth_provider.dart`): saqlangan sessiya
 bo'lsa — bosh sahifa. Bo'lmasa: shu qurilmada avval ro'yxatdan o'tgan akkaunt bilan
 kirilgan bo'lsa (`auth.hasSignedInBefore`, `shared_preferences`, `services/sign_in_history.dart`;
-chiqish va akkauntni o'chirishda ham qoladi) — `/login`, aks holda jimgina mehmon sessiyasi
+chiqish va akkauntni o'chirishda ham qoladi; 1.0.2 dan yangilanganda eski build faqat kirgan holda
+yozadigan `tour.home.v1.done` / `push_prompt_answered` kalitlari ham bir marta hisobga olinadi) — `/login`, aks holda jimgina mehmon sessiyasi
 (`POST /auth/guest`); u ham bo'lmasa (oflayn, 429, 503) — `/login`. Login ekranida
 "Ro'yxatdan o'tmasdan davom etish" tugmasi mehmon sessiyasini ochadi.
 **Mehmon** — `AuthAuthenticated` va `user.isGuest` (`AuthState.isGuest`). Pullik va aloqa
 tugmalari (`ensureRegistered`) va 403 `registration_required` (`handleRegistrationRequired`)
 "ro'yxatdan o'ting" oynasini ochadi; u `/signup` ni (root navigator'da `LoginScreen(fromGuest: true)`)
-ochadi. `/signup` faqat mehmonga: ekran muvaffaqiyatda avval yopiladi, keyin sessiya almashadi,
-shuning uchun ostidagi ekran (Studio ham) joyida qoladi. Mehmon profilida "Chiqish" yo'q, o'rniga
+ochadi. `/signup` faqat mehmonga: muvaffaqiyatda sessiya almashadi, keyin ekran `true` bilan yopiladi
+va ostidagi ekran (Studio ham) joyida qoladi. Router (`authRouterRefreshProvider`) faqat "kirgan /
+kirmagan" o'zgarganda redirect'ni qayta ishlatadi: mehmon ro'yxatdan o'tganda refresh bo'lmaydi
+(aks holda u oxirgi xabar qilingan, hali `/signup` bor joyni qayta o'qib, ekranni qaytarardi). Mehmon profilida "Chiqish" yo'q, o'rniga
 "Mehmon ma'lumotlarini o'chirish". Mehmonga push yo'q; analitikada `account_type`.
 **Login qilmagan foydalanuvchi** `/login` ga yo'naltiriladi. Login qilgan
 foydalanuvchi `/login` ga kirsa, bosh sahifaga qaytariladi. `/splash` va
