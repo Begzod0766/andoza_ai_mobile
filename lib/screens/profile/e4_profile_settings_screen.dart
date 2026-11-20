@@ -11,6 +11,7 @@ import '../../providers/estimate_provider.dart';
 import '../../providers/locale_provider.dart';
 import '../../providers/orders_provider.dart';
 import '../home/home_empty_screen.dart';
+import '../../widgets/registration_required_sheet.dart';
 import 'delete_account_dialog.dart';
 import '../settings/language_picker_sheet.dart';
 
@@ -131,7 +132,12 @@ class E4ProfileSettingsScreen extends ConsumerWidget {
             label: (ref.watch(accountRolesProvider).valueOrNull?.hasBusiness ?? false)
                 ? l10n.profileMenuBusiness
                 : l10n.profileMenuBecomePartner,
-            onTap: () => context.push('/business'),
+            onTap: () async {
+              if (await ensureRegistered(context, ref, 'business') &&
+                  context.mounted) {
+                context.push('/business');
+              }
+            },
           ),
           // The web mebel workshop; on the web too a phone reaches it only
           // from the profile.

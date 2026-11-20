@@ -60,15 +60,28 @@ class _AppShellState extends ConsumerState<AppShell> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       // Someone who registered as a shop owner or an usta goes straight to
       // that application; the interrupted-scan prompt is for everyone else.
-      final kind = ref.read(pendingBusinessSetupProvider);
-      if (kind != null) {
-        ref.read(pendingBusinessSetupProvider.notifier).state = null;
-        ref.read(startupDialogShownProvider.notifier).state = true;
-        context.push(kind == BusinessKind.usta ? '/business/apply/usta' : '/business/apply/shop');
-        return;
-      }
+      if (_openPendingBusinessSetup()) return;
       _offerPendingScan();
     });
+    // A guest registering as a shop owner or an usta does it on /signup over
+    // a shell that is already mounted: open the application once the sign-up
+    // screen has closed.
+    ref.listenManual<BusinessKind?>(pendingBusinessSetupProvider, (_, next) {
+      if (next == null) return;
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) _openPendingBusinessSetup();
+      });
+    });
+  }
+
+  /// Opens the business application someone registered for, if any.
+  bool _openPendingBusinessSetup() {
+    final kind = ref.read(pendingBusinessSetupProvider);
+    if (kind == null) return false;
+    ref.read(pendingBusinessSetupProvider.notifier).state = null;
+    ref.read(startupDialogShownProvider.notifier).state = true;
+    context.push(kind == BusinessKind.usta ? '/business/apply/usta' : '/business/apply/shop');
+    return true;
   }
 
   Future<void> _offerPendingScan() async {

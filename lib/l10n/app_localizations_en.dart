@@ -3081,4 +3081,49 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get guestSessionFailed =>
       'Couldn\'t connect right now. Try again or sign in.';
+
+  @override
+  String get guestSheetTitle => 'Sign up to use this';
+
+  @override
+  String get guestSheetBody => 'Your rooms stay and move to your account.';
+
+  @override
+  String get guestSheetSignUp => 'Sign up';
+
+  @override
+  String get guestSheetLater => 'Later';
+
+  @override
+  String get guestFeatureAiDesign => 'AI designer';
+
+  @override
+  String get guestFeatureAiBuild => 'AI builder';
+
+  @override
+  String get guestFeatureRender => 'Photoreal render';
+
+  @override
+  String get guestFeatureSmetaAsk => 'Question about the estimate';
+
+  @override
+  String get guestFeatureMebelAi => 'Furniture AI';
+
+  @override
+  String get guestFeaturePhotoModel => '3D model from a photo';
+
+  @override
+  String get guestFeatureContact => 'Contacting a pro or a shop';
+
+  @override
+  String get guestFeatureOrder => 'Ordering';
+
+  @override
+  String get guestFeatureWorkshopLink => 'Workshop link';
+
+  @override
+  String get guestFeatureBusiness => 'Seller and pro section';
+
+  @override
+  String get guestFeatureMarketPrices => 'Exact market prices';
 }

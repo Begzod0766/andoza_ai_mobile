@@ -3081,4 +3081,50 @@ class AppLocalizationsUz extends AppLocalizations {
   @override
   String get guestSessionFailed =>
       'Hozir ulanib bo\'lmadi. Qayta urinib ko\'ring yoki tizimga kiring.';
+
+  @override
+  String get guestSheetTitle => 'Bu imkoniyat uchun ro\'yxatdan o\'ting';
+
+  @override
+  String get guestSheetBody =>
+      'Xonalaringiz saqlanib qoladi va hisobingizga o\'tadi.';
+
+  @override
+  String get guestSheetSignUp => 'Ro\'yxatdan o\'tish';
+
+  @override
+  String get guestSheetLater => 'Keyinroq';
+
+  @override
+  String get guestFeatureAiDesign => 'AI dizayner';
+
+  @override
+  String get guestFeatureAiBuild => 'AI quruvchi';
+
+  @override
+  String get guestFeatureRender => 'Fotoreal render';
+
+  @override
+  String get guestFeatureSmetaAsk => 'Smeta bo\'yicha savol';
+
+  @override
+  String get guestFeatureMebelAi => 'Mebel AI';
+
+  @override
+  String get guestFeaturePhotoModel => 'Fotodan 3D model';
+
+  @override
+  String get guestFeatureContact => 'Usta yoki do\'kon bilan bog\'lanish';
+
+  @override
+  String get guestFeatureOrder => 'Buyurtma';
+
+  @override
+  String get guestFeatureWorkshopLink => 'Ustaxona havolasi';
+
+  @override
+  String get guestFeatureBusiness => 'Sotuvchi va usta bo\'limi';
+
+  @override
+  String get guestFeatureMarketPrices => 'Aniq bozor narxlari';
 }

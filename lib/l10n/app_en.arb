@@ -2955,5 +2955,21 @@
 
   "loginContinueAsGuest": "Continue without signing up",
   "loginContinueAsGuestHint": "Your rooms are kept on this device as a guest.",
-  "guestSessionFailed": "Couldn't connect right now. Try again or sign in."
+  "guestSessionFailed": "Couldn't connect right now. Try again or sign in.",
+
+  "guestSheetTitle": "Sign up to use this",
+  "guestSheetBody": "Your rooms stay and move to your account.",
+  "guestSheetSignUp": "Sign up",
+  "guestSheetLater": "Later",
+  "guestFeatureAiDesign": "AI designer",
+  "guestFeatureAiBuild": "AI builder",
+  "guestFeatureRender": "Photoreal render",
+  "guestFeatureSmetaAsk": "Question about the estimate",
+  "guestFeatureMebelAi": "Furniture AI",
+  "guestFeaturePhotoModel": "3D model from a photo",
+  "guestFeatureContact": "Contacting a pro or a shop",
+  "guestFeatureOrder": "Ordering",
+  "guestFeatureWorkshopLink": "Workshop link",
+  "guestFeatureBusiness": "Seller and pro section",
+  "guestFeatureMarketPrices": "Exact market prices"
 }

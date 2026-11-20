@@ -3345,5 +3345,66 @@
   "guestSessionFailed": "Hozir ulanib bo'lmadi. Qayta urinib ko'ring yoki tizimga kiring.",
   "@guestSessionFailed": {
     "description": "Snackbar when a guest session could not be started (offline, server limit, guest mode off)."
+  },
+
+  "guestSheetTitle": "Bu imkoniyat uchun ro'yxatdan o'ting",
+  "@guestSheetTitle": {
+    "description": "Sign-up sheet title, shown to a guest who tapped a paid or contact feature."
+  },
+  "guestSheetBody": "Xonalaringiz saqlanib qoladi va hisobingizga o'tadi.",
+  "@guestSheetBody": {
+    "description": "Sign-up sheet body: reassures the guest their rooms are kept."
+  },
+  "guestSheetSignUp": "Ro'yxatdan o'tish",
+  "@guestSheetSignUp": {
+    "description": "Sign-up sheet: primary button that opens sign-up / sign-in."
+  },
+  "guestSheetLater": "Keyinroq",
+  "@guestSheetLater": {
+    "description": "Sign-up sheet: secondary button that closes the sheet."
+  },
+  "guestFeatureAiDesign": "AI dizayner",
+  "@guestFeatureAiDesign": {
+    "description": "Sign-up sheet: name of the feature that needs an account (AI room design)."
+  },
+  "guestFeatureAiBuild": "AI quruvchi",
+  "@guestFeatureAiBuild": {
+    "description": "Sign-up sheet: feature name (AI builder)."
+  },
+  "guestFeatureRender": "Fotoreal render",
+  "@guestFeatureRender": {
+    "description": "Sign-up sheet: feature name (photoreal render)."
+  },
+  "guestFeatureSmetaAsk": "Smeta bo'yicha savol",
+  "@guestFeatureSmetaAsk": {
+    "description": "Sign-up sheet: feature name (ask AI about the estimate)."
+  },
+  "guestFeatureMebelAi": "Mebel AI",
+  "@guestFeatureMebelAi": {
+    "description": "Sign-up sheet: feature name (AI cabinet suggestions)."
+  },
+  "guestFeaturePhotoModel": "Fotodan 3D model",
+  "@guestFeaturePhotoModel": {
+    "description": "Sign-up sheet: feature name (photo to 3D model)."
+  },
+  "guestFeatureContact": "Usta yoki do'kon bilan bog'lanish",
+  "@guestFeatureContact": {
+    "description": "Sign-up sheet: feature name (sending a request to an usta or a shop)."
+  },
+  "guestFeatureOrder": "Buyurtma",
+  "@guestFeatureOrder": {
+    "description": "Sign-up sheet: feature name (placing an order)."
+  },
+  "guestFeatureWorkshopLink": "Ustaxona havolasi",
+  "@guestFeatureWorkshopLink": {
+    "description": "Sign-up sheet: feature name (furniture workshop link)."
+  },
+  "guestFeatureBusiness": "Sotuvchi va usta bo'limi",
+  "@guestFeatureBusiness": {
+    "description": "Sign-up sheet: feature name (shop/usta business section)."
+  },
+  "guestFeatureMarketPrices": "Aniq bozor narxlari",
+  "@guestFeatureMarketPrices": {
+    "description": "Sign-up sheet: feature name (exact market prices on the estimate)."
   }
 }

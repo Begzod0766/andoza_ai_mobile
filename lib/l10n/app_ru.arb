@@ -2955,5 +2955,21 @@
 
   "loginContinueAsGuest": "Продолжить без регистрации",
   "loginContinueAsGuestHint": "Ваши комнаты сохранятся на этом устройстве как у гостя.",
-  "guestSessionFailed": "Сейчас не удалось подключиться. Попробуйте ещё раз или войдите."
+  "guestSessionFailed": "Сейчас не удалось подключиться. Попробуйте ещё раз или войдите.",
+
+  "guestSheetTitle": "Для этой функции нужна регистрация",
+  "guestSheetBody": "Ваши комнаты сохранятся и перейдут в ваш аккаунт.",
+  "guestSheetSignUp": "Зарегистрироваться",
+  "guestSheetLater": "Позже",
+  "guestFeatureAiDesign": "AI-дизайнер",
+  "guestFeatureAiBuild": "AI-строитель",
+  "guestFeatureRender": "Фотореалистичный рендер",
+  "guestFeatureSmetaAsk": "Вопрос по смете",
+  "guestFeatureMebelAi": "Мебель AI",
+  "guestFeaturePhotoModel": "3D-модель по фото",
+  "guestFeatureContact": "Связь с мастером или магазином",
+  "guestFeatureOrder": "Заказ",
+  "guestFeatureWorkshopLink": "Ссылка для мастерской",
+  "guestFeatureBusiness": "Раздел продавца и мастера",
+  "guestFeatureMarketPrices": "Точные рыночные цены"
 }

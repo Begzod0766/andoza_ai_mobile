@@ -3082,4 +3082,50 @@ class AppLocalizationsRu extends AppLocalizations {
   @override
   String get guestSessionFailed =>
       'Сейчас не удалось подключиться. Попробуйте ещё раз или войдите.';
+
+  @override
+  String get guestSheetTitle => 'Для этой функции нужна регистрация';
+
+  @override
+  String get guestSheetBody =>
+      'Ваши комнаты сохранятся и перейдут в ваш аккаунт.';
+
+  @override
+  String get guestSheetSignUp => 'Зарегистрироваться';
+
+  @override
+  String get guestSheetLater => 'Позже';
+
+  @override
+  String get guestFeatureAiDesign => 'AI-дизайнер';
+
+  @override
+  String get guestFeatureAiBuild => 'AI-строитель';
+
+  @override
+  String get guestFeatureRender => 'Фотореалистичный рендер';
+
+  @override
+  String get guestFeatureSmetaAsk => 'Вопрос по смете';
+
+  @override
+  String get guestFeatureMebelAi => 'Мебель AI';
+
+  @override
+  String get guestFeaturePhotoModel => '3D-модель по фото';
+
+  @override
+  String get guestFeatureContact => 'Связь с мастером или магазином';
+
+  @override
+  String get guestFeatureOrder => 'Заказ';
+
+  @override
+  String get guestFeatureWorkshopLink => 'Ссылка для мастерской';
+
+  @override
+  String get guestFeatureBusiness => 'Раздел продавца и мастера';
+
+  @override
+  String get guestFeatureMarketPrices => 'Точные рыночные цены';
 }

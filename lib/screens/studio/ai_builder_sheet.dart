@@ -10,7 +10,9 @@ import '../../models/business_profile.dart';
 import '../../providers/ai_provider.dart';
 import '../../providers/apartment_provider.dart';
 import '../../providers/estimate_api_provider.dart';
+import '../../services/api_client.dart';
 import '../../utils/error_mapper.dart';
+import '../../widgets/registration_required_sheet.dart';
 import '../business/style_chips.dart';
 
 /// The request sent for [prompt] with a chosen furniture [style] (an id from
@@ -78,9 +80,11 @@ class _AiBuilderSheetState extends ConsumerState<AiBuilderSheet> {
     super.dispose();
   }
 
-  void _start() {
+  Future<void> _start() async {
     final prompt = _promptController.text.trim();
     if (prompt.isEmpty || _running) return;
+    if (!await ensureRegistered(context, ref, 'ai_build')) return;
+    if (!mounted) return;
     setState(() {
       _running = true;
       _result = null;
@@ -108,6 +112,11 @@ class _AiBuilderSheetState extends ConsumerState<AiBuilderSheet> {
       },
       onError: (Object e) {
         if (!mounted) return;
+        if (e is ApiException && e.isRegistrationRequired) {
+          setState(() => _running = false);
+          handleRegistrationRequired(context, e);
+          return;
+        }
         setState(() {
           // Never surface a raw exception/HTTP string to the user — map it to a
           // friendly localized message like every other error path.

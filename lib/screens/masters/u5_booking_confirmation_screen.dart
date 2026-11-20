@@ -10,6 +10,7 @@ import '../../providers/room_persistence_provider.dart';
 import '../../providers/room_provider.dart';
 import '../../providers/masters_provider.dart';
 import '../../services/analytics_service.dart';
+import '../../widgets/registration_required_sheet.dart';
 import 'master_not_found.dart';
 import '../../utils/currency.dart';
 import '../../utils/phone.dart';
@@ -67,6 +68,10 @@ class _U5BookingConfirmationScreenState
   /// the room's latest saved estimate. An unsaved room has no server id, so it
   /// is left out and the usta gets the request without it.
   Future<void> _send(MockMaster m) async {
+    // A guest has no phone on the account and no way to be trusted by an
+    // usta yet: contacting one needs an account (`POST /leads` 403s too).
+    if (!await ensureRegistered(context, ref, 'contact')) return;
+    if (!mounted) return;
     final l10n = AppLocalizations.of(context)!;
     final messenger = ScaffoldMessenger.of(context);
     final navigator = Navigator.of(context);
@@ -92,8 +97,9 @@ class _U5BookingConfirmationScreenState
       analytics.leadSent();
       navigator.pop();
       messenger.showSnackBar(SnackBar(content: Text(l10n.mastersEstimateSent)));
-    } catch (_) {
+    } catch (e) {
       if (mounted) setState(() => _sending = false);
+      if (mounted && await handleRegistrationRequired(context, e)) return;
       messenger.showSnackBar(SnackBar(content: Text(l10n.mastersSendFailed)));
     }
   }
