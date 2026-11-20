@@ -33,7 +33,8 @@ Studio "Frame load interrupted" bilan ochilmaydi (handoff §9.1).
 
 ## Mehmon rejimi
 
-- `POST /auth/guest` `{"install_id": "<uuid>", "language": "uz|ru|en"}` → 201 `LoginResponse`, `user.is_guest: true`. 503 — rejim o'chiq, 429 — limit (IP 30/soat, install 3/kun). Har qanday xato → login ekrani (`AuthNotifier.startGuestSession` false qaytaradi).
+- `POST /auth/guest` `{"install_id": "<uuid>", "language": "uz|ru|en"}` → 201 `LoginResponse`, `user.is_guest: true`. 503 — rejim o'chiq, 429 — limit (IP 30/soat, install 3/kun). Har qanday xato → login ekrani (`AuthNotifier.startGuestSession` false qaytaradi; so'rov ko'pi bilan 8 s kutiladi). 503 bo'lsa login ekrani shu ishga tushirish davomida "Ro'yxatdan o'tmasdan davom etish" tugmasini ko'rsatmaydi (`guestModeDisabled`); keyingi sovuq startda qayta so'raladi.
+- Mehmon ro'yxatdan o'tishi yoki kirishidan (register, login, OTP, Google, Apple) oldin ilova mehmon tokenini majburan yangilaydi (`ApiClient.refreshNow`): backend mehmonni faqat amaldagi bearer orqali taniydi, 30 daqiqalik access token esa ko'pincha eskirgan bo'ladi. Yangilash rad etilsa (mehmon o'chgan), kirish mehmonsiz davom etadi.
 - Pullik yoki aloqa talab qiladigan endpoint mehmonga **403** `{"detail": {"code": "registration_required", "feature": "<feature>", "message": "<matn>"}}` qaytaradi (401 emas). `ApiException.isRegistrationRequired`; ilova "ro'yxatdan o'ting" oynasini ochadi (`widgets/registration_required_sheet.dart`). Feature'lar: `ai_design`, `ai_build`, `smeta_ask`, `render`, `photo_model`, `mebel_ai`, `contact`, `order`, `workshop_link`, `business`, `market_prices`.
 - Login javoblarida `guest_merged_rooms` (int yoki null) — mehmon mavjud akkauntga kirganda ko'chgan xonalar soni; ilova "N xona akkauntingizga qo'shildi" deydi.
 - Smeta javobida `prices_approximate_for_guest` — mehmonga AI/bozor narxi o'tkazilgan; `/estimation/e1` izoh ko'rsatadi.
