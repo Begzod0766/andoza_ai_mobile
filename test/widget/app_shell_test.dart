@@ -272,5 +272,22 @@ void main() {
       expect(sheet, findsNothing);
       expect(_selected(tester), 0);
     });
+
+    testWidgets('a swipe down while it is still opening closes it', (
+      tester,
+    ) async {
+      await _pumpShell(tester);
+      await tester.tap(plus());
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 50));
+      await tester.timedDrag(
+        find.byKey(NewProjectSheet.handleKey),
+        const Offset(0, 500),
+        const Duration(milliseconds: 300),
+      );
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 400));
+      expect(sheet, findsNothing);
+    });
   });
 }
