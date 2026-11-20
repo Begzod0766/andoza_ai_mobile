@@ -8,6 +8,9 @@ import 'package:tamir_uy_mobile_flutter/l10n/app_localizations.dart';
 import 'package:tamir_uy_mobile_flutter/l10n/app_localizations_uz.dart';
 import 'package:tamir_uy_mobile_flutter/providers/room_persistence_provider.dart';
 import 'package:tamir_uy_mobile_flutter/screens/room_setup/new_project_sheet.dart';
+import 'package:tamir_uy_mobile_flutter/l10n/app_localizations_en.dart';
+import 'package:tamir_uy_mobile_flutter/l10n/app_localizations_ru.dart';
+import 'package:tamir_uy_mobile_flutter/widgets/new_project/new_project_animations.dart';
 
 final l10n = AppLocalizationsUz();
 
@@ -146,5 +149,31 @@ void main() {
     } finally {
       debugDefaultTargetPlatformOverride = null;
     }
+  });
+
+  test('metre numbers follow the language: unit and decimal mark', () {
+    expect(metresLabel(AppLocalizationsRu(), 3), '3,0 м');
+    expect(metresLabel(AppLocalizationsEn(), 3), '3.0 m');
+    expect(metresLabel(AppLocalizationsRu(), 4.25), '4,3 м');
+  });
+
+  testWidgets('the animations dispose what they paint text with', (
+    tester,
+  ) async {
+    final live = <Object>{};
+    void track(ObjectEvent e) {
+      if (e.object is! TextPainter) return;
+      if (e is ObjectCreated) live.add(e.object);
+      if (e is ObjectDisposed) live.remove(e.object);
+    }
+
+    FlutterMemoryAllocations.instance.addListener(track);
+    addTearDown(() => FlutterMemoryAllocations.instance.removeListener(track));
+    await _pump(tester, disableAnimations: false);
+    for (var i = 0; i < 5; i++) {
+      await tester.pump(const Duration(milliseconds: 700));
+    }
+    await tester.pumpWidget(const SizedBox());
+    expect(live, isEmpty);
   });
 }

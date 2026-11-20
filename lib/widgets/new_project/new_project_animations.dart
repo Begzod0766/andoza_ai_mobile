@@ -1,8 +1,10 @@
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart' show NumberFormat;
 
 import '../../config/design_tokens.dart';
+import '../../l10n/app_localizations.dart';
 import '../room/iso_projector.dart';
 import '../room/isometric_room_view.dart';
 
@@ -64,7 +66,10 @@ class _LoopingAnimationState extends State<LoopingAnimation>
 double _phase(double t, double a, double b) =>
     Curves.easeInOut.transform(((t - a) / (b - a)).clamp(0.0, 1.0));
 
-String _m(double v) => '${v.toStringAsFixed(1)} m';
+/// A length for the animations, in the app's language: one decimal with the
+/// locale's decimal mark and the localized metre unit ("3,0 м", "3.0 m").
+String metresLabel(AppLocalizations l10n, double metres) =>
+    '${NumberFormat('0.0', l10n.localeName).format(metres)} ${l10n.arScanUnitM}';
 
 void _paintFinger(Canvas canvas, Offset at, double alpha) {
   if (alpha <= 0) return;
@@ -109,6 +114,7 @@ void _paintNumber(
     ),
   )..layout();
   tp.paint(canvas, centre - Offset(tp.width / 2, tp.height / 2));
+  tp.dispose();
 }
 
 // ---------------------------------------------------------------------------
@@ -127,6 +133,7 @@ class WizardBoxAnimation extends StatelessWidget {
       period: const Duration(milliseconds: 3500),
       staticT: 0.65,
       builder: (context, t) {
+        final l10n = AppLocalizations.of(context)!;
         // Drag out over 0.12–0.55, hold, then ease back over 0.72–0.95.
         final e = _phase(t, 0.12, 0.55) - _phase(t, 0.72, 0.95);
         final w = 3.0 + e;
@@ -150,7 +157,7 @@ class WizardBoxAnimation extends StatelessWidget {
                 corners: corners,
                 zoom: zoom,
                 finger: finger,
-                readout: '${_m(w)} × ${_m(d)}',
+                readout: '${metresLabel(l10n, w)} × ${metresLabel(l10n, d)}',
               ),
             ),
           ],
@@ -364,15 +371,17 @@ class DrawRoomAnimation extends StatelessWidget {
     return LoopingAnimation(
       period: const Duration(milliseconds: 3400),
       staticT: 0.8,
-      builder: (context, t) => CustomPaint(painter: _DrawPainter(t)),
+      builder: (context, t) =>
+          CustomPaint(painter: _DrawPainter(t, AppLocalizations.of(context)!)),
     );
   }
 }
 
 class _DrawPainter extends CustomPainter {
-  _DrawPainter(this.t);
+  _DrawPainter(this.t, this.l10n);
 
   final double t;
+  final AppLocalizations l10n;
 
   /// The room being drawn, metres.
   static const _room = [
@@ -452,7 +461,12 @@ class _DrawPainter extends CustomPainter {
       // Vertical sides need room for the label's width, horizontal ones
       // only for its height.
       final gap = dir.dx.abs() < 0.5 ? 22.0 : 11.0;
-      _paintNumber(canvas, _m(metres), mid + outward * gap, alpha: numbers);
+      _paintNumber(
+        canvas,
+        metresLabel(l10n, metres),
+        mid + outward * gap,
+        alpha: numbers,
+      );
     }
 
     // The finger, while drawing.
@@ -463,5 +477,5 @@ class _DrawPainter extends CustomPainter {
   }
 
   @override
-  bool shouldRepaint(_DrawPainter old) => old.t != t;
+  bool shouldRepaint(_DrawPainter old) => old.t != t || old.l10n != l10n;
 }
