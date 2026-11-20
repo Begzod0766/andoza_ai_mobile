@@ -2951,5 +2951,9 @@
         "type": "int"
       }
     }
-  }
+  },
+
+  "loginContinueAsGuest": "Continue without signing up",
+  "loginContinueAsGuestHint": "Your rooms are kept on this device as a guest.",
+  "guestSessionFailed": "Couldn't connect right now. Try again or sign in."
 }

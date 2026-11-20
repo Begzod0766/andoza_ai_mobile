@@ -3070,4 +3070,15 @@ class AppLocalizationsUz extends AppLocalizations {
   String tourStepOf(int current, int total) {
     return '$current/$total';
   }
+
+  @override
+  String get loginContinueAsGuest => 'Ro\'yxatdan o\'tmasdan davom etish';
+
+  @override
+  String get loginContinueAsGuestHint =>
+      'Xonalaringiz bu qurilmada mehmon sifatida saqlanadi.';
+
+  @override
+  String get guestSessionFailed =>
+      'Hozir ulanib bo\'lmadi. Qayta urinib ko\'ring yoki tizimga kiring.';
 }

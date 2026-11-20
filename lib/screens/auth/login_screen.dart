@@ -7,6 +7,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../config/app_config.dart';
 import '../../config/design_tokens.dart';
 import '../../l10n/app_localizations.dart';
+import '../../models/user_model.dart';
 import '../../providers/auth_provider.dart';
 import '../../providers/business_provider.dart';
 import '../../providers/locale_provider.dart';
@@ -27,7 +28,12 @@ enum _Mode { otpPhone, otpCode, login, register }
 const int _resendCooldown = 60;
 
 class LoginScreen extends ConsumerStatefulWidget {
-  const LoginScreen({super.key});
+  const LoginScreen({super.key, this.fromGuest = false});
+
+  /// Opened as `/signup` over a guest's work: no "continue as guest", a close
+  /// button, and on success it pops `true` (before the session flips, so the
+  /// router's guest-only `/signup` rule never resets the stack under it).
+  final bool fromGuest;
 
   @override
   ConsumerState<LoginScreen> createState() => _LoginScreenState();
@@ -108,6 +114,28 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
   AuthRepository get _repo => ref.read(authRepositoryProvider);
 
+  /// Every successful sign-in ends here. Over a guest's work (`/signup`) the
+  /// screen pops first, then the session flips.
+  void _signedIn(AuthResponse res, String method) {
+    final analytics = ref.read(analyticsProvider);
+    final notifier = ref.read(authStateProvider.notifier);
+    if (widget.fromGuest && mounted) Navigator.of(context).pop(true);
+    notifier.setSession(res);
+    analytics.login(method);
+  }
+
+  bool _startingGuest = false;
+
+  Future<void> _continueAsGuest() async {
+    final messenger = ScaffoldMessenger.of(context);
+    final failed = AppLocalizations.of(context)!.guestSessionFailed;
+    setState(() => _startingGuest = true);
+    final ok = await ref.read(authStateProvider.notifier).startGuestSession();
+    if (!mounted) return;
+    setState(() => _startingGuest = false);
+    if (!ok) messenger.showSnackBar(SnackBar(content: Text(failed)));
+  }
+
   // ── actions ───────────────────────────────────────────────────────────────
   Future<void> _requestOtp() async {
     final l10n = AppLocalizations.of(context)!;
@@ -141,9 +169,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     });
     try {
       final res = await _repo.verifyOtp(_sentPhone, code);
-      final analytics = ref.read(analyticsProvider);
-      ref.read(authStateProvider.notifier).setSession(res);
-      analytics.login('password');
+      _signedIn(res, 'password');
     } catch (_) {
       setState(() {
         _error = l10n.loginErrorInvalidCode;
@@ -188,6 +214,26 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       _loading = true;
       _error = null;
     });
+    if (widget.fromGuest) {
+      // Over a guest's work: sign in through the repository so the screen can
+      // pop before the state flips (see [_signedIn]).
+      try {
+        final res = await _repo.login(_username.text.trim(), _password.text);
+        _signedIn(res, 'password');
+      } catch (e) {
+        if (!mounted) return;
+        setState(() => _error = _loginErrorMessage(
+              l10n,
+              AuthError(
+                message: e.toString(),
+                statusCode: e is AuthException ? e.statusCode : null,
+              ),
+            ));
+      } finally {
+        if (mounted) setState(() => _loading = false);
+      }
+      return;
+    }
     // Drive the login through AuthNotifier so AuthState is the single source of
     // truth: on success it flips to AuthAuthenticated (the router redirect
     // navigates onward); on failure it lands in AuthError, which we surface with
@@ -234,9 +280,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       final idToken = await ref.read(googleSignInServiceProvider).getIdToken();
       if (idToken == null) return;
       final res = await _repo.loginWithGoogle(idToken);
-      final analytics = ref.read(analyticsProvider);
-      ref.read(authStateProvider.notifier).setSession(res);
-      analytics.login('google');
+      _signedIn(res, 'google');
     } catch (e) {
       if (mounted) {
         setState(() => _error = _socialErrorMessage(e, l10n.loginGoogleFailed));
@@ -256,9 +300,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       final cred = await ref.read(appleSignInServiceProvider).getCredential();
       if (cred == null) return;
       final res = await _repo.loginWithApple(cred.identityToken, name: cred.name);
-      final analytics = ref.read(analyticsProvider);
-      ref.read(authStateProvider.notifier).setSession(res);
-      analytics.login('apple');
+      _signedIn(res, 'apple');
     } catch (e) {
       if (mounted) {
         setState(() => _error = _socialErrorMessage(e, l10n.loginAppleFailed));
@@ -311,9 +353,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       // application itself is the next screen (the app shell opens it), where
       // it can be filled in — or left for later without losing the account.
       ref.read(pendingBusinessSetupProvider.notifier).state = _businessKind;
-      final analytics = ref.read(analyticsProvider);
-      ref.read(authStateProvider.notifier).setSession(res);
-      analytics.login('password');
+      _signedIn(res, 'password');
     } catch (e) {
       // 409 Conflict = username already taken — classify by the real status
       // code (carried on AuthException), not a fragile message substring.
@@ -354,12 +394,22 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                       const _BrandHeader(),
                       const SizedBox(height: DesignTokens.spacing32),
                       _card(),
+                      if (!widget.fromGuest) ...[
+                        const SizedBox(height: DesignTokens.spacing16),
+                        _continueAsGuestSection(),
+                      ],
                       const SizedBox(height: DesignTokens.spacing24),
                       const _VersionLabel(),
                     ],
                   ),
                 ),
               ),
+              if (widget.fromGuest)
+                const Positioned(
+                  top: DesignTokens.spacing8,
+                  left: DesignTokens.spacing8,
+                  child: CloseButton(),
+                ),
               // The profile's language row is out of reach before sign-in.
               const Positioned(
                 top: DesignTokens.spacing8,
@@ -369,6 +419,30 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
             ],
           ),
         ),
+      ),
+    );
+  }
+
+  Widget _continueAsGuestSection() {
+    final l10n = AppLocalizations.of(context)!;
+    return ConstrainedBox(
+      constraints: const BoxConstraints(maxWidth: 400),
+      child: Column(
+        children: [
+          TextButton(
+            onPressed: _startingGuest || _loading ? null : _continueAsGuest,
+            child: Text(
+              l10n.loginContinueAsGuest,
+              textAlign: TextAlign.center,
+              style: const TextStyle(fontWeight: FontWeight.w600),
+            ),
+          ),
+          Text(
+            l10n.loginContinueAsGuestHint,
+            textAlign: TextAlign.center,
+            style: DesignTokens.caption.copyWith(color: DesignTokens.textMuted),
+          ),
+        ],
       ),
     );
   }

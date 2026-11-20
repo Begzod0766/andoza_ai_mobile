@@ -3070,4 +3070,15 @@ class AppLocalizationsEn extends AppLocalizations {
   String tourStepOf(int current, int total) {
     return '$current/$total';
   }
+
+  @override
+  String get loginContinueAsGuest => 'Continue without signing up';
+
+  @override
+  String get loginContinueAsGuestHint =>
+      'Your rooms are kept on this device as a guest.';
+
+  @override
+  String get guestSessionFailed =>
+      'Couldn\'t connect right now. Try again or sign in.';
 }

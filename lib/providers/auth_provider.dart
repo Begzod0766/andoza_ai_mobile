@@ -5,6 +5,7 @@ import '../repositories/auth_repository.dart';
 import '../services/api_client.dart';
 import '../services/push_service.dart';
 import '../services/secure_storage.dart';
+import '../services/sign_in_history.dart';
 import 'locale_provider.dart';
 
 // Secure Storage provider
@@ -62,7 +63,7 @@ final Provider<AuthRepository> authRepositoryProvider =
 final StateNotifierProvider<AuthNotifier, AuthState> authStateProvider =
     StateNotifierProvider<AuthNotifier, AuthState>((ref) {
   final repository = ref.watch(authRepositoryProvider);
-  final notifier = AuthNotifier(repository);
+  final notifier = AuthNotifier(repository, ref.read(signInHistoryProvider));
   // Read lazily: pushService depends on apiClient, which depends back on this.
   notifier.beforeLogout = () => ref.read(pushServiceProvider).unregister();
   notifier.onSessionEnded =
@@ -80,9 +81,22 @@ final currentUserProvider = FutureProvider.autoDispose<User?>((ref) async {
 
 // Auth notifier for managing auth state
 class AuthNotifier extends StateNotifier<AuthState> {
-  AuthNotifier(this._repository) : super(const AuthInitial());
+  AuthNotifier(this._repository, [this._signInHistory])
+      : super(const AuthInitial());
 
   final AuthRepository _repository;
+  final SignInHistory? _signInHistory;
+
+  /// Every registered session (login, Google, Apple, OTP, register, a guest's
+  /// upgrade or merge, a restored session) marks the device as signed in
+  /// before; a guest session does not.
+  @override
+  set state(AuthState value) {
+    super.state = value;
+    if (value is AuthAuthenticated && !value.user.isGuest) {
+      _signInHistory?.markSignedIn();
+    }
+  }
 
   /// Awaited first in [logout], while the session is still valid (push token
   /// removal needs auth). Must not throw.
@@ -111,6 +125,8 @@ class AuthNotifier extends StateNotifier<AuthState> {
   /// Opens a silent guest session (`POST /auth/guest`). True and
   /// [AuthAuthenticated] (a guest user) on success; false and [AuthInitial] on
   /// any failure — never [AuthError]: this path has no error UI.
+  bool get isAuthenticated => state is AuthAuthenticated;
+
   Future<bool> startGuestSession() async {
     try {
       final response = await _repository.startGuestSession();
@@ -205,6 +221,22 @@ class AuthNotifier extends StateNotifier<AuthState> {
       state = const AuthInitial();
     }
   }
+}
+
+/// Where a cold start lands once the splash is done.
+enum ColdStart { home, login }
+
+/// Restores the stored session; without one, a device that was signed in to
+/// a registered account before gets the login screen, and a fresh one a
+/// silent guest session (the login screen if that fails: offline, 429, 503).
+Future<ColdStart> resolveColdStart(
+  AuthNotifier notifier,
+  SignInHistory history,
+) async {
+  await notifier.restoreToken();
+  if (notifier.isAuthenticated) return ColdStart.home;
+  if (await history.hasSignedInBefore()) return ColdStart.login;
+  return await notifier.startGuestSession() ? ColdStart.home : ColdStart.login;
 }
 
 sealed class AuthState {

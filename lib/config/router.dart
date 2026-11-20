@@ -82,6 +82,14 @@ import '../screens/onboarding/e9_preferences_settings_screen.dart';
 
 final _rootNavigatorKey = GlobalKey<NavigatorState>();
 
+/// `/signup` (the login screen opened over a guest's work) is for guests: a
+/// registered user goes home, a signed-out one to `/login`.
+@visibleForTesting
+String? signupRedirect(AuthState auth) {
+  if (auth.isGuest) return null;
+  return auth is AuthAuthenticated ? '/' : '/login';
+}
+
 final routerProvider = Provider<GoRouter>((ref) {
   final refreshNotifier = _GoRouterRefreshNotifier(ref);
   ref.onDispose(refreshNotifier.dispose);
@@ -104,6 +112,8 @@ final routerProvider = Provider<GoRouter>((ref) {
       if (isSplash) {
         return null;
       }
+
+      if (state.matchedLocation == '/signup') return signupRedirect(authState);
 
       // Redirect unauthenticated users to login
       if (!isAuthenticated && !isLoginRoute) {
@@ -137,6 +147,13 @@ final routerProvider = Provider<GoRouter>((ref) {
         builder: (context, state) => const SplashScreen(),
       ),
       GoRoute(path: '/login', builder: (context, state) => const LoginScreen()),
+      // A guest signing up or in over what they were doing; pops `true` once
+      // signed in (`showRegistrationRequiredSheet`).
+      GoRoute(
+        path: '/signup',
+        parentNavigatorKey: _rootNavigatorKey,
+        builder: (context, state) => const LoginScreen(fromGuest: true),
+      ),
       ShellRoute(
         // The shell has its own navigator, so it needs its own observer
         // instance or its tab/inner screens never reach Analytics.

@@ -3332,5 +3332,18 @@
         "type": "int"
       }
     }
+  },
+
+  "loginContinueAsGuest": "Ro'yxatdan o'tmasdan davom etish",
+  "@loginContinueAsGuest": {
+    "description": "Login screen: button that starts a guest session (no account) instead of signing in."
+  },
+  "loginContinueAsGuestHint": "Xonalaringiz bu qurilmada mehmon sifatida saqlanadi.",
+  "@loginContinueAsGuestHint": {
+    "description": "Login screen: small note under the continue-without-signing-up button."
+  },
+  "guestSessionFailed": "Hozir ulanib bo'lmadi. Qayta urinib ko'ring yoki tizimga kiring.",
+  "@guestSessionFailed": {
+    "description": "Snackbar when a guest session could not be started (offline, server limit, guest mode off)."
   }
 }

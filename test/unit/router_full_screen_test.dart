@@ -3,6 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
 import 'package:tamir_uy_mobile_flutter/config/router.dart';
+import 'package:tamir_uy_mobile_flutter/models/user_model.dart';
+import 'package:tamir_uy_mobile_flutter/providers/auth_provider.dart';
 
 GoRoute? _find(List<RouteBase> routes, String path) {
   for (final r in routes) {
@@ -28,6 +30,8 @@ void main() {
     '/setup/dimensions',
     '/setup/wall-measurements',
     '/setup/summary',
+    // Sign-up over whatever a guest was doing (the Studio included).
+    '/signup',
   ];
 
   test('checkout, booking and room setup open on the root navigator', () {
@@ -40,5 +44,16 @@ void main() {
       expect(route, isNotNull, reason: path);
       expect(route!.parentNavigatorKey, same(root), reason: path);
     }
+  });
+
+  test('/signup is for guests only', () {
+    const guest = AuthAuthenticated(
+      user: User(id: 'g', isGuest: true),
+      token: 'g',
+    );
+    const registered = AuthAuthenticated(user: User(id: 'u'), token: 'u');
+    expect(signupRedirect(guest), isNull);
+    expect(signupRedirect(registered), '/');
+    expect(signupRedirect(const AuthInitial()), '/login');
   });
 }

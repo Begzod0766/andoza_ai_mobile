@@ -3071,4 +3071,15 @@ class AppLocalizationsRu extends AppLocalizations {
   String tourStepOf(int current, int total) {
     return '$current/$total';
   }
+
+  @override
+  String get loginContinueAsGuest => 'Продолжить без регистрации';
+
+  @override
+  String get loginContinueAsGuestHint =>
+      'Ваши комнаты сохранятся на этом устройстве как у гостя.';
+
+  @override
+  String get guestSessionFailed =>
+      'Сейчас не удалось подключиться. Попробуйте ещё раз или войдите.';
 }

@@ -5643,6 +5643,24 @@ abstract class AppLocalizations {
   /// In uz, this message translates to:
   /// **'{current}/{total}'**
   String tourStepOf(int current, int total);
+
+  /// Login screen: button that starts a guest session (no account) instead of signing in.
+  ///
+  /// In uz, this message translates to:
+  /// **'Ro\'yxatdan o\'tmasdan davom etish'**
+  String get loginContinueAsGuest;
+
+  /// Login screen: small note under the continue-without-signing-up button.
+  ///
+  /// In uz, this message translates to:
+  /// **'Xonalaringiz bu qurilmada mehmon sifatida saqlanadi.'**
+  String get loginContinueAsGuestHint;
+
+  /// Snackbar when a guest session could not be started (offline, server limit, guest mode off).
+  ///
+  /// In uz, this message translates to:
+  /// **'Hozir ulanib bo\'lmadi. Qayta urinib ko\'ring yoki tizimga kiring.'**
+  String get guestSessionFailed;
 }
 
 class _AppLocalizationsDelegate
