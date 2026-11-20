@@ -9,10 +9,23 @@ import 'package:shared_preferences/shared_preferences.dart';
 /// cleared. Not a secret, so `shared_preferences`, not secure storage.
 class SignInHistory {
   static const _key = 'auth.hasSignedInBefore';
+  static const _migratedKey = 'auth.hasSignedInBefore.migrated';
+
+  /// Written by 1.0.2 and older only inside the signed-in app (no guests
+  /// then). Someone who signed out there and updated has no [_key] yet.
+  static const _legacySignedInKeys = ['tour.home.v1.done', 'push_prompt_answered'];
 
   Future<bool> hasSignedInBefore() async {
     try {
       final prefs = await SharedPreferences.getInstance();
+      // Once, on the first launch of a build that has the flag: an update
+      // from a build that was used signed in counts as signed in before.
+      if (!(prefs.getBool(_migratedKey) ?? false)) {
+        if (_legacySignedInKeys.any(prefs.containsKey)) {
+          await prefs.setBool(_key, true);
+        }
+        await prefs.setBool(_migratedKey, true);
+      }
       return prefs.getBool(_key) ?? false;
     } catch (_) {
       return false;
