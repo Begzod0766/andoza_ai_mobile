@@ -15,6 +15,7 @@ import '../../providers/auth_provider.dart';
 import '../../providers/locale_provider.dart';
 import '../../services/pdf_share_service.dart';
 import '../../widgets/common/error_view.dart';
+import 'studio_auth_gate.dart';
 import 'studio_freshness.dart';
 import 'studio_session.dart';
 import 'studio_tour_bridge.dart';
@@ -285,6 +286,11 @@ class _StudioWebViewScreenState extends ConsumerState<StudioWebViewScreen>
         webDownloadChannel,
         onMessageReceived: (m) => _shareDownload(m.message),
       )
+      // A guest tapped a paid/identity feature: see studio_auth_gate.dart.
+      ..addJavaScriptChannel(
+        studioAuthGateChannel,
+        onMessageReceived: (m) => _onAuthGate(m.message),
+      )
       // The Studio tour's open/closed state: see studio_tour_bridge.dart.
       ..addJavaScriptChannel(
         studioTourChannel,
@@ -402,6 +408,19 @@ class _StudioWebViewScreenState extends ConsumerState<StudioWebViewScreen>
     }
     setState(() => _controller = controller);
     _bootstrap(auth, controller);
+  }
+
+  Future<void> _onAuthGate(String message) async {
+    final controller = _controller;
+    if (controller == null || !mounted) return;
+    await onStudioAuthGate(
+      context,
+      message,
+      readAuth: () => ref.read(authStateProvider),
+      storage: ref.read(secureStorageProvider),
+      runJavaScript: controller.runJavaScript,
+      reload: controller.reload,
+    );
   }
 
   /// Follows the page shown: the back button only over the 3D studio, and
