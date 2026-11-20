@@ -5,6 +5,8 @@ import 'package:tamir_uy_mobile_flutter/repositories/auth_repository.dart';
 import 'package:tamir_uy_mobile_flutter/repositories/push_repository.dart';
 import 'package:tamir_uy_mobile_flutter/services/push_service.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:riverpod/riverpod.dart';
+import 'package:tamir_uy_mobile_flutter/models/user_model.dart';
 
 class FakeMessaging implements MessagingClient {
   FakeMessaging(this.log, {this.token = 'tok-1'});
@@ -122,4 +124,45 @@ void main() {
     await service.registerCurrent();
     expect(log, isEmpty);
   });
+
+  group('pushRegistrationProvider', () {
+    late _SettableAuth auth;
+    late ProviderContainer c;
+
+    setUp(() {
+      auth = _SettableAuth();
+      c = ProviderContainer(overrides: [
+        pushServiceProvider.overrideWithValue(service),
+        authStateProvider.overrideWith((ref) => auth),
+      ]);
+      addTearDown(c.dispose);
+      c.read(pushRegistrationProvider);
+    });
+
+    int registrations() =>
+        log.where((l) => l.startsWith('repo.register')).length;
+
+    test('guest does not register a push token', () async {
+      auth.set(const AuthAuthenticated(
+          user: User(id: 'g1', isGuest: true), token: 'g'));
+      await pumpEventQueue();
+      expect(registrations(), 0);
+    });
+
+    test('upgrade registers once', () async {
+      auth.set(const AuthAuthenticated(
+          user: User(id: 'g1', isGuest: true), token: 'g'));
+      await pumpEventQueue();
+      auth.set(const AuthAuthenticated(user: User(id: 'g1'), token: 'u'));
+      await pumpEventQueue();
+      auth.set(const AuthAuthenticated(user: User(id: 'g1'), token: 'u2'));
+      await pumpEventQueue();
+      expect(registrations(), 1);
+    });
+  });
+}
+
+class _SettableAuth extends AuthNotifier {
+  _SettableAuth() : super(FakeAuthRepo([]));
+  void set(AuthState s) => state = s;
 }

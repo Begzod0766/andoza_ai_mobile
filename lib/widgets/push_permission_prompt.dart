@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../features/tour/startup_dialogs.dart';
+import '../providers/auth_provider.dart';
 import '../l10n/app_localizations.dart';
 import '../services/firebase_setup.dart';
 import '../services/push_permission.dart';
@@ -34,6 +35,8 @@ class _PushPermissionPromptState extends ConsumerState<PushPermissionPrompt> {
 
   Future<void> _maybeAsk() async {
     if (!ref.read(firebaseReadyProvider)) return;
+    // No pushes for guests, so no reason to ask.
+    if (ref.read(authStateProvider).isGuest) return;
     final permission = ref.read(pushPermissionProvider);
     final prefs = await SharedPreferences.getInstance();
     if (!await shouldAskForPush(prefs)) return;
