@@ -122,6 +122,21 @@ void main() {
     expect(await SecureStorageService().getRefreshToken(), 'gr');
   });
 
+  test('a guest start on a dead network gives up quickly', () async {
+    FlutterSecureStorage.setMockInitialValues({});
+    final client = ApiClient(baseUrl: 'http://test.local/api/v1');
+    final never = Completer<ResponseBody>();
+    final adapter = _FakeAdapter((_) => never.future);
+    client.httpDioForTest.httpClientAdapter = adapter;
+    final repo = AuthRepositoryImpl(client, SecureStorageService(),
+        guestTimeout: const Duration(milliseconds: 50));
+    await expectLater(repo.startGuestSession(), throwsA(isA<TimeoutException>()));
+  });
+
+  test('the guest start waits at most 8 seconds by default', () {
+    expect(AuthRepositoryImpl.defaultGuestTimeout, const Duration(seconds: 8));
+  });
+
   test('a guest restored at cold start is still a guest offline', () async {
     final s = _stack({}, (o) {
       if (o.path == '/auth/guest') {

@@ -48,7 +48,18 @@ abstract interface class AuthRepository {
 }
 
 class AuthRepositoryImpl implements AuthRepository {
-  AuthRepositoryImpl(this._apiClient, this._storage, {this.language});
+  AuthRepositoryImpl(
+    this._apiClient,
+    this._storage, {
+    this.language,
+    this.guestTimeout = defaultGuestTimeout,
+  });
+
+  /// How long a cold start waits for `POST /auth/guest` before falling back
+  /// to the login screen (the client's own timeouts would add up to ~40 s on
+  /// a bad network).
+  static const defaultGuestTimeout = Duration(seconds: 8);
+  final Duration guestTimeout;
 
   final ApiClient _apiClient;
   final SecureStorageService _storage;
@@ -133,11 +144,13 @@ class AuthRepositoryImpl implements AuthRepository {
   @override
   Future<AuthResponse> startGuestSession() async {
     final installId = await _storage.getOrCreateInstallId();
-    final response = await _apiClient.post<Map<String, dynamic>>(
-      '/auth/guest',
-      data: {'install_id': installId, 'language': language?.call() ?? 'uz'},
-      fromJson: (json) => json as Map<String, dynamic>,
-    );
+    final response = await _apiClient
+        .post<Map<String, dynamic>>(
+          '/auth/guest',
+          data: {'install_id': installId, 'language': language?.call() ?? 'uz'},
+          fromJson: (json) => json as Map<String, dynamic>,
+        )
+        .timeout(guestTimeout);
     final authResponse = AuthResponse.fromJson(response);
     await _persistSession(authResponse);
     return authResponse;
