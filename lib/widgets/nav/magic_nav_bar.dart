@@ -2,19 +2,22 @@ import 'package:flutter/material.dart';
 
 import '../../config/design_tokens.dart';
 
-/// One slot of [MagicNavBar]. [label] is the slot's one accessible name and
-/// the text shown under it; [key] goes on the slot (e.g. a home-tour target).
+/// One slot of [MagicNavBar]. [label] is the text shown under it and, unless
+/// [semanticLabel] is given, the slot's one accessible name; [key] goes on the
+/// slot (e.g. a home-tour target).
 class MagicNavItem {
   const MagicNavItem({
     required this.icon,
     required this.activeIcon,
     required this.label,
+    this.semanticLabel,
     this.key,
   });
 
   final IconData icon;
   final IconData activeIcon;
   final String label;
+  final String? semanticLabel;
   final Key? key;
 }
 
@@ -159,7 +162,7 @@ class _MagicNavBarState extends State<MagicNavBar> {
       key: item.key,
       button: true,
       selected: active,
-      label: item.label,
+      label: item.semanticLabel ?? item.label,
       child: GestureDetector(
         behavior: HitTestBehavior.opaque,
         onTap: () => widget.onTap(i),

@@ -140,6 +140,14 @@ void main() {
     );
   });
 
+  testWidgets('the «+» shows a short visible name, the long one is read', (
+    tester,
+  ) async {
+    await _pumpShell(tester);
+    expect(find.text('Yangi loyiha'), findsOneWidget);
+    expect(find.bySemanticsLabel("Yangi loyiha qo'shish"), findsOneWidget);
+  });
+
   testWidgets('items show their names, even at large text', (tester) async {
     await _pumpShell(tester);
     for (final name in ['Uy', "Do'kon", 'Ustalar', 'Profil']) {

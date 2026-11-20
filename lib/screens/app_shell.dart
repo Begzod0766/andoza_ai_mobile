@@ -191,7 +191,9 @@ class _ShellNavBar extends ConsumerWidget {
         MagicNavItem(
           icon: Icons.add,
           activeIcon: Icons.add,
-          label: l10n.navAddProject,
+          // Short under the icon; the full "add a new project" is read out.
+          label: l10n.newProjectTitle,
+          semanticLabel: l10n.navAddProject,
           key: tourKeys.of(HomeTourTarget.newProject),
         ),
         MagicNavItem(
