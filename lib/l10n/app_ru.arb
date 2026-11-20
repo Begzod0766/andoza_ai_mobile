@@ -2971,5 +2971,19 @@
   "guestFeatureOrder": "Заказ",
   "guestFeatureWorkshopLink": "Ссылка для мастерской",
   "guestFeatureBusiness": "Раздел продавца и мастера",
-  "guestFeatureMarketPrices": "Точные рыночные цены"
+  "guestFeatureMarketPrices": "Точные рыночные цены",
+
+  "profileGuestTitle": "Гость",
+  "profileGuestBody": "Вы не зарегистрированы. Если удалить приложение, ваши комнаты пропадут.",
+  "profileGuestCta": "Регистрация или вход",
+  "profileGuestDelete": "Удалить данные гостя",
+  "guestDeleteConfirm": "Все ваши комнаты будут удалены. Это нельзя отменить.",
+  "guestMergedRooms": "{count, plural, one{{count} комната добавлена в ваш аккаунт} few{{count} комнаты добавлены в ваш аккаунт} other{{count} комнат добавлено в ваш аккаунт}}",
+  "@guestMergedRooms": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  }
 }

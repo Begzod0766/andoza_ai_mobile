@@ -119,9 +119,18 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   void _signedIn(AuthResponse res, String method) {
     final analytics = ref.read(analyticsProvider);
     final notifier = ref.read(authStateProvider.notifier);
+    final messenger = ScaffoldMessenger.of(context);
+    final merged = res.guestMergedRooms ?? 0;
+    final mergedText = merged > 0
+        ? AppLocalizations.of(context)!.guestMergedRooms(merged)
+        : null;
     if (widget.fromGuest && mounted) Navigator.of(context).pop(true);
     notifier.setSession(res);
     analytics.login(method);
+    // The guest's rooms moved into the account they signed in to.
+    if (mergedText != null) {
+      messenger.showSnackBar(SnackBar(content: Text(mergedText)));
+    }
   }
 
   bool _startingGuest = false;

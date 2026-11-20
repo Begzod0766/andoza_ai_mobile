@@ -25,6 +25,9 @@ class E4ProfileSettingsScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context)!;
+    // A guest has no account to show or sign out of (signing out would lose
+    // the rooms): a "Guest" card with the way to sign up instead.
+    final guest = ref.watch(authStateProvider).isGuest;
     final currentUser = ref.watch(currentUserProvider);
     final name = currentUser.maybeWhen(
       data: (user) => user?.firstName ?? user?.name ?? user?.username,
@@ -55,46 +58,49 @@ class E4ProfileSettingsScreen extends ConsumerWidget {
       body: ListView(
         padding: const EdgeInsets.all(DesignTokens.screenPaddingHorizontal),
         children: [
-          Center(
-            child: Column(
-              children: [
-                const CircleAvatar(
-                  radius: 44,
-                  backgroundColor: DesignTokens.primaryBlue,
-                  child: Icon(
-                    Icons.person,
-                    color: DesignTokens.white,
-                    size: 44,
+          if (guest)
+            const _GuestCard()
+          else
+            Center(
+              child: Column(
+                children: [
+                  const CircleAvatar(
+                    radius: 44,
+                    backgroundColor: DesignTokens.primaryBlue,
+                    child: Icon(
+                      Icons.person,
+                      color: DesignTokens.white,
+                      size: 44,
+                    ),
                   ),
-                ),
-                const SizedBox(height: DesignTokens.spacingMd),
-                Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
+                  const SizedBox(height: DesignTokens.spacingMd),
+                  Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        name ?? l10n.profileDefaultName,
+                        style: DesignTokens.heading3,
+                      ),
+                    ],
+                  ),
+                  if (phone != null)
                     Text(
-                      name ?? l10n.profileDefaultName,
-                      style: DesignTokens.heading3,
+                      displayPhone(phone),
+                      style: DesignTokens.body2.copyWith(
+                        color: DesignTokens.textGray,
+                      ),
                     ),
-                  ],
-                ),
-                if (phone != null)
+                  const SizedBox(height: DesignTokens.spacingXs),
                   Text(
-                    displayPhone(phone),
-                    style: DesignTokens.body2.copyWith(
-                      color: DesignTokens.textGray,
+                    l10n.commonVerifiedBadge,
+                    style: DesignTokens.caption.copyWith(
+                      color: DesignTokens.successText,
+                      fontWeight: FontWeight.bold,
                     ),
                   ),
-                const SizedBox(height: DesignTokens.spacingXs),
-                Text(
-                  l10n.commonVerifiedBadge,
-                  style: DesignTokens.caption.copyWith(
-                    color: DesignTokens.successText,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ],
+                ],
+              ),
             ),
-          ),
           const SizedBox(height: DesignTokens.spacingLg),
           Row(
             children: [
@@ -182,19 +188,62 @@ class E4ProfileSettingsScreen extends ConsumerWidget {
             },
           ),
           const SizedBox(height: DesignTokens.spacingSm),
-          _MenuTile(
-            icon: Icons.logout,
-            label: l10n.profileMenuLogout,
-            isDestructive: true,
-            onTap: () => ref.read(authStateProvider.notifier).logout(),
-          ),
+          if (!guest)
+            _MenuTile(
+              icon: Icons.logout,
+              label: l10n.profileMenuLogout,
+              isDestructive: true,
+              onTap: () => ref.read(authStateProvider.notifier).logout(),
+            ),
           const SizedBox(height: DesignTokens.spacingLg),
           const Divider(),
           _MenuTile(
             icon: Icons.delete_forever_outlined,
-            label: l10n.profileMenuDeleteAccount,
+            label: guest ? l10n.profileGuestDelete : l10n.profileMenuDeleteAccount,
             isDestructive: true,
-            onTap: () => confirmAndDeleteAccount(context, ref),
+            onTap: () => confirmAndDeleteAccount(context, ref, guest: guest),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _GuestCard extends StatelessWidget {
+  const _GuestCard();
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    return Container(
+      padding: const EdgeInsets.all(DesignTokens.spacingMd),
+      decoration: BoxDecoration(
+        color: DesignTokens.white,
+        borderRadius: BorderRadius.circular(DesignTokens.radiusLg),
+        border: Border.all(color: DesignTokens.borderGray),
+      ),
+      child: Column(
+        children: [
+          const CircleAvatar(
+            radius: 32,
+            backgroundColor: DesignTokens.borderGray,
+            child: Icon(Icons.person_outline, color: DesignTokens.textGray, size: 32),
+          ),
+          const SizedBox(height: DesignTokens.spacingSm),
+          Text(l10n.profileGuestTitle, style: DesignTokens.heading3),
+          const SizedBox(height: DesignTokens.spacingXs),
+          Text(
+            l10n.profileGuestBody,
+            textAlign: TextAlign.center,
+            style: DesignTokens.body2.copyWith(color: DesignTokens.textGray),
+          ),
+          const SizedBox(height: DesignTokens.spacingMd),
+          SizedBox(
+            width: double.infinity,
+            child: FilledButton(
+              onPressed: () => context.push('/signup'),
+              child: Text(l10n.profileGuestCta),
+            ),
           ),
         ],
       ),

@@ -3128,4 +3128,33 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get guestFeatureMarketPrices => 'Точные рыночные цены';
+
+  @override
+  String get profileGuestTitle => 'Гость';
+
+  @override
+  String get profileGuestBody =>
+      'Вы не зарегистрированы. Если удалить приложение, ваши комнаты пропадут.';
+
+  @override
+  String get profileGuestCta => 'Регистрация или вход';
+
+  @override
+  String get profileGuestDelete => 'Удалить данные гостя';
+
+  @override
+  String get guestDeleteConfirm =>
+      'Все ваши комнаты будут удалены. Это нельзя отменить.';
+
+  @override
+  String guestMergedRooms(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count комнат добавлено в ваш аккаунт',
+      few: '$count комнаты добавлены в ваш аккаунт',
+      one: '$count комната добавлена в ваш аккаунт',
+    );
+    return '$_temp0';
+  }
 }

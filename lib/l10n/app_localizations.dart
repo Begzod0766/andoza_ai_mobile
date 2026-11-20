@@ -5751,6 +5751,42 @@ abstract class AppLocalizations {
   /// In uz, this message translates to:
   /// **'Aniq bozor narxlari'**
   String get guestFeatureMarketPrices;
+
+  /// Profile for a guest (no account): card title.
+  ///
+  /// In uz, this message translates to:
+  /// **'Mehmon'**
+  String get profileGuestTitle;
+
+  /// Profile for a guest: warns that uninstalling loses the rooms.
+  ///
+  /// In uz, this message translates to:
+  /// **'Siz ro\'yxatdan o\'tmagansiz. Ilovani o\'chirsangiz, xonalaringiz yo\'qoladi.'**
+  String get profileGuestBody;
+
+  /// Profile for a guest: button that opens sign-up / sign-in.
+  ///
+  /// In uz, this message translates to:
+  /// **'Ro\'yxatdan o\'tish yoki kirish'**
+  String get profileGuestCta;
+
+  /// Profile for a guest: destructive row that deletes the guest account and its rooms.
+  ///
+  /// In uz, this message translates to:
+  /// **'Mehmon ma\'lumotlarini o\'chirish'**
+  String get profileGuestDelete;
+
+  /// Delete-guest-data dialog body.
+  ///
+  /// In uz, this message translates to:
+  /// **'Barcha xonalaringiz o\'chiriladi. Buni qaytarib bo\'lmaydi.'**
+  String get guestDeleteConfirm;
+
+  /// Snackbar after a guest signed in to an existing account: how many of the guest's rooms moved into it.
+  ///
+  /// In uz, this message translates to:
+  /// **'{count, plural, other{{count} xona akkauntingizga qo\'shildi}}'**
+  String guestMergedRooms(int count);
 }
 
 class _AppLocalizationsDelegate

@@ -3127,4 +3127,31 @@ class AppLocalizationsUz extends AppLocalizations {
 
   @override
   String get guestFeatureMarketPrices => 'Aniq bozor narxlari';
+
+  @override
+  String get profileGuestTitle => 'Mehmon';
+
+  @override
+  String get profileGuestBody =>
+      'Siz ro\'yxatdan o\'tmagansiz. Ilovani o\'chirsangiz, xonalaringiz yo\'qoladi.';
+
+  @override
+  String get profileGuestCta => 'Ro\'yxatdan o\'tish yoki kirish';
+
+  @override
+  String get profileGuestDelete => 'Mehmon ma\'lumotlarini o\'chirish';
+
+  @override
+  String get guestDeleteConfirm =>
+      'Barcha xonalaringiz o\'chiriladi. Buni qaytarib bo\'lmaydi.';
+
+  @override
+  String guestMergedRooms(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count xona akkauntingizga qo\'shildi',
+    );
+    return '$_temp0';
+  }
 }

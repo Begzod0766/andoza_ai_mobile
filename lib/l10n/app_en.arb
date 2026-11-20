@@ -2971,5 +2971,19 @@
   "guestFeatureOrder": "Ordering",
   "guestFeatureWorkshopLink": "Workshop link",
   "guestFeatureBusiness": "Seller and pro section",
-  "guestFeatureMarketPrices": "Exact market prices"
+  "guestFeatureMarketPrices": "Exact market prices",
+
+  "profileGuestTitle": "Guest",
+  "profileGuestBody": "You haven't signed up. If you delete the app, your rooms are lost.",
+  "profileGuestCta": "Sign up or sign in",
+  "profileGuestDelete": "Delete guest data",
+  "guestDeleteConfirm": "All your rooms will be deleted. This can't be undone.",
+  "guestMergedRooms": "{count, plural, one{{count} room was added to your account} other{{count} rooms were added to your account}}",
+  "@guestMergedRooms": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  }
 }

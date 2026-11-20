@@ -3126,4 +3126,32 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get guestFeatureMarketPrices => 'Exact market prices';
+
+  @override
+  String get profileGuestTitle => 'Guest';
+
+  @override
+  String get profileGuestBody =>
+      'You haven\'t signed up. If you delete the app, your rooms are lost.';
+
+  @override
+  String get profileGuestCta => 'Sign up or sign in';
+
+  @override
+  String get profileGuestDelete => 'Delete guest data';
+
+  @override
+  String get guestDeleteConfirm =>
+      'All your rooms will be deleted. This can\'t be undone.';
+
+  @override
+  String guestMergedRooms(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count rooms were added to your account',
+      one: '$count room was added to your account',
+    );
+    return '$_temp0';
+  }
 }

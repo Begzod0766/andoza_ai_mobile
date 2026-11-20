@@ -3406,5 +3406,35 @@
   "guestFeatureMarketPrices": "Aniq bozor narxlari",
   "@guestFeatureMarketPrices": {
     "description": "Sign-up sheet: feature name (exact market prices on the estimate)."
+  },
+
+  "profileGuestTitle": "Mehmon",
+  "@profileGuestTitle": {
+    "description": "Profile for a guest (no account): card title."
+  },
+  "profileGuestBody": "Siz ro'yxatdan o'tmagansiz. Ilovani o'chirsangiz, xonalaringiz yo'qoladi.",
+  "@profileGuestBody": {
+    "description": "Profile for a guest: warns that uninstalling loses the rooms."
+  },
+  "profileGuestCta": "Ro'yxatdan o'tish yoki kirish",
+  "@profileGuestCta": {
+    "description": "Profile for a guest: button that opens sign-up / sign-in."
+  },
+  "profileGuestDelete": "Mehmon ma'lumotlarini o'chirish",
+  "@profileGuestDelete": {
+    "description": "Profile for a guest: destructive row that deletes the guest account and its rooms."
+  },
+  "guestDeleteConfirm": "Barcha xonalaringiz o'chiriladi. Buni qaytarib bo'lmaydi.",
+  "@guestDeleteConfirm": {
+    "description": "Delete-guest-data dialog body."
+  },
+  "guestMergedRooms": "{count, plural, other{{count} xona akkauntingizga qo'shildi}}",
+  "@guestMergedRooms": {
+    "description": "Snackbar after a guest signed in to an existing account: how many of the guest's rooms moved into it.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
   }
 }
