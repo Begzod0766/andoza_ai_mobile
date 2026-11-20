@@ -163,6 +163,7 @@ void main() {
     test('a login without a refresh token drops the guest refresh token',
         () async {
       var refreshCookie = <String?>[];
+      var signedIn = false;
       final s = _stack({}, (o) {
         if (o.path == '/auth/guest') {
           return _json(
@@ -172,13 +173,15 @@ void main() {
           return _json(_login('ua', null, {'id': 'u9'}, merged: 2), 200);
         }
         if (o.path == '/auth/refresh') {
-          refreshCookie.add(o.headers['Cookie'] as String?);
+          // Only the guest's own refresh right before signing in is fine.
+          if (signedIn) refreshCookie.add(o.headers['Cookie'] as String?);
           return _json({'detail': 'guest merged'}, 401);
         }
         return _json({'detail': 'expired'}, 401);
       });
       await s.repo.startGuestSession();
       final res = await s.repo.login('someone', 'pw-not-real');
+      signedIn = true;
       expect(res.guestMergedRooms, 2);
       expect(await SecureStorageService().getRefreshToken(), isNull);
       await expectLater(
@@ -193,6 +196,7 @@ void main() {
         'a guest refresh that fails after sign-in does not wipe the new '
         'session', () async {
       late AuthRepositoryImpl repo;
+      var signingIn = false;
       final s = _stack({}, (o) async {
         if (o.path == '/auth/guest') {
           return _json(
@@ -204,7 +208,10 @@ void main() {
         if (o.path == '/auth/refresh') {
           // The sign-in completes while the guest's refresh is in flight; the
           // server then rejects the (now merged) guest's refresh token.
-          await repo.login('someone', 'pw-not-real');
+          if (!signingIn) {
+            signingIn = true;
+            await repo.login('someone', 'pw-not-real');
+          }
           return _json({'detail': 'merged'}, 401);
         }
         final auth = o.headers['Authorization'];

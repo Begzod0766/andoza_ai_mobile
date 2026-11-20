@@ -36,6 +36,18 @@ class ApiException implements Exception {
   String toString() => message;
 }
 
+/// What [ApiClient.refreshNow] did.
+enum RefreshOutcome {
+  /// New tokens are in place.
+  refreshed,
+
+  /// The server refused the refresh token: the session is dead and cleared.
+  refused,
+
+  /// No refresh token, or the call failed (offline…): nothing changed.
+  failed,
+}
+
 class ApiClient {
   ApiClient({
     required String baseUrl,
@@ -121,6 +133,43 @@ class ApiClient {
   /// the refresh interceptor can use it when the access token expires.
   void setRefreshToken(String token) {
     _refreshToken = token;
+  }
+
+  /// The current access token (null when signed out).
+  String? get authToken => _authToken;
+
+  /// Refreshes the session now, not on a 401 — a guest about to sign up or
+  /// in needs a valid bearer, since the server recognises the guest (and
+  /// keeps its rooms) only through one.
+  Future<RefreshOutcome> refreshNow() async {
+    final refreshToken = _refreshToken;
+    if (refreshToken == null || refreshToken.isEmpty) {
+      return RefreshOutcome.failed;
+    }
+    Response<dynamic> response;
+    try {
+      response = await _refreshDio.post<dynamic>(
+        '/auth/refresh',
+        options: Options(headers: {'Cookie': 'refresh_token=$refreshToken'}),
+      );
+    } on DioException catch (e) {
+      final status = e.response?.statusCode;
+      if ((status == 401 || status == 403) && _refreshToken == refreshToken) {
+        await _handleRefreshFailure();
+        return RefreshOutcome.refused;
+      }
+      return RefreshOutcome.failed;
+    }
+    if (_refreshToken != refreshToken) return RefreshOutcome.failed;
+    final data = response.data;
+    final newAccess =
+        data is Map<String, dynamic> ? data['access_token'] as String? : null;
+    if (newAccess == null || newAccess.isEmpty) return RefreshOutcome.failed;
+    final newRefresh = (data!['refresh_token'] as String?) ?? refreshToken;
+    _authToken = newAccess;
+    _refreshToken = newRefresh;
+    await onTokensRefreshed?.call(newAccess, newRefresh);
+    return RefreshOutcome.refreshed;
   }
 
   /// Forgets the refresh token, e.g. when a sign-in replaced a guest session

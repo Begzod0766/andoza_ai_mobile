@@ -62,6 +62,7 @@ class AuthRepositoryImpl implements AuthRepository {
 
   @override
   Future<AuthResponse> login(String email, String password) async {
+    await _freshenGuestToken();
     try {
       final response = await _apiClient.post<Map<String, dynamic>>(
         '/auth/login',
@@ -79,6 +80,7 @@ class AuthRepositoryImpl implements AuthRepository {
 
   @override
   Future<AuthResponse> loginWithGoogle(String idToken) async {
+    await _freshenGuestToken();
     try {
       final response = await _apiClient.post<Map<String, dynamic>>(
         '/auth/google',
@@ -95,6 +97,7 @@ class AuthRepositoryImpl implements AuthRepository {
 
   @override
   Future<AuthResponse> loginWithApple(String identityToken, {String? name}) async {
+    await _freshenGuestToken();
     try {
       final response = await _apiClient.post<Map<String, dynamic>>(
         '/auth/apple',
@@ -106,6 +109,24 @@ class AuthRepositoryImpl implements AuthRepository {
       return authResponse;
     } on ApiException catch (e) {
       throw AuthException(e.message, statusCode: e.statusCode);
+    }
+  }
+
+  /// Before any sign-up or sign-in from a guest session: refresh the guest's
+  /// tokens so the call carries a valid guest bearer. The server recognises
+  /// the guest — and upgrades it or merges its rooms — only through one, and
+  /// the 30-minute access token is often expired by now (the Studio WebView
+  /// never refreshes it). A refused refresh means the guest is gone: sign in
+  /// as nobody, there is nothing to merge.
+  Future<void> _freshenGuestToken() async {
+    if (_cachedUser?.isGuest != true) return;
+    switch (await _apiClient.refreshNow()) {
+      case RefreshOutcome.refreshed:
+        _cachedToken = _apiClient.authToken;
+      case RefreshOutcome.refused:
+        await clearSession();
+      case RefreshOutcome.failed:
+        break;
     }
   }
 
@@ -161,6 +182,7 @@ class AuthRepositoryImpl implements AuthRepository {
 
   @override
   Future<AuthResponse> verifyOtp(String phone, String code) async {
+    await _freshenGuestToken();
     try {
       final response = await _apiClient.post<Map<String, dynamic>>(
         '/auth/otp/verify',
@@ -177,6 +199,7 @@ class AuthRepositoryImpl implements AuthRepository {
 
   @override
   Future<AuthResponse> register(String username, String password, String? name) async {
+    await _freshenGuestToken();
     try {
       final data = <String, dynamic>{'username': username, 'password': password};
       if (name != null && name.isNotEmpty) data['name'] = name;
