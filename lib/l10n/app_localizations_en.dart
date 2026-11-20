@@ -538,8 +538,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get newProjectArScanTitle => 'Measure with camera';
 
   @override
-  String get newProjectArScanDesc =>
-      'Mark the floor corners with your phone camera to get the room plan';
+  String get newProjectArScanCaption => 'Mark floor corners with the camera';
 
   @override
   String get arScanFindFloor =>
@@ -1401,15 +1400,13 @@ class AppLocalizationsEn extends AppLocalizations {
   String get newProjectWizardTitle => '3D Wizard';
 
   @override
-  String get newProjectWizardDesc =>
-      'Enter room dimensions in an interactive 3D view';
+  String get newProjectWizardCaption => 'Enter the room size';
 
   @override
   String get newProjectLidarTitle => 'LiDAR scanner';
 
   @override
-  String get newProjectLidarDesc =>
-      'Scan the room with LiDAR and get an automatic 3D model';
+  String get newProjectLidarCaption => 'Scan the room with LiDAR';
 
   @override
   String get newProjectPhotoTitle => '360° Photo scan';
@@ -1422,8 +1419,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get newProjectDrawTitle => 'Draw it yourself';
 
   @override
-  String get newProjectDrawDesc =>
-      'Draw the room with your finger — dimensions are calculated automatically from your drawing';
+  String get newProjectDrawCaption => 'Draw the room with a finger';
 
   @override
   String get summarySavedTitle => 'Dimensions saved!';

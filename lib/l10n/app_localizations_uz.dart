@@ -528,8 +528,8 @@ class AppLocalizationsUz extends AppLocalizations {
   String get newProjectArScanTitle => 'Kamera bilan o\'lchash';
 
   @override
-  String get newProjectArScanDesc =>
-      'Telefon kamerasi bilan pol burchaklarini belgilab, xona rejasini oling';
+  String get newProjectArScanCaption =>
+      'Pol burchaklarini kamera bilan belgilang';
 
   @override
   String get arScanFindFloor => 'Telefonni polga qaratib sekin aylantiring';
@@ -1389,15 +1389,13 @@ class AppLocalizationsUz extends AppLocalizations {
   String get newProjectWizardTitle => '3D Master';
 
   @override
-  String get newProjectWizardDesc =>
-      'Interaktiv 3D ko\'rinishda xona o\'lchamlarini kiriting';
+  String get newProjectWizardCaption => 'Xona o\'lchamlarini kiriting';
 
   @override
   String get newProjectLidarTitle => 'LiDAR skaner';
 
   @override
-  String get newProjectLidarDesc =>
-      'Xonani LiDAR yordamida skanerlang va avtomatik 3D model oling';
+  String get newProjectLidarCaption => 'Xonani LiDAR bilan skanerlang';
 
   @override
   String get newProjectPhotoTitle => '360° Foto skan';
@@ -1410,8 +1408,7 @@ class AppLocalizationsUz extends AppLocalizations {
   String get newProjectDrawTitle => 'O\'zingiz chizing';
 
   @override
-  String get newProjectDrawDesc =>
-      'Xonani barmog\'ingiz bilan chizing — o\'lchamlar chizganingizga qarab o\'zi hisoblanadi';
+  String get newProjectDrawCaption => 'Xonani barmoq bilan chizing';
 
   @override
   String get summarySavedTitle => 'O\'lchamlar saqlandi!';
