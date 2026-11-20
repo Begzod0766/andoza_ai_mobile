@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:logger/logger.dart';
@@ -6,11 +8,29 @@ import '../config/app_config.dart';
 import 'sse_client.dart';
 
 class ApiException implements Exception {
-  ApiException({required this.message, this.statusCode, this.response});
+  ApiException({
+    required this.message,
+    this.statusCode,
+    this.response,
+    this.code,
+    this.feature,
+  });
 
   final String message;
   final int? statusCode;
   final dynamic response;
+
+  /// Machine-readable `detail.code` when the server sent a structured error,
+  /// e.g. `registration_required`.
+  final String? code;
+
+  /// `detail.feature` of a `registration_required` error (`render`, `contact`…).
+  final String? feature;
+
+  /// The guest-mode contract: HTTP 403 `{"detail": {"code":
+  /// "registration_required", "feature": …, "message": …}}`.
+  bool get isRegistrationRequired =>
+      statusCode == 403 && code == 'registration_required';
 
   @override
   String toString() => message;
@@ -114,6 +134,8 @@ class ApiClient {
     '/auth/otp/verify',
     '/auth/register',
     '/auth/google',
+    '/auth/apple',
+    '/auth/guest',
   };
 
   static bool _isAuthPath(String path) =>
@@ -396,7 +418,7 @@ class ApiClient {
       if (body == null) return;
       yield* parseSseStream(body.stream.cast<List<int>>());
     } on DioException catch (e) {
-      throw _handleDioError(e);
+      throw _handleDioError(await _withDecodedStreamBody(e));
     } finally {
       // Runs when the stream completes OR the subscription is cancelled — either
       // way, tear down the connection.
@@ -404,7 +426,45 @@ class ApiClient {
     }
   }
 
+  /// A `ResponseType.stream` request keeps an error body as a [ResponseBody];
+  /// read and decode it so a 403's `detail.code` is not lost.
+  Future<DioException> _withDecodedStreamBody(DioException e) async {
+    final response = e.response;
+    final data = response?.data;
+    if (response == null || data is! ResponseBody) return e;
+    dynamic decoded;
+    try {
+      final text = await utf8.decodeStream(data.stream);
+      decoded = text.isEmpty ? null : jsonDecode(text);
+    } catch (_) {
+      decoded = null;
+    }
+    return e.copyWith(
+      response: Response<dynamic>(
+        requestOptions: response.requestOptions,
+        data: decoded,
+        statusCode: response.statusCode,
+        statusMessage: response.statusMessage,
+        headers: response.headers,
+      ),
+    );
+  }
+
   ApiException _handleDioError(DioException error) {
+    final data = error.response?.data;
+    final detail = data is Map ? data['detail'] : null;
+    if (detail is Map && detail['code'] is String) {
+      final detailMessage = detail['message'];
+      return ApiException(
+        message: detailMessage is String && detailMessage.isNotEmpty
+            ? detailMessage
+            : _handleBadResponse(error),
+        statusCode: error.response?.statusCode,
+        response: data,
+        code: detail['code'] as String,
+        feature: detail['feature'] as String?,
+      );
+    }
     final message = switch (error.type) {
       DioExceptionType.connectionTimeout => 'Connection timeout',
       DioExceptionType.sendTimeout => 'Send timeout',

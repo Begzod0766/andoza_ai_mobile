@@ -187,5 +187,37 @@ void main() {
       );
       expect(cleared, isTrue);
     });
+
+    for (final authPath in ['/auth/apple', '/auth/guest']) {
+      final name = authPath == '/auth/apple'
+          ? 'apple 401 does not refresh'
+          : 'guest 401 does not refresh';
+      test(name, () async {
+        var refreshCalls = 0;
+        var unauthorized = 0;
+        final client = ApiClient(
+          baseUrl: 'http://test.local/api/v1',
+          onUnauthorized: () => unauthorized++,
+        );
+        client.setAuthToken('guest-access');
+        client.setRefreshToken('guest-refresh');
+        final adapter = _FakeAdapter((options) {
+          if (options.path.endsWith('/auth/refresh')) {
+            refreshCalls++;
+            return _json({'access_token': 'x'}, 200);
+          }
+          return _json({'detail': 'Invalid token'}, 401);
+        });
+        client.httpDioForTest.httpClientAdapter = adapter;
+        client.refreshDioForTest.httpClientAdapter = adapter;
+
+        await expectLater(
+          client.post<dynamic>(authPath, data: {}, fromJson: (j) => j),
+          throwsA(isA<ApiException>()),
+        );
+        expect(refreshCalls, 0);
+        expect(unauthorized, 0);
+      });
+    }
   });
 }
