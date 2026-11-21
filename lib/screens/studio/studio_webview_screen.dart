@@ -15,6 +15,7 @@ import '../../providers/auth_provider.dart';
 import '../../providers/locale_provider.dart';
 import '../../services/pdf_share_service.dart';
 import '../../widgets/common/error_view.dart';
+import 'external_link.dart';
 import 'studio_auth_gate.dart';
 import 'studio_freshness.dart';
 import 'studio_session.dart';
@@ -290,6 +291,11 @@ class _StudioWebViewScreenState extends ConsumerState<StudioWebViewScreen>
       ..addJavaScriptChannel(
         studioAuthGateChannel,
         onMessageReceived: (m) => _onAuthGate(m.message),
+      )
+      // A map, Telegram or product link from the smeta: see external_link.dart.
+      ..addJavaScriptChannel(
+        externalLinkChannel,
+        onMessageReceived: (m) => openExternalLink(m.message),
       )
       // The Studio tour's open/closed state: see studio_tour_bridge.dart.
       ..addJavaScriptChannel(
