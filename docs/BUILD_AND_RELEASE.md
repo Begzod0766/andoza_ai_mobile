@@ -64,6 +64,29 @@ emulyatorlarda u ilovani yiqitardi.
 - Xcode'dan archive qilinganda (Automatic signing) extension'ning App ID va profili avtomatik yaratiladi.
 - CI'da qo'lda imzolash (`ios.yml`) uchun extension'ga ham alohida App Store provisioning profile va `ExportOptions.plist`'da ikkinchi qator kerak bo'ladi.
 
+## iOS: IPA va App Store Connect'ga yuklash
+
+`UPLOAD=1 ./scripts/build_ios_ipa.sh` uchta ishni bajaradi:
+- IPA'ni yig'adi;
+- uni Xcode'ning bulutdagi Distribution sertifikati bilan imzolaydi;
+- App Store Connect'ga yuklaydi.
+
+Imzolash va yuklash uchun **App Store Connect API kaliti** ishlatiladi. Xcode hisobi sessiyasi relizlar orasida yo'qolib qolardi (2026-11-19/21), shuning uchun kalit ma'qulroq. Kalitni bir marta, repo'dan tashqarida sozlaysiz:
+
+1. App Store Connect → Users and Access → Integrations → Keys'da «App Manager» huquqli kalit yarating. `.p8` faylni yuklab oling. Uni faqat bir marta yuklab olish mumkin.
+2. Faylni joylang: `mkdir -p ~/.appstoreconnect && mv AuthKey_<KEY_ID>.p8 ~/.appstoreconnect/ && chmod 600 ~/.appstoreconnect/AuthKey_<KEY_ID>.p8`.
+3. `~/.appstoreconnect/andoza.env` fayliga yozing:
+   ```
+   ASC_KEY_ID=<Key ID>
+   ASC_ISSUER_ID=<Issuer ID>
+   ```
+
+Skript kalitni topsa, «Signing and upload with the App Store Connect API key …» deb yozadi. Kalit topilmasa, avvalgidek Xcode hisobidan foydalanadi.
+
+`.p8` imzolash materiali hisoblanadi:
+- repo'ga commit qilinmaydi (`.gitignore` da `*.p8` bor);
+- skript uni hech qayerga chiqarmaydi.
+
 ## Versiya
 
 `pubspec.yaml` dagi `version: 1.0.0+N` qo'lda oshiriladi (`+N` — build raqami,

@@ -15,8 +15,17 @@
 # Notifications enabled on the App ID uz.andozaai.app in the developer portal.
 #
 # Output: build/ios/ipa-appstore/*.ipa (upload with Transporter or Xcode).
-# UPLOAD=1 ./scripts/build_ios_ipa.sh also sends the build to App Store Connect
-# through the Xcode account (no password or API key needed here).
+# UPLOAD=1 ./scripts/build_ios_ipa.sh also sends the build to App Store Connect.
+#
+# Cloud signing and upload need either the Xcode account (Settings → Accounts) or an
+# App Store Connect API key. The key is preferred: the Xcode account session kept
+# getting lost between releases (2026-11-19/21). Set up once, outside the repo:
+#   ~/.appstoreconnect/AuthKey_<KEY_ID>.p8   (downloaded from App Store Connect →
+#                                             Users and Access → Integrations → Keys,
+#                                             role App Manager; chmod 600)
+#   ~/.appstoreconnect/andoza.env            with  ASC_KEY_ID=...  ASC_ISSUER_ID=...
+# or export ASC_KEY_ID / ASC_ISSUER_ID (and optionally ASC_KEY_PATH) in the shell.
+# Never commit the .p8 (.gitignore has *.p8); this script never prints it.
 set -euo pipefail
 
 TEAM=L797T8GBY4
@@ -26,6 +35,22 @@ BASE=${API_BASE_URL:-https://andozaai.uz}
 STUDIO=${STUDIO_BASE_URL:-https://andozaai.uz}
 
 cd "$(dirname "$0")/.."
+
+# App Store Connect API key, if configured (see the header). Without it the export
+# falls back to the Xcode account, as before.
+ASC_ENV="$HOME/.appstoreconnect/andoza.env"
+# shellcheck disable=SC1090
+[ -f "$ASC_ENV" ] && . "$ASC_ENV"
+AUTH=()
+if [ -n "${ASC_KEY_ID:-}" ] && [ -n "${ASC_ISSUER_ID:-}" ]; then
+  ASC_KEY_PATH=${ASC_KEY_PATH:-$HOME/.appstoreconnect/AuthKey_${ASC_KEY_ID}.p8}
+  [ -f "$ASC_KEY_PATH" ] || { echo "ASC key file not found: $ASC_KEY_PATH" >&2; exit 1; }
+  AUTH=(-authenticationKeyPath "$ASC_KEY_PATH" -authenticationKeyID "$ASC_KEY_ID"
+        -authenticationKeyIssuerID "$ASC_ISSUER_ID")
+  echo "Signing and upload with the App Store Connect API key $ASC_KEY_ID"
+else
+  echo "No App Store Connect API key configured; using the Xcode account"
+fi
 OUT=build/ios/ipa-appstore
 WORK=$(mktemp -d)
 trap 'rm -rf "$WORK"' EXIT
@@ -86,7 +111,7 @@ cat > "$WORK/export.plist" <<EOF
 EOF
 rm -rf "$OUT"
 xcodebuild -exportArchive -archivePath "$ARCHIVE" -exportPath "$OUT" \
-  -exportOptionsPlist "$WORK/export.plist" -allowProvisioningUpdates
+  -exportOptionsPlist "$WORK/export.plist" -allowProvisioningUpdates ${AUTH[@]+"${AUTH[@]}"}
 
 IPA=$(ls "$OUT"/*.ipa)
 mkdir "$WORK/check" && unzip -q "$IPA" -d "$WORK/check"
@@ -99,6 +124,6 @@ echo "OK: $IPA"
 if [ "${UPLOAD:-0}" = "1" ]; then
   sed 's|<string>export</string>|<string>upload</string>|' "$WORK/export.plist" > "$WORK/upload.plist"
   xcodebuild -exportArchive -archivePath "$ARCHIVE" -exportPath "$WORK/upload" \
-    -exportOptionsPlist "$WORK/upload.plist" -allowProvisioningUpdates
+    -exportOptionsPlist "$WORK/upload.plist" -allowProvisioningUpdates ${AUTH[@]+"${AUTH[@]}"}
   echo "Uploaded; App Store Connect processes it for ~15-30 min before TestFlight shows it."
 fi
