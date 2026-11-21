@@ -9,6 +9,7 @@ import '../../l10n/app_localizations.dart';
 import '../../providers/auth_provider.dart';
 import '../../providers/locale_provider.dart';
 import '../../widgets/common/error_view.dart';
+import '../studio/external_link.dart';
 import '../studio/studio_auth_gate.dart';
 import '../studio/studio_session.dart';
 import '../studio/studio_webview_screen.dart' show studioPageUrl;
@@ -79,6 +80,11 @@ class _MebelWebViewScreenState extends ConsumerState<MebelWebViewScreen> {
       ..addJavaScriptChannel(
         studioAuthGateChannel,
         onMessageReceived: (m) => _onAuthGate(m.message),
+      )
+      // A shop's Telegram or product page: opened outside the app.
+      ..addJavaScriptChannel(
+        externalLinkChannel,
+        onMessageReceived: (m) => openExternalLink(m.message),
       )
       ..setNavigationDelegate(
         NavigationDelegate(
