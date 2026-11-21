@@ -16,11 +16,17 @@ const supportedAppLocales = [
 ];
 
 /// The supported language matching [system] (the phone's first language),
-/// else Uzbek.
-Locale appLocaleFor(Locale system) => supportedAppLocales.firstWhere(
-      (l) => l.languageCode == system.languageCode,
-      orElse: () => supportedAppLocales.first,
-    );
+/// else Uzbek. An English phone set to Uzbekistan (`en-UZ`, common there)
+/// starts in Uzbek: owner's call, 2026-11-21.
+Locale appLocaleFor(Locale system) {
+  if (system.languageCode == 'en' && system.countryCode == 'UZ') {
+    return supportedAppLocales.first;
+  }
+  return supportedAppLocales.firstWhere(
+    (l) => l.languageCode == system.languageCode,
+    orElse: () => supportedAppLocales.first,
+  );
+}
 
 /// The app language: the one the user picked, else the phone's when the app
 /// has it, else Uzbek.

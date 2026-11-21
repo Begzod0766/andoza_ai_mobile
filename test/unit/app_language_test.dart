@@ -121,6 +121,16 @@ void main() {
     expect(appLocaleFor(const Locale('de')), const Locale('uz'));
   });
 
+  // Owner, 2026-11-21: many phones in Uzbekistan run English with region UZ
+  // (en-UZ); the app starts in Uzbek there until the user picks a language.
+  test('an English phone set to Uzbekistan starts in Uzbek', () {
+    expect(appLocaleFor(const Locale('en', 'UZ')), const Locale('uz'));
+    expect(appLocaleFor(const Locale('ru', 'UZ')), const Locale('ru'));
+    expect(appLocaleFor(const Locale('uz', 'UZ')), const Locale('uz'));
+    expect(appLocaleFor(const Locale('en', 'GB')), const Locale('en'));
+    expect(appLocaleFor(const Locale('en')), const Locale('en'));
+  });
+
   test('every request carries the current language as Accept-Language', () async {
     final c = container();
     final api = c.read(apiClientProvider);
