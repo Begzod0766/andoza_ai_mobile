@@ -15,6 +15,7 @@ import '../../providers/auth_provider.dart';
 import '../../providers/locale_provider.dart';
 import '../../services/pdf_share_service.dart';
 import '../../widgets/common/error_view.dart';
+import 'eager_web_view.dart';
 import 'external_link.dart';
 import 'studio_auth_gate.dart';
 import 'studio_freshness.dart';
@@ -629,7 +630,7 @@ class _StudioWebViewScreenState extends ConsumerState<StudioWebViewScreen>
                 child: Stack(
                   children: [
                     if (_error == null && _controller != null)
-                      WebViewWidget(controller: _controller!),
+                      EagerWebView(controller: _controller!),
                     if (_loading && _error == null)
                       const Center(child: CircularProgressIndicator()),
                     if (_error != null)

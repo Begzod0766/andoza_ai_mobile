@@ -9,6 +9,7 @@ import '../../l10n/app_localizations.dart';
 import '../../providers/auth_provider.dart';
 import '../../providers/locale_provider.dart';
 import '../../widgets/common/error_view.dart';
+import '../studio/eager_web_view.dart';
 import '../studio/external_link.dart';
 import '../studio/studio_auth_gate.dart';
 import '../studio/studio_session.dart';
@@ -224,7 +225,7 @@ class _MebelWebViewScreenState extends ConsumerState<MebelWebViewScreen> {
           top: false,
           child: Stack(
             children: [
-              if (error == null && _controller != null) WebViewWidget(controller: _controller!),
+              if (error == null && _controller != null) EagerWebView(controller: _controller!),
               if (_loading && error == null) const Center(child: CircularProgressIndicator()),
               if (error != null) ErrorView(message: error, onRetry: _retry, icon: Icons.chair_outlined),
             ],

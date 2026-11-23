@@ -12,6 +12,7 @@ import 'services/push_service.dart';
 import 'services/session_telemetry.dart';
 import 'services/share_intent.dart';
 import 'utils/error_mapper.dart';
+import 'widgets/common/dismiss_keyboard_on_tap.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -46,20 +47,13 @@ class MyApp extends ConsumerWidget {
       localizationsDelegates: AppLocalizations.localizationsDelegates,
       supportedLocales: AppLocalizations.supportedLocales,
       routerConfig: router,
-      // A tap on empty space closes the keyboard. iOS number and phone pads
-      // have no return key, so without this a phone or ceiling field could
-      // not be dismissed and kept the buttons under it hidden. Taps on
-      // controls still go to the controls: they win the gesture arena.
+      // A tap on empty space closes the keyboard (see DismissKeyboardOnTap).
       builder: (context, child) => AnnotatedRegion<SystemUiOverlayStyle>(
         // The app is light: dark status-bar icons by default. A dark screen
         // (the 360° scan) declares light icons over this; without a default
         // here its light icons stuck after leaving it, white on white.
         value: SystemUiOverlayStyle.dark,
-        child: GestureDetector(
-          behavior: HitTestBehavior.translucent,
-          onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
-          child: child,
-        ),
+        child: DismissKeyboardOnTap(child: child!),
       ),
     );
   }
