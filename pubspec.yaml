@@ -105,6 +105,8 @@ dev_dependencies:
 
   # Testing
   mocktail: ^1.0.0
+  # Fake WebView platform in widget tests (already a transitive dependency).
+  webview_flutter_platform_interface: ^2.15.1
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
