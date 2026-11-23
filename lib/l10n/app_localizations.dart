@@ -406,11 +406,11 @@ abstract class AppLocalizations {
   /// **'Ta\'mir va interyer loyihalaringiz bir joyda'**
   String get loginTagline;
 
-  /// Login: app-version footnote below the auth card.
+  /// Login: app-version footnote below the auth card. {version} is the installed app version from package_info_plus, e.g. 1.0.3.
   ///
   /// In uz, this message translates to:
-  /// **'AndozaAI v1.0.0'**
-  String get loginVersion;
+  /// **'AndozaAI v{version}'**
+  String loginVersion(String version);
 
   /// Login error: the entered phone number is invalid, with an example format.
   ///

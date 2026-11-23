@@ -203,9 +203,14 @@
   "@loginTagline": {
     "description": "Login: tagline under the brand name above the auth card."
   },
-  "loginVersion": "AndozaAI v1.0.0",
+  "loginVersion": "AndozaAI v{version}",
   "@loginVersion": {
-    "description": "Login: app-version footnote below the auth card."
+    "description": "Login: app-version footnote below the auth card. {version} is the installed app version, e.g. 1.0.3.",
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
   },
   "loginErrorInvalidPhone": "Неверный номер телефона. Например: 90 123 45 67",
   "@loginErrorInvalidPhone": {

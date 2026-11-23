@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 import 'package:tamir_uy_mobile_flutter/screens/auth/login_screen.dart';
 
 import '../support/localized_pump.dart';
@@ -59,5 +60,19 @@ void main() {
     await tester.tap(find.byTooltip("Parolni ko'rsatish"));
     await tester.pumpAndSettle();
     expect(find.byTooltip('Parolni yashirish'), findsOneWidget);
+  });
+
+  testWidgets('the version under the card is the installed app version', (tester) async {
+    PackageInfo.setMockInitialValues(
+      appName: 'AndozaAI',
+      packageName: 'uz.andozaai.app',
+      version: '1.0.3',
+      buildNumber: '36',
+      buildSignature: '',
+    );
+    await tester.pumpWidget(wrap());
+    await tester.pumpAndSettle();
+    expect(find.text('AndozaAI v1.0.3'), findsOneWidget);
+    expect(find.text('AndozaAI v1.0.0'), findsNothing);
   });
 }

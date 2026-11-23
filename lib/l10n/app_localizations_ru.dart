@@ -167,7 +167,9 @@ class AppLocalizationsRu extends AppLocalizations {
   String get loginTagline => 'Проекты ремонта и интерьера в одном месте';
 
   @override
-  String get loginVersion => 'AndozaAI v1.0.0';
+  String loginVersion(String version) {
+    return 'AndozaAI v$version';
+  }
 
   @override
   String get loginErrorInvalidPhone =>

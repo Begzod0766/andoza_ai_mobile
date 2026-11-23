@@ -169,7 +169,9 @@ class AppLocalizationsEn extends AppLocalizations {
       'Your renovation and interior projects in one place';
 
   @override
-  String get loginVersion => 'AndozaAI v1.0.0';
+  String loginVersion(String version) {
+    return 'AndozaAI v$version';
+  }
 
   @override
   String get loginErrorInvalidPhone =>

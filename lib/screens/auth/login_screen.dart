@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 
 import '../../config/app_config.dart';
 import '../../config/design_tokens.dart';
@@ -962,13 +963,39 @@ class _BrandHeader extends StatelessWidget {
   }
 }
 
-/// Static app-version footnote below the auth card. `const` for the same reason.
-class _VersionLabel extends StatelessWidget {
+/// App-version footnote below the auth card: the installed version from
+/// [PackageInfo] (e.g. "AndozaAI v1.0.3"), like the settings screen shows it.
+/// Empty until it has loaded, or if the platform can't report it.
+class _VersionLabel extends StatefulWidget {
   const _VersionLabel();
 
   @override
+  State<_VersionLabel> createState() => _VersionLabelState();
+}
+
+class _VersionLabelState extends State<_VersionLabel> {
+  String? _version;
+
+  @override
+  void initState() {
+    super.initState();
+    _load();
+  }
+
+  Future<void> _load() async {
+    try {
+      final info = await PackageInfo.fromPlatform();
+      if (mounted) setState(() => _version = info.version);
+    } catch (_) {
+      // No version to show — leave the line empty rather than a wrong one.
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return Text(AppLocalizations.of(context)!.loginVersion,
+    final version = _version;
+    return Text(
+        version == null ? '' : AppLocalizations.of(context)!.loginVersion(version),
         style: DesignTokens.caption.copyWith(color: DesignTokens.textMuted));
   }
 }

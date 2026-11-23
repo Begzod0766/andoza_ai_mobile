@@ -1,9 +1,11 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:riverpod/riverpod.dart';
 import 'package:tamir_uy_mobile_flutter/models/api/api.dart';
+import 'package:tamir_uy_mobile_flutter/models/project_item.dart';
 import 'package:tamir_uy_mobile_flutter/models/room_model.dart';
 import 'package:tamir_uy_mobile_flutter/models/room_plan.dart';
 import 'package:tamir_uy_mobile_flutter/providers/apartment_provider.dart';
+import 'package:tamir_uy_mobile_flutter/providers/projects_provider.dart';
 import 'package:tamir_uy_mobile_flutter/providers/room_persistence_provider.dart';
 import 'package:tamir_uy_mobile_flutter/providers/room_provider.dart';
 import 'package:tamir_uy_mobile_flutter/repositories/apartment_repository.dart';
@@ -134,5 +136,38 @@ void main() {
         );
     await p.ensurePersisted();
     expect(repo.bodies.single.toJson().containsKey('room_type'), isFalse);
+  });
+
+  // QA 2026-11-23: after the wizard, Home's card read «—» for area, models and
+  // estimate — it was the wizard's local placeholder (no room id, no area),
+  // because the project list was never fetched again once the room was saved.
+  test('a saved room replaces its Home placeholder with the server project', () async {
+    var fetches = 0;
+    c.dispose();
+    c = ProviderContainer(overrides: [
+      apartmentRepositoryProvider.overrideWithValue(repo),
+      apartmentsProvider.overrideWith((ref) async {
+        fetches++;
+        return const <Apartment>[];
+      }),
+    ]);
+    final p = c.read(roomPersistenceProvider.notifier)..startNewProject();
+    newLocalRoom();
+    final clientId = c.read(activeRoomProvider)!.id;
+    c.read(homeStateProvider.notifier).addProject(ProjectItem(
+          id: clientId,
+          name: 'Yotoqxona',
+          location: '',
+          roomCount: 1,
+          createdAt: DateTime(2026),
+        ));
+    await c.read(apartmentsProvider.future);
+    expect(fetches, 1);
+
+    await p.ensurePersisted(override: _body);
+
+    expect(c.read(homeStateProvider).projects.map((e) => e.id), isNot(contains(clientId)));
+    await c.read(apartmentsProvider.future);
+    expect(fetches, 2);
   });
 }
