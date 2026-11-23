@@ -167,7 +167,9 @@ class AppLocalizationsUz extends AppLocalizations {
   String get loginTagline => 'Ta\'mir va interyer loyihalaringiz bir joyda';
 
   @override
-  String get loginVersion => 'AndozaAI v1.0.0';
+  String loginVersion(String version) {
+    return 'AndozaAI v$version';
+  }
 
   @override
   String get loginErrorInvalidPhone =>
