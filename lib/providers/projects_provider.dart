@@ -50,7 +50,9 @@ ProjectItem _apartmentToProject(Apartment a) {
     studioRoomId: rooms.isNotEmpty ? rooms.first.id : null,
     thumbnailUrl: rooms.isNotEmpty ? rooms.first.thumbnailUrl : null,
     floorArea: rooms.isNotEmpty ? rooms.first.floorArea : null,
-    furnitureCount: rooms.isNotEmpty ? rooms.first.furnitureLayout?.length : null,
+    // A saved room with no layout yet has 0 models — known, not unknown.
+    furnitureCount:
+        rooms.isNotEmpty ? (rooms.first.furnitureLayout?.length ?? 0) : null,
   );
 }
 

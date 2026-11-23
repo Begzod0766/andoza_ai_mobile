@@ -111,5 +111,16 @@ void main() {
       expect(container.read(projectsProvider).requireValue.single.studioRoomId,
           isNull);
     });
+
+    test('a room with no furniture yet counts 0 models, and its area shows', () async {
+      final container = await _container([
+        _apartment(id: 'srv-1', rooms: [
+          RoomOut(id: 'r1', apartmentId: 'srv-1', name: 'Yotoqxona', floorArea: 14.0, updatedAt: DateTime(2026)),
+        ]),
+      ]);
+      final p = container.read(projectsProvider).requireValue.single;
+      expect(p.floorArea, 14.0);
+      expect(p.furnitureCount, 0);
+    });
   });
 }

@@ -7,6 +7,7 @@ import '../utils/room_geometry_mapper.dart';
 import 'apartment_provider.dart';
 import 'design_provider.dart';
 import 'estimate_api_provider.dart';
+import 'projects_provider.dart';
 import 'room_provider.dart';
 
 /// A room that has been persisted to the backend, tying the local client-room
@@ -111,6 +112,11 @@ class RoomPersistenceNotifier
       state = AsyncValue.data(
         PersistedRoom(clientRoomId: clientRoom.id, room: room),
       );
+      // The flow put a local placeholder on Home under the client room id (no
+      // room id, area or estimate, so its stats read «—»). Now the room is on
+      // the server: drop the placeholder and fetch the real project instead.
+      _ref.read(homeStateProvider.notifier).removeProject(clientRoom.id);
+      _ref.invalidate(apartmentsProvider);
       // Every flow that saves a room (wizard, drawing, LiDAR/ARCore scan
       // handoff, photo, …) lands here exactly once per room, so this is the
       // single place room_created is logged — only after the save succeeded.
